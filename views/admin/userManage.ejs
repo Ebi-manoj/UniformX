@@ -1,4 +1,4 @@
-<div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
+<div class="w-full max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6">
   <div class="flex justify-between items-center mb-4">
     <h2 class="text-xl font-semibold">Users</h2>
     <div class="relative">
@@ -16,69 +16,46 @@
       </button>
     </div>
   </div>
-  <!-- ..........................Table start from here............................ -->
-  <table class="w-full border-collapse rounded-lg overflow-hidden">
-    <thead class="bg-gray-100">
-      <tr>
-        <th class="text-left p-3">Name</th>
-        <th class="text-left p-3">Email</th>
-        <th class="text-left p-3">Joined Date</th>
-        <th class="text-left p-3">Status</th>
-      </tr>
-    </thead>
-    <tbody id="userTable" class="bg-white divide-y">
-      <% users.forEach(user => { %>
-      <tr>
-        <td class="p-3"><%= user.name %></td>
-        <td class="p-3"><%= user.email %></td>
-        <td class="p-3"><%= user.joinedDate %></td>
-        <td class="p-3">
-          <label class="flex items-center cursor-pointer">
-            <input type="checkbox" class="hidden peer toggle-status"
-            data-id="<%= user._id %>" data-status="<%= user.isBlocked %>" <%=
-            user.isBlocked ? 'checked' : '' %> />
-            <div
-              class="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 relative transition-all"
-            >
+
+  <!-- Table Wrapper for Responsiveness -->
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse rounded-lg overflow-hidden">
+      <thead class="bg-gray-100 border-b">
+        <tr>
+          <th class="text-left p-3 border-b">Name</th>
+          <th class="text-left p-3 border-b">Email</th>
+          <th class="text-left p-3 border-b">Joined Date</th>
+          <th class="text-left p-3 border-b text-center">Status</th>
+        </tr>
+      </thead>
+      <tbody id="userTable" class="bg-white divide-y">
+        <% users.forEach(user => { %>
+        <tr>
+          <td class="p-3"><%= user.name %></td>
+          <td class="p-3"><%= user.email %></td>
+          <td class="p-3"><%= user.joinedDate %></td>
+          <td class="p-3 flex justify-center">
+            <label class="flex items-center cursor-pointer">
+              <input type="checkbox" class="hidden peer toggle-status"
+              data-id="<%= user._id %>" data-status="<%= user.isBlocked %>" <%=
+              user.isBlocked ? 'checked' : '' %> />
               <div
-                class="w-5 h-5 bg-white rounded-full absolute left-1 top-0.5 peer-checked:left-6 transition-all"
-              ></div>
-            </div>
-          </label>
-        </td>
-      </tr>
-      <% }) %>
-    </tbody>
-  </table>
-
-  <!-- Pagination Controls -->
-  <div class="flex justify-between items-center mt-4">
-    <span class="text-gray-600">Total Users: <%= totalUsers %></span>
-
-    <div>
-      <% if (currentPage > 1) { %>
-      <a
-        href="?page=<%= currentPage - 1 %>&search=<%= searchQuery %>"
-        class="px-3 py-1 bg-gray-200 rounded"
-        >Previous</a
-      >
-      <% } %>
-
-      <span class="px-3 py-1 bg-gray-300 rounded"
-        ><%= currentPage %> / <%= totalPages %></span
-      >
-
-      <% if (currentPage < totalPages) { %>
-      <a
-        href="?page=<%= currentPage + 1 %>&search=<%= searchQuery %>"
-        class="px-3 py-1 bg-gray-200 rounded"
-        >Next</a
-      >
-      <% } %>
-    </div>
+                class="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 relative transition-all"
+              >
+                <div
+                  class="w-5 h-5 bg-white rounded-full absolute left-1 top-0.5 peer-checked:left-6 transition-all"
+                ></div>
+              </div>
+            </label>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
   </div>
-  <!--..............................................................................................  -->
-  <div class="flex justify-between items-center mt-4">
+
+  <!-- Additional Pagination -->
+  <div class="flex justify-between items-center mt-10">
     <p class="text-sm text-gray-500">Showing 1-10 of 50</p>
     <div class="flex space-x-2">
       <button class="px-3 py-1 bg-gray-200 rounded">&lt;</button>

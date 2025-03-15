@@ -45,3 +45,11 @@ export const getDashboard = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('login');
   res.render('admin/dashboard');
 });
+
+export const logout = asyncHandler(async (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'strict',
+  });
+  res.redirect('login');
+});
