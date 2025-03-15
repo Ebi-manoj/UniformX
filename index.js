@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
+import nocache from 'nocache';
 import { fileURLToPath } from 'url';
 import { errorhandling } from './middlewares/error_handling.js';
 import { connectDB } from './config/db.js';
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
+app.use(nocache());
 
 //set view engine
 app.use(expressLayouts);

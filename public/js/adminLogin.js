@@ -5,21 +5,43 @@ const error_message = document.querySelector('.error-message');
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 console.log('logged');
 
-admin_form.addEventListener('submit', e => {
-  console.log('started');
-
+admin_form.addEventListener('submit', async e => {
   e.preventDefault();
   let messages = [];
+
   if (!emailPattern.test(email.value) || password.value.length <= 1) {
-    messages.push('Invalid Credintials');
+    messages.push('Invalid Credentials');
   }
+
   if (messages.length) {
     console.log(error_message);
     console.log(messages);
-
     error_message.textContent = messages[0];
     error_message.classList.remove('hidden');
   } else {
-    admin_form.submit();
+    try {
+      const response = await fetch('login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.value,
+          password: password.value,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        error_message.textContent = data.message;
+        error_message.classList.remove('hidden');
+      } else {
+        window.location.href = 'dashboard';
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      error_message.textContent = 'Something went wrong. Try again!';
+      error_message.classList.remove('hidden');
+    }
   }
 });
