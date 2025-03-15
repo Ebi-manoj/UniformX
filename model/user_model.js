@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
+    required: true,
+    unique: true,
   },
   password: {
     type: String,
@@ -25,10 +27,6 @@ const userSchema = new mongoose.Schema({
   join_date: {
     type: Date,
     default: Date.now,
-  },
-  role: {
-    type: String,
-    default: 'user',
   },
   status: {
     type: String,

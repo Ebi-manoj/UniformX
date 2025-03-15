@@ -2,12 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, initial-scale=0.8"
+    />
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/styles/admin/admin_sidebar.css" />
     <link rel="stylesheet" href="/styles/admin/admin_dashboard.css" />
+    <link rel="stylesheet" href="/styles/admin/admin_sidebar.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
     <%- include('../partials/admin_sidebar') %> <%- body %>
+    <script src="/js/userManage.js"></script>
   </body>
 </html>
