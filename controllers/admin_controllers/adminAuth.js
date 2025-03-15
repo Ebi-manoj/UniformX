@@ -43,5 +43,5 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
 export const getDashboard = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('login');
-  res.send('Admin dashboard');
+  res.render('admin/dashboard');
 });

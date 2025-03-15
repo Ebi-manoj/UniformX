@@ -6,7 +6,7 @@ export const isProtected = asyncHandler(async (req, res, next) => {
   if (!token) {
     console.log('no token');
 
-    return res.redirect('/login');
+    return res.redirect('login');
   }
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);

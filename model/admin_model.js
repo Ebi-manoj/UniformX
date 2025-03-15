@@ -18,10 +18,14 @@ const adminSchema = new mongoose.Schema({
 });
 
 adminSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
+  try {
+    if (this.isModified('password')) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  next();
 });
 
 export const Admin = mongoose.model('admin', adminSchema);

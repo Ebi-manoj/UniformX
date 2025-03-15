@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { errorhandling } from './middlewares/error_handling.js';
 import { connectDB } from './config/db.js';
 import { Admin } from './model/admin_model.js';
+import { User } from './model/user_model.js';
 import adminRoutes from './routes/admin_routes.js';
 
 dotenv.config();
@@ -52,4 +53,32 @@ async function createAdmin() {
   }
 }
 
-// createAdmin();
+const createUser = async () => {
+  try {
+    const users = [
+      {
+        full_name: 'Alice Johnson',
+        email: 'alice@example.com',
+        phone: '9876543210',
+        password: 'password123',
+      },
+      {
+        full_name: 'Bob Williams',
+        email: 'bob@example.com',
+        phone: '9876543211',
+        password: 'password456',
+      },
+      {
+        full_name: 'Charlie Brown',
+        email: 'charlie@example.com',
+        phone: '9876543212',
+        password: 'password789',
+      },
+    ];
+
+    const savedUser = await User.create(users);
+    console.log('User created successfully:', savedUser);
+  } catch (error) {
+    console.error('Error creating user:', error.message);
+  }
+};
