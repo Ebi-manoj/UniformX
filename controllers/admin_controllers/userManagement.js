@@ -26,6 +26,7 @@ export const getUser = asyncHandler(async (req, res) => {
     .limit(limit);
 
   res.render('admin/userManage', {
+    cssFile: 'user_manage',
     users,
     currentPage: page,
     totalPages,

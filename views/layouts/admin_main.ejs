@@ -7,12 +7,14 @@
       content="width=device-width, initial-scale=1, initial-scale=0.8"
     />
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="/styles/admin/admin_dashboard.css" />
-    <link rel="stylesheet" href="/styles/admin/admin_sidebar.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles/admin/<%= cssFile %>.css" />
+    <link rel="stylesheet" href="/styles/admin/admin_sidebar.css" />
+    <!-- <link rel="stylesheet" href="/styles/admin/user_manage.css" /> -->
   </head>
   <body>
     <%- include('../partials/admin_sidebar') %> <%- body %>
+    <script src="/js/common.js"></script>
     <script src="/js/userManage.js"></script>
   </body>
 </html>

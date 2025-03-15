@@ -31,19 +31,26 @@
       <tbody id="userTable" class="bg-white divide-y">
         <% users.forEach(user => { %>
         <tr>
-          <td class="p-3"><%= user.name %></td>
+          <td class="p-3"><%= user.full_name %></td>
           <td class="p-3"><%= user.email %></td>
-          <td class="p-3"><%= user.joinedDate %></td>
+          <td class="p-3">
+            <%= new Date(user.join_date).toLocaleDateString("en-GB", { day:
+            "2-digit", month: "short", year: "numeric" }) %>
+          </td>
           <td class="p-3 flex justify-center">
             <label class="flex items-center cursor-pointer">
+              <!-- Hidden Checkbox -->
               <input type="checkbox" class="hidden peer toggle-status"
-              data-id="<%= user._id %>" data-status="<%= user.isBlocked %>" <%=
-              user.isBlocked ? 'checked' : '' %> />
+              data-id="<%= user._id %>" data-status="<%= user.is_blocked %>" <%=
+              user.is_blocked ? 'checked' : '' %> />
+
+              <!-- Outer Track -->
               <div
-                class="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 relative transition-all"
+                class="w-12 h-6 bg-gray-300 rounded-full relative transition-all peer-checked:bg-green-500 toggle-track"
               >
+                <!-- Toggle Circle -->
                 <div
-                  class="w-5 h-5 bg-white rounded-full absolute left-1 top-0.5 peer-checked:left-6 transition-all"
+                  class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-1 transition-all peer-checked:translate-x-6 toggle-circle"
                 ></div>
               </div>
             </label>
