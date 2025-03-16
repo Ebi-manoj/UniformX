@@ -7,15 +7,16 @@
       content="width=device-width, initial-scale=1, initial-scale=0.8"
     />
     <title>Admin Dashboard</title>
-    <!-- css file renderinggg -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- css file renderinggg -->
     <link rel="stylesheet" href="/styles/admin/<%= cssFile %>.css" />
     <link rel="stylesheet" href="/styles/admin/admin_sidebar.css" />
 
     <!-- js file rendering... -->
     <script src="/js/admin/common.js" defer></script>
     <% if (js_file) { %>
-    <script src="/js/admin/<%= js_file %>.js" defer></script>
+    <script type="module" src="/js/admin/<%= js_file %>.js" defer></script>
     <% } %>
   </head>
   <body>

@@ -50,40 +50,41 @@ document.addEventListener('DOMContentLoaded', function () {
   toggleButtons.forEach(toggle => {
     toggle.addEventListener('change', function () {
       const userId = this.dataset.id;
-      const isBlocked = this.checked; // true if checked, false otherwise
+      const isBlocked = this.checked;
 
-      const action = isBlocked ? 'block' : 'unblock';
-      const confirmation = confirm(
-        `Are you sure you want to ${action} this user?`
-      );
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you want to ${isBlocked ? 'block' : 'unblock'} this user?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, do it!',
+        cancelButtonText: 'Cancel',
+      }).then(result => {
+        if (!result.isConfirmed) {
+          this.checked = !isBlocked; // Revert toggle if cancelled
+          return;
+        }
 
-      if (!confirmation) {
-        // Revert the checkbox state if action is canceled
-        this.checked = !isBlocked;
-        return;
-      }
-      console.log(userId);
-
-      // Send an AJAX request to update the status
-      fetch(`customers/block/${userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isBlocked }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (!data.success) {
-            alert('Failed to update status!');
-            this.checked = !isBlocked; // Revert toggle if error occurs
-          } else {
-            console.log('updated');
-          }
+        fetch(`customers/block/${userId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isBlocked }),
         })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Something went wrong!');
-          this.checked = !isBlocked;
-        });
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              Swal.fire('Error', 'Failed to update status!', 'error');
+              this.checked = !isBlocked; // Revert toggle if error occurs
+            } else {
+              Swal.fire('Success', 'User status updated!', 'success');
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            Swal.fire('Error', 'Something went wrong!', 'error');
+            this.checked = !isBlocked;
+          });
+      });
     });
   });
 
