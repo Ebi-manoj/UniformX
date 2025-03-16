@@ -4,13 +4,13 @@
     <div class="relative">
       <input
         type="text"
-        id="search"
-        placeholder="Search users..."
-        class="border rounded-lg px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300"
+        id="searchInput"
+        class="border p-2 w-full"
+        placeholder="Search..."
       />
       <button
-        onclick="clearSearch()"
-        class="absolute right-2 top-2 text-gray-500"
+        id="clearButton"
+        class="absolute right-2 top-2 text-gray-500 hidden"
       >
         ✖
       </button>
@@ -25,7 +25,7 @@
           <th class="text-left p-3 border-b">Name</th>
           <th class="text-left p-3 border-b">Email</th>
           <th class="text-left p-3 border-b">Joined Date</th>
-          <th class="text-left p-3 border-b text-center">Status</th>
+          <th class="text-left p-3 border-b text-center">Block</th>
         </tr>
       </thead>
       <tbody id="userTable" class="bg-white divide-y">
@@ -46,7 +46,7 @@
 
               <!-- Outer Track -->
               <div
-                class="w-12 h-6 bg-gray-300 rounded-full relative transition-all peer-checked:bg-green-500 toggle-track"
+                class="w-12 h-6 bg-gray-300 rounded-full relative transition-all peer-checked:bg-red-500 toggle-track"
               >
                 <!-- Toggle Circle -->
                 <div
@@ -62,15 +62,31 @@
   </div>
 
   <!-- Additional Pagination -->
+
   <div class="flex justify-between items-center mt-10">
-    <p class="text-sm text-gray-500">Showing 1-10 of 50</p>
+    <p class="text-sm text-gray-500">
+      Showing <%= (page - 1) * limit + 1 %>-<%= Math.min(page * limit,
+      totalUsers) %> of <%= totalUsers %>
+    </p>
+    <% if (page>1) { %>
     <div class="flex space-x-2">
-      <button class="px-3 py-1 bg-gray-200 rounded">&lt;</button>
-      <button class="px-3 py-1 bg-gray-800 text-white rounded">1</button>
-      <button class="px-3 py-1 bg-gray-200 rounded">2</button>
-      <button class="px-3 py-1 bg-gray-200 rounded">...</button>
-      <button class="px-3 py-1 bg-gray-200 rounded">5</button>
-      <button class="px-3 py-1 bg-gray-200 rounded">&gt;</button>
+      <% if (page > 1) { %>
+      <a href="?page=<%= page - 1 %>" class="px-3 py-1 bg-gray-200 rounded"
+        >&lt;</a
+      >
+      <% } %> <% for (let i = 1; i <= totalPages; i++) { %> <% if (i === page) {
+      %>
+      <span class="px-3 py-1 bg-gray-800 text-white rounded"><%= i %></span>
+      <% } else { %>
+      <a href="?page=<%= i %>" class="px-3 py-1 bg-gray-200 rounded"
+        ><%= i %></a
+      >
+      <% } %> <% } %> <% if (page < totalPages) { %>
+      <a href="?page=<%= page + 1 %>" class="px-3 py-1 bg-gray-200 rounded"
+        >&gt;</a
+      >
+      <% } %>
     </div>
+    <% } %>
   </div>
 </div>

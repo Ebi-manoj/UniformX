@@ -10,11 +10,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/styles/admin/<%= cssFile %>.css" />
     <link rel="stylesheet" href="/styles/admin/admin_sidebar.css" />
-    <!-- <link rel="stylesheet" href="/styles/admin/user_manage.css" /> -->
   </head>
   <body>
     <%- include('../partials/admin_sidebar') %> <%- body %>
-    <script src="/js/common.js"></script>
-    <script src="/js/userManage.js"></script>
+    <script src="/js/common.js" defer></script>
+    <script src="/js/userManage.js" defer></script>
   </body>
 </html>

@@ -1,10 +1,30 @@
 document.addEventListener('DOMContentLoaded', function () {
+  ///////////////////////////////////////////////////////////////////////////////////
+  // Toggle the search Clear button admin start typing
+  console.log('Hai');
+
+  function toggleClearButton() {
+    const input = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearButton');
+
+    input.addEventListener('input', function () {
+      clearBtn.classList.toggle('hidden', input.value.trim() === '');
+    });
+
+    // Working of clear Button
+    clearBtn.addEventListener('click', function () {
+      input.value = '';
+      clearBtn.classList.add('hidden');
+      input.focus();
+    });
+  }
+  ///////////////////////////////////////////////////////////////////////////////
   const toggleButtons = document.querySelectorAll('.toggle-status');
 
   toggleButtons.forEach(button => {
     button.addEventListener('click', function () {
-      const userId = this.dataset.id; // Assuming each button has a user ID
-      const status = this.getAttribute('data-status') === 'true'; // Check current status
+      const userId = this.dataset.id;
+      const status = this.getAttribute('data-status') === 'true';
 
       // Toggle UI instantly
       this.textContent = status ? 'Unblock' : 'Block';
@@ -23,4 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
       //   .catch(err => console.error('Error updating status:', err));
     });
   });
+
+  toggleClearButton();
 });

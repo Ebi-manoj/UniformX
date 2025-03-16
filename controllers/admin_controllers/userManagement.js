@@ -4,10 +4,12 @@ import { User } from '../../model/user_model.js';
 export const getUser = asyncHandler(async (req, res) => {
   const page = req.query.page || 1;
   const limit = 10;
-  const skip = (page - 1) * 10;
+  const skip = (page - 1) * limit;
 
-  const searchQuery = req.query.search || '';
+  const searchQuery = req.query.search?.trim() || '';
   let query = {};
+  console.log(searchQuery);
+
   if (searchQuery) {
     query = {
       $or: [
@@ -28,7 +30,8 @@ export const getUser = asyncHandler(async (req, res) => {
   res.render('admin/userManage', {
     cssFile: 'user_manage',
     users,
-    currentPage: page,
+    limit,
+    page,
     totalPages,
     totalUsers,
     searchQuery,

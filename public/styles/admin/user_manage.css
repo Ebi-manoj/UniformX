@@ -20,7 +20,7 @@
 
 /* When the checkbox is checked, move the circle and change the track color */
 input.toggle-status:checked + .toggle-track {
-  background-color: #22c55e; /* Matches bg-green-500 */
+  background-color: #fe0101; /* Matches bg-green-500 */
 }
 
 input.toggle-status:checked + .toggle-track .toggle-circle {
