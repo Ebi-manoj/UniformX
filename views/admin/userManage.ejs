@@ -68,21 +68,31 @@
       Showing <%= (page - 1) * limit + 1 %>-<%= Math.min(page * limit,
       totalUsers) %> of <%= totalUsers %>
     </p>
-    <% if (page>1) { %>
+
+    <% if (totalUsers > limit) { %>
     <div class="flex space-x-2">
+      <!-- Previous Page Button (Only show if page > 1) -->
       <% if (page > 1) { %>
       <a href="?page=<%= page - 1 %>" class="px-3 py-1 bg-gray-200 rounded"
         >&lt;</a
       >
-      <% } %> <% for (let i = 1; i <= totalPages; i++) { %> <% if (i === page) {
-      %>
+      <% } %>
+
+      <!-- Page Numbers -->
+      <% for (let i = 1; i <= totalPages; i++) { %> <% if (i === page) { %>
       <span class="px-3 py-1 bg-gray-800 text-white rounded"><%= i %></span>
       <% } else { %>
       <a href="?page=<%= i %>" class="px-3 py-1 bg-gray-200 rounded"
         ><%= i %></a
       >
-      <% } %> <% } %> <% if (page < totalPages) { %>
-      <a href="?page=<%= page + 1 %>" class="px-3 py-1 bg-gray-200 rounded"
+      <% } %> <% } %>
+
+      <!-- Next Page Button (Only show if page < totalPages) -->
+
+      <% if (page < totalPages) { %>
+      <a
+        href="?page=<%= Math.min(page + 1, totalPages) %>"
+        class="px-3 py-1 bg-gray-200 rounded"
         >&gt;</a
       >
       <% } %>

@@ -57,22 +57,64 @@ const createUser = async () => {
   try {
     const users = [
       {
-        full_name: 'Alice Johnson',
-        email: 'alice@example.com',
-        phone: '9876543210',
-        password: 'password123',
+        full_name: 'David Smith',
+        email: 'david@example.com',
+        phone: '9876543213',
+        password: 'password101',
       },
       {
-        full_name: 'Bob Williams',
-        email: 'bob@example.com',
-        phone: '9876543211',
-        password: 'password456',
+        full_name: 'Emma Davis',
+        email: 'emma@example.com',
+        phone: '9876543214',
+        password: 'password202',
       },
       {
-        full_name: 'Charlie Brown',
-        email: 'charlie@example.com',
-        phone: '9876543212',
-        password: 'password789',
+        full_name: 'Frank Miller',
+        email: 'frank@example.com',
+        phone: '9876543215',
+        password: 'password303',
+      },
+      {
+        full_name: 'Grace Wilson',
+        email: 'grace@example.com',
+        phone: '9876543216',
+        password: 'password404',
+      },
+      {
+        full_name: 'Henry Martinez',
+        email: 'henry@example.com',
+        phone: '9876543217',
+        password: 'password505',
+      },
+      {
+        full_name: 'Isabella Anderson',
+        email: 'isabella@example.com',
+        phone: '9876543218',
+        password: 'password606',
+      },
+      {
+        full_name: 'Jack Thomas',
+        email: 'jack@example.com',
+        phone: '9876543219',
+        password: 'password707',
+      },
+      {
+        full_name: 'Karen Harris',
+        email: 'karen@example.com',
+        phone: '9876543220',
+        password: 'password808',
+      },
+      {
+        full_name: 'Liam White',
+        email: 'liam@example.com',
+        phone: '9876543221',
+        password: 'password909',
+      },
+      {
+        full_name: 'Mia Hall',
+        email: 'mia@example.com',
+        phone: '9876543222',
+        password: 'password000',
       },
     ];
 
