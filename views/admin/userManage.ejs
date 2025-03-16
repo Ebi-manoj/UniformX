@@ -7,7 +7,7 @@
         id="searchInput"
         class="border p-2 w-full"
         placeholder="Search..."
-        value="<%= searchQuery %>"
+        value="<%= search %>"
       />
       <button
         id="clearButton"
@@ -72,9 +72,14 @@
 
     <% if (totalUsers > limit) { %>
     <div class="flex space-x-2">
-      <!-- Previous Page Button (Only show if page > 1) -->
+      <!-- Get the search query if it exists -->
+      <% let searchQuery = search ? `&search=${search}` : ''; %>
+
+      <!-- Previous Page Button -->
       <% if (page > 1) { %>
-      <a href="?page=<%= page - 1 %>" class="px-3 py-1 bg-gray-200 rounded"
+      <a
+        href="?page=<%= page - 1 %><%= searchQuery %>"
+        class="px-3 py-1 bg-gray-200 rounded"
         >&lt;</a
       >
       <% } %>
@@ -83,16 +88,17 @@
       <% for (let i = 1; i <= totalPages; i++) { %> <% if (i === page) { %>
       <span class="px-3 py-1 bg-gray-800 text-white rounded"><%= i %></span>
       <% } else { %>
-      <a href="?page=<%= i %>" class="px-3 py-1 bg-gray-200 rounded"
+      <a
+        href="?page=<%= i %><%= searchQuery %>"
+        class="px-3 py-1 bg-gray-200 rounded"
         ><%= i %></a
       >
       <% } %> <% } %>
 
-      <!-- Next Page Button (Only show if page < totalPages) -->
-
+      <!-- Next Page Button -->
       <% if (page < totalPages) { %>
       <a
-        href="?page=<%= Math.min(page + 1, totalPages) %>"
+        href="?page=<%= page + 1 %><%= searchQuery %>"
         class="px-3 py-1 bg-gray-200 rounded"
         >&gt;</a
       >

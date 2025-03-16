@@ -3,7 +3,6 @@ const email = document.getElementById('email');
 const password = document.getElementById('password');
 const error_message = document.querySelector('.error-message');
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-console.log('logged');
 
 admin_form.addEventListener('submit', async e => {
   e.preventDefault();

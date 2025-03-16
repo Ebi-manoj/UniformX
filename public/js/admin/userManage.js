@@ -44,28 +44,46 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   ///////////////////////////////////////////////////////////////////////////////
+  //Block and UnBlock Functionality
   const toggleButtons = document.querySelectorAll('.toggle-status');
 
-  toggleButtons.forEach(button => {
-    button.addEventListener('click', function () {
+  toggleButtons.forEach(toggle => {
+    toggle.addEventListener('change', function () {
       const userId = this.dataset.id;
-      const status = this.getAttribute('data-status') === 'true';
+      const isBlocked = this.checked; // true if checked, false otherwise
 
-      // Toggle UI instantly
-      this.textContent = status ? 'Unblock' : 'Block';
-      this.setAttribute('data-status', !status);
+      const action = isBlocked ? 'block' : 'unblock';
+      const confirmation = confirm(
+        `Are you sure you want to ${action} this user?`
+      );
 
-      // Optional: Update backend if needed
-      // fetch(`/admin/users/toggle-status/${userId}`, {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ is_blocked: !status }),
-      // })
-      //   .then(res => res.json())
-      //   .then(data => {
-      //     console.log('Status updated:', data);
-      //   })
-      //   .catch(err => console.error('Error updating status:', err));
+      if (!confirmation) {
+        // Revert the checkbox state if action is canceled
+        this.checked = !isBlocked;
+        return;
+      }
+      console.log(userId);
+
+      // Send an AJAX request to update the status
+      fetch(`customers/block/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isBlocked }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (!data.success) {
+            alert('Failed to update status!');
+            this.checked = !isBlocked; // Revert toggle if error occurs
+          } else {
+            console.log('updated');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Something went wrong!');
+          this.checked = !isBlocked;
+        });
     });
   });
 
