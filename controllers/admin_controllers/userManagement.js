@@ -3,7 +3,7 @@ import { User } from '../../model/user_model.js';
 
 export const getUser = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = 10;
+  const limit = 6;
   const skip = (page - 1) * limit;
 
   const searchQuery = req.query.search?.trim() || '';
@@ -26,9 +26,13 @@ export const getUser = asyncHandler(async (req, res) => {
     .sort({ join_date: -1 })
     .skip(skip)
     .limit(limit);
+  if (req.xhr) {
+    return res.json({ users });
+  }
 
   res.render('admin/userManage', {
     cssFile: 'user_manage',
+    js_file: 'userManage',
     users,
     limit,
     page,

@@ -13,6 +13,8 @@ export const isProtected = asyncHandler(async (req, res, next) => {
     req.admin = await Admin.findById(decoded.id).select('-password');
     next();
   } catch (error) {
+    console.log('Token expired redirected to login');
+    res.clearCookie('token', { httpOnly: true, sameSite: 'strict' });
     res.redirect('login');
   }
 });

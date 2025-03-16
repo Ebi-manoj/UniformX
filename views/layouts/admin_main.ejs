@@ -14,6 +14,8 @@
   <body>
     <%- include('../partials/admin_sidebar') %> <%- body %>
     <script src="/js/common.js" defer></script>
-    <script src="/js/userManage.js" defer></script>
+    <% if (js_file) { %>
+    <script src="/js/<%= js_file %>.js" defer></script>
+    <% } %>
   </body>
 </html>

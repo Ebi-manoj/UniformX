@@ -8,9 +8,8 @@ const adminLogin_layout = './layouts/admin_login';
 // Get Login Page
 export const getLogin = asyncHandler(async (req, res) => {
   if (req.cookies.token) return res.redirect('dashboard');
-  else res.render('admin/admin_login', { layout: adminLogin_layout });
+  res.render('admin/admin_login', { layout: adminLogin_layout });
 });
-
 // Verify Login
 export const adminLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -42,8 +41,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
 });
 
 export const getDashboard = asyncHandler(async (req, res) => {
-  if (!req.cookies.token) return res.redirect('login');
-  res.render('admin/dashboard', { cssFile: 'admin_dashboard' });
+  res.render('admin/dashboard', { cssFile: 'admin_dashboard', js_file: null });
 });
 
 export const logout = asyncHandler(async (req, res) => {

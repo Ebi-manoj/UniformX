@@ -1,14 +1,16 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearButton');
   ///////////////////////////////////////////////////////////////////////////////////
   // Toggle the search Clear button admin start typing
   console.log('Hai');
 
   function toggleClearButton() {
-    const input = document.getElementById('searchInput');
-    const clearBtn = document.getElementById('clearButton');
-
+    input.addEventListener('focus', function () {
+      clearBtn.classList.toggle('hidden', input?.value.trim() === '');
+    });
     input.addEventListener('input', function () {
-      clearBtn.classList.toggle('hidden', input.value.trim() === '');
+      clearBtn.classList.toggle('hidden', input?.value.trim() === '');
     });
 
     // Working of clear Button
@@ -16,8 +18,31 @@ document.addEventListener('DOMContentLoaded', function () {
       input.value = '';
       clearBtn.classList.add('hidden');
       input.focus();
+      const url = new URL(window.location.href);
+      url.searchParams.delete('search');
+      window.location.href = url.toString();
     });
   }
+  ///////////////////////////////////////////////////////////////////////////////////////
+  //////Search Functionality
+  function searchFunctionality() {
+    input.addEventListener('keypress', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const searchQuery = event.target.value.trim();
+        const url = new URL(window.location.href);
+
+        if (searchQuery) {
+          url.searchParams.set('search', searchQuery);
+        } else {
+          url.searchParams.delete('search');
+        }
+        url.searchParams.set('page', 1);
+        window.location.href = url.toString();
+      }
+    });
+  }
+
   ///////////////////////////////////////////////////////////////////////////////
   const toggleButtons = document.querySelectorAll('.toggle-status');
 
@@ -45,4 +70,5 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   toggleClearButton();
+  searchFunctionality();
 });
