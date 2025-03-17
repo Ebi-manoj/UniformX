@@ -17,5 +17,5 @@ router.post('/login', adminLogin);
 router.get('/dashboard', isProtected, getDashboard);
 router.get('/customers', isProtected, getUser);
 router.post('/logout', logout);
-router.patch('/customers/block/:id', toggleBlock);
+router.patch('/customers/block/:id', isProtected, toggleBlock);
 export default router;

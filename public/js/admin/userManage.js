@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
         cancelButtonText: 'Cancel',
       }).then(result => {
         if (!result.isConfirmed) {
-          this.checked = !isBlocked; // Revert toggle if cancelled
+          this.checked = !isBlocked;
           return;
         }
 
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
           .then(data => {
             if (!data.success) {
               Swal.fire('Error', 'Failed to update status!', 'error');
-              this.checked = !isBlocked; // Revert toggle if error occurs
+              this.checked = !isBlocked;
             } else {
               Swal.fire('Success', 'User status updated!', 'success');
             }

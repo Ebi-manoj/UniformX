@@ -4,6 +4,8 @@ import path from 'path';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import nocache from 'nocache';
+import session from 'express-session';
+import flash from 'connect-flash';
 import { fileURLToPath } from 'url';
 import { errorhandling } from './middlewares/error_handling.js';
 import { connectDB } from './config/db.js';
@@ -26,6 +28,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(nocache());
+app.use(
+  session({
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 60000 },
+  })
+);
+app.use(flash());
 
 //set view engine
 app.use(expressLayouts);
@@ -34,6 +45,12 @@ app.set('layout', 'layouts/admin_main');
 // routes
 app.use('/admin', adminRoutes);
 
+// Flash middleware
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success');
+  res.locals.error_msg = req.flash('error');
+  next();
+});
 // error Handling
 app.use(errorhandling);
 app.listen(PORT, () => console.log(`Server is running on the ${PORT}`));
