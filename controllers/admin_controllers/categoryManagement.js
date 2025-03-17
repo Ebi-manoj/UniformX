@@ -3,7 +3,7 @@ import { Category } from '../../model/category_model.js';
 
 export const getCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = 10;
+  const limit = 1;
   const skip = (page - 1) * limit;
   const searchQuery = req.query.search?.trim() || '';
 
@@ -11,8 +11,8 @@ export const getCategory = asyncHandler(async (req, res) => {
   if (searchQuery) {
     query.name = { $regex: searchQuery, $options: 'i' };
   }
-  const totalCategories = await Category.countDocuments(query);
-  const totalPages = Math.ceil(totalCategories / limit);
+  const totalCount = await Category.countDocuments(query);
+  const totalPages = Math.ceil(totalCount / limit);
 
   // Fetch categories
   const categories = await Category.find(query)
@@ -26,8 +26,9 @@ export const getCategory = asyncHandler(async (req, res) => {
     categories,
     currentPage: page,
     totalPages,
-    totalCategories,
+    totalCount,
     searchQuery,
+    limit,
   });
 });
 export const addCategory = asyncHandler(async (req, res) => {
