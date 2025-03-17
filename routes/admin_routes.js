@@ -11,6 +11,7 @@ import {
   toggleBlock,
 } from '../controllers/admin_controllers/userManagement.js';
 import { getCategory } from '../controllers/admin_controllers/categoryManagement.js';
+import { getClubCategory } from '../controllers/admin_controllers/clubCategory.js';
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -20,4 +21,5 @@ router.post('/logout', logout);
 router.get('/customers', isProtected, getUser);
 router.patch('/customers/block/:id', isProtected, toggleBlock);
 router.get('/category', getCategory);
+router.get('/club-category', getClubCategory);
 export default router;
