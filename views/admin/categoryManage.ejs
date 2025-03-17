@@ -33,7 +33,43 @@
           <tbody
             id="categoryTableBody"
             class="bg-white divide-y divide-gray-100"
-          ></tbody>
+          >
+            <% if (categories && categories.length > 0) { %> <%
+            categories.forEach((category,index) => { %>
+            <tr class="border-b border-gray-300">
+              <td class="px-6 py-4"><%= index+1 %></td>
+              <td class="px-6 py-4"><%= category.name %></td>
+              <td class="px-6 py-4"><%= category.description || 'N/A' %></td>
+              <td class="px-6 py-4">
+                <% if (category.isActive) { %>
+                <span class="text-green-500 font-semibold">Active</span>
+                <% } else { %>
+                <span class="text-red-500 font-semibold">Inactive</span>
+                <% } %>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button
+                  class="text-blue-500 hover:underline"
+                  onclick="editCategory('<%= category._id %>')"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  class="text-red-500 hover:underline ml-3"
+                  onclick="deleteCategory('<%= category._id %>')"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <% }); %> <% } else { %>
+            <tr>
+              <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                No categories found.
+              </td>
+            </tr>
+            <% } %>
+          </tbody>
         </table>
       </div>
     </div>
