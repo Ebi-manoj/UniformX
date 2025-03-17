@@ -10,8 +10,12 @@ import {
   getUser,
   toggleBlock,
 } from '../controllers/admin_controllers/userManagement.js';
-import { getCategory } from '../controllers/admin_controllers/categoryManagement.js';
+import {
+  addCategory,
+  getCategory,
+} from '../controllers/admin_controllers/categoryManagement.js';
 import { getClubCategory } from '../controllers/admin_controllers/clubCategory.js';
+import { categoryUpload } from '../config/cloudinary.js';
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -22,4 +26,5 @@ router.get('/customers', isProtected, getUser);
 router.patch('/customers/block/:id', isProtected, toggleBlock);
 router.get('/category', getCategory);
 router.get('/club-category', getClubCategory);
+router.post('/add-category', categoryUpload.single('image'), addCategory);
 export default router;

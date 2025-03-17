@@ -56,13 +56,10 @@ categoryForm.addEventListener('submit', function (event) {
     showToast('Image is required!', 'warning');
     return;
   }
-
   // Show success toast
+  categoryForm.submit();
   showToast('Category added successfully!', 'success');
 
   // Close the modal after success
   closeModal();
-
-  // Reset the form after submission
-  categoryForm.reset();
 });

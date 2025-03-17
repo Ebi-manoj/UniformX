@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
+
 const categorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       unique: true,
-      trim: true,
     },
     description: {
       type: String,
@@ -13,17 +13,12 @@ const categorySchema = new mongoose.Schema(
     image_url: {
       type: String,
     },
-    status: {
-      type: String,
-      enum: ['active', 'inactive', 'deleted'],
-      default: 'active',
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }
 );
 
-export const Category = mongoose.model('Category', categorySchema);
+export const Category = mongoose.model('category', categorySchema);
