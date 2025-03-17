@@ -28,7 +28,7 @@ export const getUser = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(limit);
   res.render('admin/userManage', {
-    cssFile: 'user_manage',
+    cssFile: null,
     js_file: 'userManage',
     users,
     limit,
