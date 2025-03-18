@@ -22,21 +22,42 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// flash
+app.use(
+  session({
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 600000,
+      secure: false,
+      httpOnly: true,
+    },
+  })
+);
+
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success');
+  res.locals.error_msg = req.flash('error');
+  console.log('Locals', res.locals);
+
+  next();
+});
+app.use((req, res, next) => {
+  console.log('Session ID:', req.sessionID); // Verify session continuity
+  console.log('Session data:', req.session); // Check if flash data is present
+  res.locals.success_msg = req.flash('success') || [];
+  res.locals.error_msg = req.flash('error') || [];
+  console.log('Locals set:', res.locals);
+  next();
+});
 //common middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(nocache());
-app.use(
-  session({
-    secret: process.env.SECRET_KEY,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 60000 },
-  })
-);
-app.use(flash());
 
 //set view engine
 app.use(expressLayouts);
@@ -44,12 +65,14 @@ app.set('view engine', 'ejs');
 app.set('layout', 'layouts/admin_main');
 // routes
 app.use('/admin', adminRoutes);
+app.get('/test-flash', (req, res) => {
+  req.flash('success', 'Test flash message');
+  res.redirect('/test-flash-result');
+});
 
-// Flash middleware
-app.use((req, res, next) => {
-  res.locals.success_msg = req.flash('success');
-  res.locals.error_msg = req.flash('error');
-  next();
+app.get('/test-flash-result', (req, res) => {
+  console.log('Flash in test result:', req.flash('success'));
+  res.send(`Flash message: ${res.locals.success_msg}`);
 });
 // error Handling
 app.use(errorhandling);

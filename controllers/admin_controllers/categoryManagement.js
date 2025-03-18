@@ -3,6 +3,8 @@ import { Category } from '../../model/category_model.js';
 import mongoose from 'mongoose';
 //Get all Category
 export const getCategory = asyncHandler(async (req, res) => {
+  console.log('Flash before consumption:', req.flash('success')); // Log raw flash data
+  console.log('res.locals.success_msg:', res.locals.success_msg);
   const page = parseInt(req.query.page) || 1;
   const limit = 1;
   const skip = (page - 1) * limit;
@@ -20,6 +22,7 @@ export const getCategory = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
+
   res.render('admin/categoryManage', {
     category: 'main',
     cssFile: null,
@@ -30,8 +33,8 @@ export const getCategory = asyncHandler(async (req, res) => {
     totalCount,
     searchQuery,
     limit,
-    success_msg: false,
-    error_msg: false,
+    success_msg: res.locals.success_msg,
+    error_msg: res.locals.error_msg,
   });
 });
 
@@ -42,7 +45,7 @@ export const addCategory = asyncHandler(async (req, res) => {
   if (!name || !req.file) {
     console.log('error');
     req.flash('success', 'Name and Image required');
-    res.redirect('category');
+    res.redirect('/admin/category');
   }
 
   // Cloudinary file URL
@@ -51,7 +54,7 @@ export const addCategory = asyncHandler(async (req, res) => {
   const newCategory = new Category({ name, description, image: imageUrl });
   await newCategory.save();
   req.flash('success', 'Category added successfully!');
-  res.redirect('category');
+  res.redirect('/admin/category');
 });
 
 //Edit Category
@@ -85,5 +88,11 @@ export const editCategory = asyncHandler(async (req, res) => {
   await category.save();
 
   req.flash('success', 'Category updated successfully!');
-  return res.redirect('/admin/category');
+  console.log('Flash set:', req.flash('success'));
+  // After setting the flash message
+  req.session.save(err => {
+    // Ensure session is saved
+    if (err) console.error('Session save error:', err);
+    res.redirect('/admin/category');
+  });
 });

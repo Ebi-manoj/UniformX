@@ -2,7 +2,6 @@ import asyncHandler from 'express-async-handler';
 import { Admin } from '../../model/admin_model.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../config/jwt.js';
-import { error } from 'console';
 
 const adminLogin_layout = './layouts/admin_login';
 
