@@ -7,6 +7,8 @@ const cancelDelete = document.getElementById('cancelDelete');
 const categoryForm = document.getElementById('categoryForm');
 const editButtons = document.querySelector('.edit-category-btn');
 
+/////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Toast notification function
 const showToast = function (message, icon = 'error') {
   Swal.fire({

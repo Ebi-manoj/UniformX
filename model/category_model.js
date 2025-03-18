@@ -10,7 +10,7 @@ const categorySchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    image_url: {
+    image: {
       type: String,
     },
     isActive: {

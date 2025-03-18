@@ -32,3 +32,53 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+
+function search() {
+  ///////////////////////////////////////////////////////////////
+  ///Search Functionality
+  const input = document.getElementById('searchInput');
+  const clearBtn = document.getElementById('clearButton');
+  console.log('Hai');
+
+  function toggleClearButton() {
+    input.addEventListener('focus', function () {
+      clearBtn.classList.toggle('hidden', input?.value.trim() === '');
+    });
+    input.addEventListener('input', function () {
+      clearBtn.classList.toggle('hidden', input?.value.trim() === '');
+    });
+
+    // Working of clear Button
+    clearBtn.addEventListener('click', function () {
+      input.value = '';
+      clearBtn.classList.add('hidden');
+      input.focus();
+      const url = new URL(window.location.href);
+      url.searchParams.delete('search');
+      window.location.href = url.toString();
+    });
+  }
+
+  function searchFunctionality() {
+    input.addEventListener('keypress', function (event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const searchQuery = event.target.value.trim();
+        const url = new URL(window.location.href);
+
+        if (searchQuery) {
+          url.searchParams.set('search', searchQuery);
+        } else {
+          url.searchParams.delete('search');
+        }
+        url.searchParams.set('page', 1);
+        window.location.href = url.toString();
+      }
+    });
+  }
+  if (input && clearBtn) {
+    toggleClearButton();
+    searchFunctionality();
+  }
+}
+search();

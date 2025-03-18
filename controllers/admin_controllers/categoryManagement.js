@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { Category } from '../../model/category_model.js';
+import { cloudinary } from '../../config/cloudinary.js';
 
 ///////////////////////////////////////////////////////////////////////////
 //Get all Category
@@ -75,11 +76,15 @@ export const editCategory = asyncHandler(async (req, res) => {
     return res.redirect('/admin/category');
   }
 
-  let imageUrl = category.image_url;
+  let imageUrl = category.image;
   if (req.file) {
     imageUrl = req.file.path;
-    if (category.image_url) {
-      const publicId = category.image_url.split('/').pop().split('.')[0];
+    console.log('file checked');
+
+    if (category.image) {
+      console.log('Category checked');
+
+      const publicId = category.image.split('/').pop().split('.')[0];
       await cloudinary.uploader.destroy(`uniformx/categories/${publicId}`);
     }
   }
