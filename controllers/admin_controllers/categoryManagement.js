@@ -103,6 +103,8 @@ export const editCategory = asyncHandler(async (req, res) => {
 //////Delete Category
 
 export const deleteCategory = asyncHandler(async (req, res) => {
+  console.log(req.body);
+
   const id = req.body.categoryId;
   if (!validateId(id)) {
     req.flash('error', 'Category not Found');

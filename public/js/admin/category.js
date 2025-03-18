@@ -83,6 +83,8 @@ function editCategory(id, name, description) {
 
 // Delete confirmation
 function confirmDelete(id) {
+  console.log(id);
+
   document.getElementById('deleteCategoryId').value = id;
   deleteModal.classList.remove('hidden');
 }
