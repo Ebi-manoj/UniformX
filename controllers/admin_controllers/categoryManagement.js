@@ -7,7 +7,7 @@ import { validateId } from '../../utilities/validateId.js';
 //Get all Category
 export const getCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = 5;
+  const limit = 4;
   const skip = (page - 1) * limit;
   const searchQuery = req.query.search?.trim() || '';
 
