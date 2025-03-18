@@ -4,9 +4,9 @@ import path from 'path';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import nocache from 'nocache';
-import methodOverride from 'method-override';
 import session from 'express-session';
 import flash from 'connect-flash';
+import methodOverride from 'method-override';
 import { fileURLToPath } from 'url';
 import { errorhandling } from './middlewares/error_handling.js';
 import { connectDB } from './config/db.js';
@@ -39,14 +39,6 @@ app.use(
 
 app.use(flash());
 
-// app.use((req, res, next) => {
-//   console.log('Session ID:', req.sessionID);
-//   console.log('Session data before flash consumption:', req.session);
-//   res.locals.success_msg = req.flash('success') || [];
-//   res.locals.error_msg = req.flash('error') || [];
-//   console.log('Locals set:', res.locals);
-//   next();
-// });
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success');
   res.locals.error_msg = req.flash('error');
@@ -56,17 +48,16 @@ app.use((req, res, next) => {
 //common middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-  console.log('Before:', req.method, req.body);
-  next();
-});
-console.log(methodOverride);
-
-app.use(methodOverride('_method'));
-app.use((req, res, next) => {
-  console.log('After:', req.method, req.body);
-  next();
-});
+app.use(
+  methodOverride((req, res) => {
+    if (req.body && '_method' in req.body) {
+      const method = req.body._method.toUpperCase();
+      delete req.body._method;
+      return method;
+    }
+    return req.method;
+  })
+);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(nocache());
