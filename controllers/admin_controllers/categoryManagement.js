@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { Category } from '../../model/category_model.js';
 import { cloudinary } from '../../config/cloudinary.js';
+import { validateId } from '../../utilities/validateId.js';
 
 ///////////////////////////////////////////////////////////////////////////
 //Get all Category
@@ -95,5 +96,27 @@ export const editCategory = asyncHandler(async (req, res) => {
   await category.save();
 
   req.flash('success', 'Category updated successfully!');
+  res.redirect('/admin/category');
+});
+
+/////////////////////////////////////////////////////////////////////////////////
+//////Delete Category
+
+export const deleteCategory = asyncHandler(async (req, res) => {
+  const id = req.body.categoryId;
+  if (!validateId(id)) {
+    req.flash('error', 'Category not Found');
+    return res.redirect('/admin/category');
+  }
+  const deletedCategory = await Category.findByIdAndUpdate(
+    id,
+    { isActive: false },
+    { new: true }
+  );
+  if (!deletedCategory) {
+    req.flash('error', 'Something went wrong!');
+    return res.redirect('/admin/category');
+  }
+  req.flash('success', 'Category deleted Successfully');
   res.redirect('/admin/category');
 });

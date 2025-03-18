@@ -12,6 +12,7 @@ import {
 } from '../controllers/admin_controllers/userManagement.js';
 import {
   addCategory,
+  deleteCategory,
   editCategory,
   getCategory,
 } from '../controllers/admin_controllers/categoryManagement.js';
@@ -39,4 +40,6 @@ router.post(
   categoryUpload.single('image'),
   editCategory
 );
+router.patch('/delete-category', isProtected, deleteCategory);
+
 export default router;
