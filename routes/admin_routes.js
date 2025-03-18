@@ -24,7 +24,12 @@ router.get('/dashboard', isProtected, getDashboard);
 router.post('/logout', logout);
 router.get('/customers', isProtected, getUser);
 router.patch('/customers/block/:id', isProtected, toggleBlock);
-router.get('/category', getCategory);
-router.get('/club-category', getClubCategory);
-router.post('/add-category', categoryUpload.single('image'), addCategory);
+router.get('/category', isProtected, getCategory);
+router.get('/club-category', isProtected, getClubCategory);
+router.post(
+  '/add-category',
+  isProtected,
+  categoryUpload.single('image'),
+  addCategory
+);
 export default router;

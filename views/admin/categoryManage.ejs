@@ -104,21 +104,21 @@
           <div class="flex space-x-1">
             <% if (currentPage > 1) { %>
             <a
-              href="/admin/categories?page=<%= currentPage - 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+              href="/admin/category?page=<%= currentPage - 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
               class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
             >
-              Previous
+              &lt;
             </a>
             <% } %> <% for(let i = 1; i <= totalPages; i++) { %>
             <a
-              href="/admin/categories?page=<%= i %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+              href="/admin/category?page=<%= i %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
               class="px-3 py-1 rounded-md border <%= currentPage === i ? 'bg-black text-white' : 'border-gray-300 text-gray-600 hover:bg-gray-100' %>"
             >
               <%= i %>
             </a>
             <% } %> <% if (currentPage < totalPages) { %>
             <a
-              href="/admin/categories?page=<%= currentPage + 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+              href="/admin/category?page=<%= currentPage + 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
               class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
             >
               Next

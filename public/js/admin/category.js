@@ -26,7 +26,6 @@ const openModal = function () {
   if (categoryForm.action.includes('add-category')) {
     categoryForm.reset();
     document.getElementById('modalTitle').textContent = 'Add Category';
-    document.getElementById('currentImageContainer').classList.add('hidden');
   }
 };
 
@@ -43,8 +42,7 @@ const validateForm = function () {
   const name = document.getElementById('name').value.trim();
   const description = document.getElementById('description').value.trim();
   const image = document.getElementById('image').files.length;
-  const isEdit = categoryForm.action.includes('update-category');
-  const hasCurrentImage = document.getElementById('currentImage').src !== '';
+  const isEdit = categoryForm.action.includes('edit-category');
 
   if (!name) {
     showToast('Name is required!', 'warning');
@@ -57,7 +55,7 @@ const validateForm = function () {
   }
 
   // Only require image for new categories or if no current image exists
-  if (image === 0 && !isEdit && !hasCurrentImage) {
+  if (image === 0 && !isEdit) {
     showToast('Image is required!', 'warning');
     return false;
   }
@@ -68,7 +66,7 @@ const validateForm = function () {
 // Edit category function
 function editCategory(id, name, description) {
   // Update form attributes
-  categoryForm.action = '/admin/update-category';
+  categoryForm.action = `/admin/edit-category/4${id}`;
   document.getElementById('modalTitle').textContent = 'Edit Category';
 
   // Set form values
@@ -142,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Submit the form and show success message
         this.submit();
-        showToast(successMessage, 'success');
         closeModal();
       }
     });

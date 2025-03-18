@@ -36,6 +36,8 @@ export const getUser = asyncHandler(async (req, res) => {
     totalPages,
     totalUsers,
     search: searchQuery,
+    success_msg: false,
+    error_msg: false,
   });
 });
 

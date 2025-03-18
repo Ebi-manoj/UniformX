@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { Category } from '../../model/category_model.js';
 
+//Get all Category
 export const getCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 1;
@@ -29,17 +30,19 @@ export const getCategory = asyncHandler(async (req, res) => {
     totalCount,
     searchQuery,
     limit,
+    success_msg: false,
+    error_msg: false,
   });
 });
+
+// AddCategory
 export const addCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
 
   if (!name || !req.file) {
     console.log('error');
-
-    return res
-      .status(400)
-      .json({ error: 'Category name and image are required' });
+    req.flash('success', 'Name and Image required');
+    res.redirect('category');
   }
 
   // Cloudinary file URL
@@ -47,6 +50,39 @@ export const addCategory = asyncHandler(async (req, res) => {
 
   const newCategory = new Category({ name, description, image: imageUrl });
   await newCategory.save();
-
   res.redirect('category');
+});
+
+//Edit Category
+export const editCategory = asyncHandler(async (req, res) => {
+  const { name, description } = req.body;
+  const { id } = req.params;
+
+  let category = await Category.findById(id);
+
+  if (!category) {
+    req.flash('error', 'Category not found');
+    return res.redirect('category');
+  }
+
+  let imageUrl = category.image_url;
+
+  if (req.file) {
+    imageUrl = req.file.path;
+
+    // Optional: Delete old Cloudinary image
+    if (category.image_url) {
+      const publicId = category.image_url.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`uniformx/categories/${publicId}`);
+    }
+  }
+
+  category.name = name || category.name;
+  category.description = description || category.description;
+  category.image = imageUrl;
+
+  await category.save();
+
+  req.flash('success', 'Category updated successfully!');
+  return res.redirect('category');
 });

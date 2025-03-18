@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { Admin } from '../../model/admin_model.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../config/jwt.js';
+import { error } from 'console';
 
 const adminLogin_layout = './layouts/admin_login';
 
@@ -37,11 +38,18 @@ export const adminLogin = asyncHandler(async (req, res) => {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
   });
+
   res.status(200).json({ success: true, message: 'Login successfully' });
 });
 
 export const getDashboard = asyncHandler(async (req, res) => {
-  res.render('admin/dashboard', { cssFile: 'admin_dashboard', js_file: null });
+  req.flash('success', 'Authenticated');
+  res.render('admin/dashboard', {
+    cssFile: 'admin_dashboard',
+    js_file: null,
+    success_msg: false,
+    error_msg: false,
+  });
 });
 
 export const logout = asyncHandler(async (req, res) => {

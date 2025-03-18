@@ -200,4 +200,19 @@
       </form>
     </li>
   </ul>
+  <% if (success_msg) { %>
+  <input
+    type="hidden"
+    id="successMessage"
+    value="<%= success_msg %>"
+    data-alert="<%= success_msg ? 'true' : 'false' %>"
+  />
+  <% } else if (error_msg) { %>
+  <input
+    type="hidden"
+    id="errorMessage"
+    value="<%= error_msg %>"
+    data-alert="<%= error_msg ? 'true' : 'false' %>"
+  />
+  <% } %>
 </aside>
