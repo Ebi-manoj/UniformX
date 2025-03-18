@@ -1,9 +1,11 @@
 import asyncHandler from 'express-async-handler';
 import { Category } from '../../model/category_model.js';
+
+///////////////////////////////////////////////////////////////////////////
 //Get all Category
 export const getCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = 1;
+  const limit = 5;
   const skip = (page - 1) * limit;
   const searchQuery = req.query.search?.trim() || '';
 
@@ -34,7 +36,7 @@ export const getCategory = asyncHandler(async (req, res) => {
     error_msg: res.locals.error_msg,
   });
 });
-
+//////////////////////////////////////////////////////////////////////////////////
 // AddCategory
 export const addCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -43,6 +45,13 @@ export const addCategory = asyncHandler(async (req, res) => {
     console.log('error');
     req.flash('error', 'Name and Image required');
     res.redirect('/admin/category');
+  }
+  const existingCategory = await Category.findOne({
+    name: { $regex: new RegExp(`^${name}$`, 'i') },
+  });
+  if (existingCategory) {
+    req.flash('error', 'A category with this name already exists');
+    return res.redirect('/admin/category');
   }
 
   // Cloudinary file URL
@@ -54,6 +63,7 @@ export const addCategory = asyncHandler(async (req, res) => {
   res.redirect('/admin/category');
 });
 
+///////////////////////////////////////////////////////////////////////////////////
 //Edit Category
 export const editCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
@@ -81,12 +91,4 @@ export const editCategory = asyncHandler(async (req, res) => {
 
   req.flash('success', 'Category updated successfully!');
   res.redirect('/admin/category');
-  // req.session.save(err => {
-  //   if (err) {
-  //     console.error('Session save error in editCategory:', err);
-  //     return res.status(500).send('Server error');
-  //   }
-  //   console.log('Session saved in editCategory:', req.session.flash); // Debug after save
-  //   res.redirect('/admin/category');
-  // });
 });
