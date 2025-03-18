@@ -66,7 +66,7 @@ const validateForm = function () {
 // Edit category function
 function editCategory(id, name, description) {
   // Update form attributes
-  categoryForm.action = `/admin/edit-category/4${id}`;
+  categoryForm.action = `/admin/edit-category/${id}`;
   document.getElementById('modalTitle').textContent = 'Edit Category';
 
   // Set form values
@@ -132,12 +132,6 @@ document.addEventListener('DOMContentLoaded', function () {
       event.preventDefault();
 
       if (validateForm()) {
-        // Determine appropriate success message
-        const isEdit = categoryForm.action.includes('update-category');
-        const successMessage = isEdit
-          ? 'Category updated successfully!'
-          : 'Category added successfully!';
-
         // Submit the form and show success message
         this.submit();
         closeModal();

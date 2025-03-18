@@ -11,7 +11,7 @@ window.onload = function () {
       icon: 'success',
       title: successInput.value,
       toast: true,
-      position: 'top-end',
+      position: 'bottom-end',
       showConfirmButton: false,
       timer: 3000,
     });
@@ -22,7 +22,7 @@ window.onload = function () {
       icon: 'error',
       title: errorInput.value,
       toast: true,
-      position: 'top-end',
+      position: 'bottom-end',
       showConfirmButton: false,
       timer: 3000,
     });

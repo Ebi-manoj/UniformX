@@ -1,6 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import { Category } from '../../model/category_model.js';
-
+import mongoose from 'mongoose';
 //Get all Category
 export const getCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -50,6 +50,7 @@ export const addCategory = asyncHandler(async (req, res) => {
 
   const newCategory = new Category({ name, description, image: imageUrl });
   await newCategory.save();
+  req.flash('success', 'Category added successfully!');
   res.redirect('category');
 });
 
@@ -57,12 +58,12 @@ export const addCategory = asyncHandler(async (req, res) => {
 export const editCategory = asyncHandler(async (req, res) => {
   const { name, description } = req.body;
   const { id } = req.params;
-
+  console.log('Is Valid ObjectId:', mongoose.Types.ObjectId.isValid(id));
   let category = await Category.findById(id);
 
   if (!category) {
     req.flash('error', 'Category not found');
-    return res.redirect('category');
+    return res.redirect('/admin/category');
   }
 
   let imageUrl = category.image_url;
@@ -84,5 +85,5 @@ export const editCategory = asyncHandler(async (req, res) => {
   await category.save();
 
   req.flash('success', 'Category updated successfully!');
-  return res.redirect('category');
+  return res.redirect('/admin/category');
 });

@@ -12,6 +12,7 @@ import {
 } from '../controllers/admin_controllers/userManagement.js';
 import {
   addCategory,
+  editCategory,
   getCategory,
 } from '../controllers/admin_controllers/categoryManagement.js';
 import { getClubCategory } from '../controllers/admin_controllers/clubCategory.js';
@@ -31,5 +32,11 @@ router.post(
   isProtected,
   categoryUpload.single('image'),
   addCategory
+);
+router.post(
+  '/edit-category/:id',
+  isProtected,
+  categoryUpload.single('image'),
+  editCategory
 );
 export default router;
