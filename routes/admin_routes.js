@@ -42,7 +42,7 @@ router.post(
   categoryUpload.single('image'),
   editCategory
 );
-router.patch('/delete-category', isProtected, deleteCategory);
+router.patch('/delete-category/:id', isProtected, deleteCategory);
 router.get('/club-category', isProtected, getClubCategory);
-router.post('/club-category', isProtected, clubUpload.single('image'), addClub);
+router.post('/add-club', isProtected, clubUpload.single('image'), addClub);
 export default router;
