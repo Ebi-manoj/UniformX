@@ -18,6 +18,7 @@ import {
 } from '../controllers/admin_controllers/categoryManagement.js';
 import {
   addClub,
+  editClub,
   getClubCategory,
 } from '../controllers/admin_controllers/clubCategory.js';
 import { categoryUpload, clubUpload } from '../config/cloudinary.js';
@@ -45,4 +46,10 @@ router.post(
 router.patch('/delete-category/:id', isProtected, deleteCategory);
 router.get('/club-category', isProtected, getClubCategory);
 router.post('/add-club', isProtected, clubUpload.single('image'), addClub);
+router.post(
+  '/edit-club/:id',
+  isProtected,
+  clubUpload.single('image'),
+  editClub
+);
 export default router;

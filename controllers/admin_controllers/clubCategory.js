@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { Club } from '../../model/club_model.js';
 import { validateId } from '../../utilities/validateId.js';
 import { Category } from '../../model/category_model.js';
+import { v2 as cloudinary } from 'cloudinary';
 
 export const getClubCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -63,5 +64,48 @@ export const addClub = asyncHandler(async (req, res) => {
   });
   await newClub.save();
   req.flash('success', 'Club category added');
+  res.redirect('/admin/club-category');
+});
+
+export const editClub = asyncHandler(async (req, res) => {
+  const { name, description, category_id } = req.body;
+  const { id } = req.params;
+
+  if (!validateId(id)) {
+    req.flash('error', 'Invalid Club!');
+    return res.redirect('/admin/club-category');
+  }
+
+  const club = await Club.findById(id);
+  if (!club) {
+    req.flash('error', 'No club found!');
+    return res.redirect('/admin/club-category');
+  }
+
+  // Validate required fields
+  if (!name || !description) {
+    req.flash('error', 'Name and description are required');
+    return res.redirect('/admin/club-category');
+  }
+
+  // Handle image update
+  let imageUrl = club.image;
+  if (req.file) {
+    imageUrl = req.file.path;
+    if (club.image) {
+      const publicId = club.image.split('/').pop().split('.')[0];
+      await cloudinary.uploader.destroy(`uniformx/clubs/${publicId}`);
+    }
+  }
+
+  // Update club fields
+  club.name = name;
+  club.description = description;
+  club.category_id = category_id;
+  club.image = imageUrl;
+
+  await club.save();
+
+  req.flash('success', 'Club updated successfully!');
   res.redirect('/admin/club-category');
 });
