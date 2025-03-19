@@ -3,43 +3,110 @@
     <!-- header started -->
     <%- include('../partials/category_header') %>
     <!-- headerfinished -->
-
-    <div
-      class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
-    >
-      <div class="table-container">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr class="bg-gray-50">
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">
-                ID
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">
-                Name
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">
-                Parent Category
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">
-                Description
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500">
-                Status
-              </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500"
+    <!-- .....................club cards.............. -->
+    <div class="container mx-auto px-4 py-6">
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        <% if (clubs && clubs.length > 0) { %> <% clubs.forEach((club) => { %>
+        <div
+          class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-all duration-300"
+        >
+          <!-- Club Logo/Image -->
+          <div
+            class="h-40 bg-gray-100 flex items-center justify-center overflow-hidden"
+          >
+            <% if (club.image) { %>
+            <img
+              src="<%= club.image %>"
+              alt="<%= club.name %>"
+              class="w-full h-full object-contain p-2"
+            />
+            <% } else { %>
+            <div
+              class="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center"
+            >
+              <span class="text-2xl text-gray-400"
+                ><%= club.name.charAt(0) %></span
               >
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody
-            id="categoryTableBody"
-            class="bg-white divide-y divide-gray-100"
-          ></tbody>
-        </table>
+            </div>
+            <% } %>
+          </div>
+
+          <div class="p-4">
+            <!-- Club Name -->
+            <h3 class="text-lg font-semibold text-gray-800 mb-1 truncate">
+              <%= club.name %>
+            </h3>
+
+            <!-- Parent Category -->
+            <div class="text-sm text-gray-500 mb-2">
+              <span
+                class="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs"
+              >
+                <%= club.parentCategory ? club.parentCategory.name : 'No
+                Category' %>
+              </span>
+            </div>
+
+            <!-- Description -->
+            <p
+              class="text-sm text-gray-600 mb-3 h-12 overflow-hidden line-clamp-2"
+            >
+              <%= club.description || 'No description available' %>
+            </p>
+
+            <!-- Status Badge -->
+            <div class="mb-3">
+              <% if (club.isActive) { %>
+              <span
+                class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full"
+              >
+                Active
+              </span>
+              <% } else { %>
+              <span
+                class="px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full"
+              >
+                Inactive
+              </span>
+              <% } %>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end pt-2 border-t border-gray-100">
+              <button
+                class="text-blue-500 hover:text-blue-700 mr-4 edit-club-btn"
+                data-id="<%= club._id %>"
+                data-name="<%= club.name %>"
+                data-description="<%= club.description %>"
+                data-parent="<%= club.parentCategory ? club.parentCategory._id : '' %>"
+                data-image="<%= club.image %>"
+                data-active="<%= club.isActive %>"
+              >
+                <i class="fas fa-edit"></i> Edit
+              </button>
+
+              <button
+                class="text-red-500 hover:text-red-700 delete-club-btn"
+                data-id="<%= club._id %>"
+              >
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+        <% }); %> <% } else { %>
+        <div
+          class="col-span-full bg-white rounded-lg shadow p-6 text-center text-gray-500"
+        >
+          No clubs found.
+        </div>
+        <% } %>
       </div>
     </div>
+
+    <!-- ........................club cards end -->
   </div>
 </div>
 

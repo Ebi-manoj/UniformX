@@ -30,6 +30,7 @@ export const getClubCategory = asyncHandler(async (req, res) => {
     totalPages,
     searchQuery,
     limit,
+    clubs,
     categories,
   });
 });
