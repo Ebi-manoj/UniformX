@@ -21,6 +21,14 @@ const categoryStorage = new CloudinaryStorage({
     transformation: [{ width: 500, crop: 'limit' }],
   },
 });
+const clubStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'uniformx/clubs',
+    format: async (req, file) => 'webp',
+    transformation: [{ width: 500, crop: 'limit' }],
+  },
+});
 
 // For product images
 const productStorage = new CloudinaryStorage({
@@ -35,4 +43,5 @@ const productStorage = new CloudinaryStorage({
 // Create multer instances
 export const categoryUpload = multer({ storage: categoryStorage });
 export const productUpload = multer({ storage: productStorage });
+export const clubUpload = multer({ storage: clubStorage });
 export { cloudinary };

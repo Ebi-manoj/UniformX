@@ -1,14 +1,14 @@
 // DOM Elements
 const modal = document.getElementById('modal');
 const deleteModal = document.getElementById('deleteModal');
-const addCategoryBtn = document.getElementById('addCategoryBtn');
+const addCategoryBtn = document.getElementById('addCategoryBtn'); // For Main Category
+const addClubBtn = document.getElementById('addClubBtn'); // Add this for Club Category if you have a separate button
 const closeBtn = document.getElementById('closeBtn');
 const cancelDelete = document.getElementById('cancelDelete');
 const categoryForm = document.getElementById('categoryForm');
 const editButtons = document.querySelector('.edit-category-btn');
+const editClubButtons = document.querySelector('.edit-club-btn'); // Add this for club edit buttons if needed
 
-/////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 // Toast notification function
 const showToast = function (message, icon = 'error') {
   Swal.fire({
@@ -22,12 +22,22 @@ const showToast = function (message, icon = 'error') {
 };
 
 // Modal functions
-const openModal = function () {
+const openModal = function (formType = 'category') {
   modal.classList.remove('hidden');
-  // Reset form when opening for new category
-  if (categoryForm.action.includes('add-category')) {
+  if (formType === 'club') {
+    categoryForm.action = '/admin/club-category';
     categoryForm.reset();
-    document.getElementById('modalTitle').textContent = 'Add Category';
+    document.getElementById('modalTitle').textContent = 'Club Category';
+    document.getElementById('categoryId').value = '';
+    if (document.getElementById('status'))
+      document.getElementById('status').value = ''; // Reset dropdown
+  } else {
+    // Main Category
+    if (categoryForm.action.includes('add-category')) {
+      categoryForm.reset();
+      document.getElementById('modalTitle').textContent = 'Add Category';
+      document.getElementById('categoryId').value = '';
+    }
   }
 };
 
@@ -44,7 +54,15 @@ const validateForm = function () {
   const name = document.getElementById('name').value.trim();
   const description = document.getElementById('description').value.trim();
   const image = document.getElementById('image').files.length;
-  const isEdit = categoryForm.action.includes('edit-category');
+  const status = document.getElementById('status')
+    ? document.getElementById('status').value
+    : null;
+  const isEdit =
+    categoryForm.action.includes('edit-category') ||
+    categoryForm.action.includes('edit-club');
+  const isClubForm =
+    categoryForm.action.includes('club-category') ||
+    categoryForm.action.includes('edit-club');
 
   if (!name) {
     showToast('Name is required!', 'warning');
@@ -56,7 +74,13 @@ const validateForm = function () {
     return false;
   }
 
-  // Only require image for new categories or if no current image exists
+  // Validate status for club form
+  if (isClubForm && !status) {
+    showToast('Main Category is required!', 'warning');
+    return false;
+  }
+
+  // Only require image for new entries (not edits)
   if (image === 0 && !isEdit) {
     showToast('Image is required!', 'warning');
     return false;
@@ -65,43 +89,45 @@ const validateForm = function () {
   return true;
 };
 
-// Edit category function
+// Edit functions
 function editCategory(id, name, description) {
-  // Update form attributes
-  console.log(window.location.pathname);
-
   categoryForm.action = `/admin/edit-category/${id}`;
   document.getElementById('modalTitle').textContent = 'Edit Category';
-
-  // Set form values
   document.getElementById('categoryId').value = id;
   document.getElementById('name').value = name || '';
   document.getElementById('description').value = description || '';
-  document.getElementById('image').value = '';
+  document.getElementById('image').value = ''; // Reset file input
+  openModal('category');
+}
 
-  // Show modal
-  openModal();
+function editClub(id, name, description, mainCategory) {
+  categoryForm.action = `/admin/edit-club/${id}`; // Assuming an edit-club route
+  document.getElementById('modalTitle').textContent = 'Edit Club Category';
+  document.getElementById('categoryId').value = id;
+  document.getElementById('name').value = name || '';
+  document.getElementById('description').value = description || '';
+  if (document.getElementById('status'))
+    document.getElementById('status').value = mainCategory || ''; // Set dropdown
+  document.getElementById('image').value = ''; // Reset file input
+  openModal('club');
 }
 
 // Delete confirmation
 function confirmDelete(id) {
-  console.log(id);
-
   document.getElementById('deleteCategoryId').value = id;
   deleteModal.classList.remove('hidden');
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function () {
-  // Modal controls
+  // Modal controls for Main Category
   if (addCategoryBtn) {
-    addCategoryBtn.addEventListener('click', function () {
-      categoryForm.action = '/admin/add-category';
-      categoryForm.reset();
-      document.getElementById('modalTitle').textContent = 'Add Category';
-      document.getElementById('categoryId').value = '';
-      openModal();
-    });
+    addCategoryBtn.addEventListener('click', () => openModal('category'));
+  }
+
+  // Modal controls for Club Category
+  if (addClubBtn) {
+    addClubBtn.addEventListener('click', () => openModal('club'));
   }
 
   if (closeBtn) {
@@ -113,15 +139,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Close modal on outside click
   modal.addEventListener('click', event => {
-    if (event.target === modal) {
-      closeModal();
-    }
+    if (event.target === modal) closeModal();
   });
 
   deleteModal.addEventListener('click', event => {
-    if (event.target === deleteModal) {
-      closeDeleteModal();
-    }
+    if (event.target === deleteModal) closeDeleteModal();
   });
 
   // Close modals on escape key
@@ -136,33 +158,42 @@ document.addEventListener('DOMContentLoaded', function () {
   if (categoryForm) {
     categoryForm.addEventListener('submit', function (event) {
       event.preventDefault();
-
       if (validateForm()) {
-        // Submit the form and show success message
         this.submit();
         closeModal();
       }
     });
   }
-  // edit-caegory
+
+  // Edit and delete handlers
   document.addEventListener('click', function (event) {
-    // Handle edit buttons
+    // Handle edit category buttons
     if (event.target.closest('.edit-category-btn')) {
       const button = event.target.closest('.edit-category-btn');
       const id = button.getAttribute('data-id');
       const name = button.getAttribute('data-name');
       const description = button.getAttribute('data-description');
       const imagePath = button.getAttribute('data-image');
-      console.log('Edit');
-      console.log(id, name, description, imagePath);
+      console.log('Edit Category:', id, name, description, imagePath);
+      editCategory(id, name, description);
+    }
 
-      editCategory(id, name, description, imagePath);
+    // Handle edit club buttons
+    if (event.target.closest('.edit-club-btn')) {
+      const button = event.target.closest('.edit-club-btn');
+      const id = button.getAttribute('data-id');
+      const name = button.getAttribute('data-name');
+      const description = button.getAttribute('data-description');
+      const mainCategory = button.getAttribute('data-main-category'); // Store category value here
+      console.log('Edit Club:', id, name, description, mainCategory);
+      editClub(id, name, description, mainCategory);
     }
 
     // Handle delete buttons
     if (event.target.closest('.delete-category-btn')) {
       const button = event.target.closest('.delete-category-btn');
       const id = button.getAttribute('data-id');
+      console.log('Delete:', id);
       confirmDelete(id);
     }
   });

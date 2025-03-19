@@ -60,7 +60,7 @@
 
     <form
       id="categoryForm"
-      action="/admin/add-club"
+      action="/admin/club-category"
       method="post"
       enctype="multipart/form-data"
     >
@@ -95,13 +95,13 @@
         <label class="block font-semibold">Main Category</label>
         <select
           id="status"
-          name="status"
+          name="mainCategory"
           class="w-full px-4 py-3 border border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-black bg-white"
         >
           <option value="" disabled selected>Select Category</option>
-          <option value="active">Football</option>
-          <option value="inactive">Cricket</option>
-          <option value="pending">BasketBall</option>
+          <option value="football">Football</option>
+          <option value="cricket">Cricket</option>
+          <option value="basketball">BasketBall</option>
         </select>
       </div>
 

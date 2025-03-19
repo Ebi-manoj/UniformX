@@ -29,3 +29,8 @@ export const getClubCategory = asyncHandler(async (req, res) => {
     limit,
   });
 });
+
+export const addClub = asyncHandler(async (req, res) => {
+  const { name, description, status } = req.body;
+  console.log();
+});
