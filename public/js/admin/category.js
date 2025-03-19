@@ -54,8 +54,8 @@ const validateForm = function () {
   const name = document.getElementById('name').value.trim();
   const description = document.getElementById('description').value.trim();
   const image = document.getElementById('image').files.length;
-  const status = document.getElementById('status')
-    ? document.getElementById('status').value
+  const status = document.getElementById('category_main')
+    ? document.getElementById('category_main').value
     : null;
   const isEdit =
     categoryForm.action.includes('edit-category') ||
