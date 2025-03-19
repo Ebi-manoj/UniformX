@@ -109,3 +109,22 @@ export const editClub = asyncHandler(async (req, res) => {
   req.flash('success', 'Club updated successfully!');
   res.redirect('/admin/club-category');
 });
+
+export const deleteClub = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!validateId(id)) {
+    req.flash('error', 'Category not Found');
+    return res.redirect('/admin/club-category');
+  }
+  const deletedClub = await Club.findByIdAndUpdate(
+    id,
+    { isActive: false },
+    { new: true }
+  );
+  if (!deletedClub) {
+    req.flash('error', 'Something went wrong!');
+    return res.redirect('/admin/club-category');
+  }
+  req.flash('success', 'Category deleted Successfully');
+  res.redirect('/admin/club-category');
+});

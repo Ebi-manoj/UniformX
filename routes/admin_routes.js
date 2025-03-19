@@ -18,6 +18,7 @@ import {
 } from '../controllers/admin_controllers/categoryManagement.js';
 import {
   addClub,
+  deleteClub,
   editClub,
   getClubCategory,
 } from '../controllers/admin_controllers/clubCategory.js';
@@ -52,4 +53,5 @@ router.post(
   clubUpload.single('image'),
   editClub
 );
+router.patch('/delete-club/:id', isProtected, deleteClub);
 export default router;
