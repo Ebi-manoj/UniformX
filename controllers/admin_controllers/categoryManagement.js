@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { Category } from '../../model/category_model.js';
 import { cloudinary } from '../../config/cloudinary.js';
 import { validateId } from '../../utilities/validateId.js';
+import { Club } from '../../model/club_model.js';
 
 ///////////////////////////////////////////////////////////////////////////
 //Get all Category
@@ -34,8 +35,6 @@ export const getCategory = asyncHandler(async (req, res) => {
     totalCount,
     searchQuery,
     limit,
-    success_msg: res.locals.success_msg,
-    error_msg: res.locals.error_msg,
   });
 });
 //////////////////////////////////////////////////////////////////////////////////

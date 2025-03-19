@@ -68,6 +68,8 @@ const validateForm = function () {
 // Edit category function
 function editCategory(id, name, description) {
   // Update form attributes
+  console.log(window.location.pathname);
+
   categoryForm.action = `/admin/edit-category/${id}`;
   document.getElementById('modalTitle').textContent = 'Edit Category';
 

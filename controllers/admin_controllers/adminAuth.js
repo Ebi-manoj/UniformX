@@ -46,8 +46,6 @@ export const getDashboard = asyncHandler(async (req, res) => {
   res.render('admin/dashboard', {
     cssFile: 'admin_dashboard',
     js_file: null,
-    success_msg: false,
-    error_msg: false,
   });
 });
 
