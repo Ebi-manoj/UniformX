@@ -2,7 +2,6 @@ import asyncHandler from 'express-async-handler';
 import { Club } from '../../model/club_model.js';
 import { validateId } from '../../utilities/validateId.js';
 import { Category } from '../../model/category_model.js';
-import mongoose from 'mongoose';
 
 export const getClubCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -20,7 +19,8 @@ export const getClubCategory = asyncHandler(async (req, res) => {
   const clubs = await Club.find(query)
     .sort({ createdAt: -1 })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .populate('category_id', 'name');
   const categories = await Category.find({}, { name: 1 });
   res.render('admin/clubCategory', {
     category: 'club',

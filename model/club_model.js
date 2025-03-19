@@ -10,7 +10,7 @@ const clubSchema = new mongoose.Schema(
     },
     category_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
+      ref: 'category',
       required: true,
     },
     description: {

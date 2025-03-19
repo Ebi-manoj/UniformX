@@ -17,6 +17,7 @@
             class="h-40 bg-gray-100 flex items-center justify-center overflow-hidden"
           >
             <% if (club.image) { %>
+            <!-- Assuming logo_url from schema -->
             <img
               src="<%= club.image %>"
               alt="<%= club.name %>"
@@ -44,8 +45,7 @@
               <span
                 class="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs"
               >
-                <%= club.parentCategory ? club.parentCategory.name : 'No
-                Category' %>
+                <%= club.category_id ? club.category_id.name : 'No Category' %>
               </span>
             </div>
 
@@ -80,7 +80,7 @@
                 data-id="<%= club._id %>"
                 data-name="<%= club.name %>"
                 data-description="<%= club.description %>"
-                data-parent="<%= club.parentCategory ? club.parentCategory._id : '' %>"
+                data-parent="<%= club.category_id ? club.category_id._id : '' %>"
                 data-image="<%= club.image %>"
                 data-active="<%= club.isActive %>"
               >
