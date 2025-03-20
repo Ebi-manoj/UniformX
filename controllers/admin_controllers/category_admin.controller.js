@@ -118,7 +118,15 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     req.flash('error', 'Category not Found');
     return res.redirect('/admin/category');
   }
+  const category = await Category.findById(id);
+
+  // delete cloudinary image
+  if (category.image) {
+    const publicId = category.image.split('/').pop().split('.')[0];
+    await cloudinary.uploader.destroy(`uniformx/categories/${publicId}`);
+  }
   const deletedCategory = await Category.findByIdAndDelete(id);
+
   if (!deletedCategory) {
     req.flash('error', 'Something went wrong!');
     return res.redirect('/admin/category');

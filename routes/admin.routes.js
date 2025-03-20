@@ -32,6 +32,8 @@ router.get('/dashboard', isProtected, getDashboard);
 router.post('/logout', logout);
 router.get('/customers', isProtected, getUser);
 router.patch('/customers/block/:id', isProtected, toggleBlock);
+
+// Catgeory routes
 router.get('/category', isProtected, getCategory);
 router.post(
   '/add-category',
@@ -46,7 +48,9 @@ router.post(
   editCategory
 );
 router.post('/toggle-category/:id', isProtected, toggleCategoryStatus);
-router.patch('/delete-category/:id', isProtected, deleteCategory);
+router.delete('/delete-category/:id', isProtected, deleteCategory);
+
+// Club routes
 router.get('/club-category', isProtected, getClubCategory);
 router.post('/add-club', isProtected, clubUpload.single('image'), addClub);
 router.post(
@@ -56,4 +60,5 @@ router.post(
   editClub
 );
 router.delete('/delete-club/:id', isProtected, deleteClub);
+
 export default router;
