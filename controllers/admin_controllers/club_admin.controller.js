@@ -4,13 +4,15 @@ import { validateId } from '../../utilities/validateId.js';
 import { Category } from '../../model/category_model.js';
 import { v2 as cloudinary } from 'cloudinary';
 
+//////////////////////////////////////////////////
+///Get all clubs
 export const getClubCategory = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 4;
   const skip = (page - 1) * limit;
   const searchQuery = req.query.search?.trim() || '';
 
-  let query = { isActive: true };
+  let query = {};
   if (searchQuery) {
     query.name = { $regex: searchQuery, $options: 'i' };
   }
@@ -27,6 +29,7 @@ export const getClubCategory = asyncHandler(async (req, res) => {
     category: 'club',
     cssFile: 'user_manage',
     js_file: 'category',
+    currentPage: page,
     totalCount,
     totalPages,
     searchQuery,
@@ -36,6 +39,8 @@ export const getClubCategory = asyncHandler(async (req, res) => {
   });
 });
 
+/////////////////////////////////////////////////////
+/////////addClub
 export const addClub = asyncHandler(async (req, res) => {
   const { name, description, category_id } = req.body;
   console.log(req.file);
@@ -67,6 +72,8 @@ export const addClub = asyncHandler(async (req, res) => {
   res.redirect('/admin/club-category');
 });
 
+////////////////////////////////////////////////////////////
+///////edit club
 export const editClub = asyncHandler(async (req, res) => {
   const { name, description, category_id } = req.body;
   const { id } = req.params;
@@ -109,18 +116,36 @@ export const editClub = asyncHandler(async (req, res) => {
   req.flash('success', 'Club updated successfully!');
   res.redirect('/admin/club-category');
 });
+///////////////////////////////////////////////////////
+//toggle club status
+export const toggleClubStatus = async (req, res) => {
+  const clubId = req.params.id;
+  const club = await Club.findById(clubId);
+  if (!club) return res.status(404).send('Category not found');
+
+  club.isActive = !club.isActive;
+  await club.save();
+
+  res.status(200).json({ success: true });
+};
+//////////////////////////////////////////////////////
+//delete club permanently
 
 export const deleteClub = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!validateId(id)) {
-    req.flash('error', 'Category not Found');
+    req.flash('error', 'Club not Found');
     return res.redirect('/admin/club-category');
   }
-  const deletedClub = await Club.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const club = await Club.findById(id);
+
+  // delete cloudinary image
+  if (club.image) {
+    const publicId = club.image.split('/').pop().split('.')[0];
+    await cloudinary.uploader.destroy(`uniformx/categories/${publicId}`);
+  }
+  const deletedClub = await Club.findByIdAndDelete(id);
+
   if (!deletedClub) {
     req.flash('error', 'Something went wrong!');
     return res.redirect('/admin/club-category');

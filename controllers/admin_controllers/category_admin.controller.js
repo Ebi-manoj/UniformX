@@ -106,7 +106,7 @@ export const toggleCategoryStatus = async (req, res) => {
   category.isActive = !category.isActive;
   await category.save();
 
-  res.redirect('/admin/category');
+  res.status(200).json({ success: true });
 };
 
 /////////////////////////////////////////////////////////////////////////////////

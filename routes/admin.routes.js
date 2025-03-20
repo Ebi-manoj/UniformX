@@ -22,6 +22,7 @@ import {
   deleteClub,
   editClub,
   getClubCategory,
+  toggleClubStatus,
 } from '../controllers/admin_controllers/club_admin.controller.js';
 import { categoryUpload, clubUpload } from '../config/cloudinary.js';
 const router = express.Router();
@@ -59,6 +60,7 @@ router.post(
   clubUpload.single('image'),
   editClub
 );
+router.post('/toggle-club/:id', isProtected, toggleClubStatus);
 router.delete('/delete-club/:id', isProtected, deleteClub);
 
 export default router;
