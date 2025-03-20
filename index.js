@@ -12,7 +12,7 @@ import { errorhandling } from './middlewares/error_handling.js';
 import { connectDB } from './config/db.js';
 import { Admin } from './model/admin_model.js';
 import { User } from './model/user_model.js';
-import adminRoutes from './routes/admin_routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 dotenv.config();
 connectDB();

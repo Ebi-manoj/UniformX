@@ -4,24 +4,24 @@ import {
   getLogin,
   getDashboard,
   logout,
-} from '../controllers/admin_controllers/adminAuth.js';
+} from '../controllers/admin_controllers/auth_admin.controller.js';
 import { isProtected } from '../middlewares/auth_middleware.js';
 import {
   getUser,
   toggleBlock,
-} from '../controllers/admin_controllers/userManagement.js';
+} from '../controllers/admin_controllers/user_admin.controller.js';
 import {
   addCategory,
   deleteCategory,
   editCategory,
   getCategory,
-} from '../controllers/admin_controllers/categoryManagement.js';
+} from '../controllers/admin_controllers/category_admin.controller.js';
 import {
   addClub,
   deleteClub,
   editClub,
   getClubCategory,
-} from '../controllers/admin_controllers/clubCategory.js';
+} from '../controllers/admin_controllers/club_admin.controller.js';
 import { categoryUpload, clubUpload } from '../config/cloudinary.js';
 const router = express.Router();
 
