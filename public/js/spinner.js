@@ -1,53 +1,35 @@
-// spinner.js
+// public/js/spinner.js
 class Spinner {
   constructor() {
     this.spinner = document.getElementById('loadingSpinner');
+    this.timeout = null;
     this.init();
   }
 
-  // Show the spinner
   show() {
+    clearTimeout(this.timeout);
     if (this.spinner) this.spinner.classList.remove('hidden');
   }
 
-  // Hide the spinner
   hide() {
-    if (this.spinner) this.spinner.classList.add('hidden');
+    clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      if (this.spinner) this.spinner.classList.add('hidden');
+    }, 200);
   }
 
-  // Detect navigation events
   init() {
-    // Hide spinner on page load
     document.addEventListener('DOMContentLoaded', () => this.hide());
-
-    // Show spinner on form submissions
     document.querySelectorAll('form').forEach(form => {
       form.addEventListener('submit', event => {
-        const isValid = form.checkValidity();
-        if (isValid) this.show();
+        if (form.checkValidity()) this.show();
       });
     });
-
-    // Show spinner on navigation link clicks
     document.querySelectorAll('a[href*="/admin"]').forEach(link => {
-      link.addEventListener('click', () => {
-        this.show();
-      });
+      link.addEventListener('click', () => this.show());
     });
-
-    // Show spinner before page unload (e.g., redirect)
-    window.addEventListener('beforeunload', () => {
-      this.show();
-    });
-
-    // Hide spinner when new page is fully loaded
-    window.addEventListener('load', () => {
-      this.hide();
-    });
+    window.addEventListener('beforeunload', () => this.show());
+    window.addEventListener('load', () => this.hide());
   }
 }
-
-// Instantiate the spinner globally
-const spinner = new Spinner();
-
-// Export for manual control (optional)
+new Spinner();
