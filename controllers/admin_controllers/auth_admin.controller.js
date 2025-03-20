@@ -42,7 +42,6 @@ export const adminLogin = asyncHandler(async (req, res) => {
 });
 
 export const getDashboard = asyncHandler(async (req, res) => {
-  req.flash('success', 'Authenticated');
   res.render('admin/dashboard', {
     cssFile: 'admin_dashboard',
     js_file: null,
