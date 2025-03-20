@@ -35,7 +35,7 @@ const closeDeleteModal = function () {
 const validateForm = function () {
   const name = document.getElementById('name').value.trim();
   const description = document.getElementById('description').value.trim();
-  const categoryId = document.getElementById('category_main')?.value; // Club-specific dropdown
+  const categoryId = document.getElementById('category_main')?.value;
   const image = document.getElementById('image').files.length;
   const isEdit = categoryForm.action.includes('edit');
   const isClubForm = categoryForm.action.includes('club');
@@ -66,8 +66,14 @@ const validateForm = function () {
 };
 
 // Edit function (for both category and club)
-function editItem(id, name, description, categoryId = '', image = '') {
-  const isClub = categoryForm.action.includes('club') || categoryId !== '';
+function editItem(
+  id,
+  name,
+  description,
+  categoryId = '',
+  image = '',
+  isClub = false
+) {
   categoryForm.action = isClub
     ? `/admin/edit-club/${id}`
     : `/admin/edit-category/${id}`;
@@ -87,6 +93,25 @@ function editItem(id, name, description, categoryId = '', image = '') {
   openModal();
 }
 
+// Toggle function (for both category and club)
+function toggleItem(id, isClub = false) {
+  const url = isClub
+    ? `/admin/toggle-club/${id}`
+    : `/admin/toggle-category/${id}`;
+  fetch(url, { method: 'POST' })
+    .then(response => {
+      if (!response.ok) throw new Error('Toggle failed');
+      showToast('Status updated successfully!', 'success');
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    })
+    .catch(err => {
+      console.error('Toggle error:', err);
+      showToast('Failed to update status', 'error');
+    });
+}
+
 // Delete confirmation
 function confirmDelete(id, isClub = false) {
   document.getElementById('deleteCategoryId').value = id;
@@ -101,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Add new item (category or club)
   if (addCategoryBtn) {
     addCategoryBtn.addEventListener('click', function () {
-      const isClubForm = this.dataset.type === 'club'; // Use data-type to distinguish
+      const isClubForm = this.dataset.type === 'club';
       categoryForm.action = isClubForm
         ? '/admin/add-club'
         : '/admin/add-category';
@@ -111,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
         : 'Add Category';
       document.getElementById('categoryId').value = '';
       if (isClubForm && document.getElementById('category_main')) {
-        document.getElementById('category_main').value = ''; // Reset dropdown for clubs
+        document.getElementById('category_main').value = '';
       }
       openModal();
     });
@@ -129,15 +154,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Close modal on outside click
   modal.addEventListener('click', event => {
-    if (event.target === modal) {
-      closeModal();
-    }
+    if (event.target === modal) closeModal();
   });
 
   deleteModal.addEventListener('click', event => {
-    if (event.target === deleteModal) {
-      closeDeleteModal();
-    }
+    if (event.target === deleteModal) closeDeleteModal();
   });
 
   // Close modals on escape key
@@ -159,24 +180,33 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Edit and delete button handlers
+  // Button handlers for edit, toggle, and delete
   document.addEventListener('click', function (event) {
-    // Handle edit buttons
+    // Determine if we're in a club context
+    const isClub = event.target.closest('.club-category-template') !== null;
+
+    // Edit button
     if (event.target.closest('.edit-category-btn')) {
       const button = event.target.closest('.edit-category-btn');
       const id = button.getAttribute('data-id');
       const name = button.getAttribute('data-name');
       const description = button.getAttribute('data-description');
-      const categoryId = button.getAttribute('data-parent') || ''; // Club-specific
+      const categoryId = button.getAttribute('data-parent') || '';
       const image = button.getAttribute('data-image') || '';
-      editItem(id, name, description, categoryId, image);
+      editItem(id, name, description, categoryId, image, isClub);
     }
 
-    // Handle delete buttons
+    // Toggle button
+    if (event.target.closest('.toggle-category-btn')) {
+      const button = event.target.closest('.toggle-category-btn');
+      const id = button.getAttribute('data-id');
+      toggleItem(id, isClub);
+    }
+
+    // Delete button
     if (event.target.closest('.delete-category-btn')) {
       const button = event.target.closest('.delete-category-btn');
       const id = button.getAttribute('data-id');
-      const isClub = button.closest('.club-category-template') !== null; // Detect club context if needed
       confirmDelete(id, isClub);
     }
   });

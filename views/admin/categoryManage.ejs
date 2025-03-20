@@ -222,6 +222,7 @@
         Cancel
       </button>
       <form id="deleteForm" action="/admin/delete-category" method="post">
+        <input type="hidden" name="_method" value="patch" />
         <input type="hidden" id="deleteCategoryId" name="categoryId" />
         <button
           type="submit"

@@ -11,7 +11,7 @@ export const getCategory = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   const searchQuery = req.query.search?.trim() || '';
 
-  let query = { isActive: true };
+  let query = {};
   if (searchQuery) {
     query.name = { $regex: searchQuery, $options: 'i' };
   }
@@ -96,6 +96,18 @@ export const editCategory = asyncHandler(async (req, res) => {
   req.flash('success', 'Category updated successfully!');
   res.redirect('/admin/category');
 });
+////////////////////////////////////////////////////////////////////////////////////
+////////Toggle status of Catgeory
+export const toggleCategoryStatus = async (req, res) => {
+  const categoryId = req.params.id;
+  const category = await Category.findById(categoryId);
+  if (!category) return res.status(404).send('Category not found');
+
+  category.isActive = !category.isActive;
+  await category.save();
+
+  res.redirect('/admin/category');
+};
 
 /////////////////////////////////////////////////////////////////////////////////
 //////Delete Category
@@ -106,11 +118,7 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     req.flash('error', 'Category not Found');
     return res.redirect('/admin/category');
   }
-  const deletedCategory = await Category.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const deletedCategory = await Category.findByIdAndDelete(id);
   if (!deletedCategory) {
     req.flash('error', 'Something went wrong!');
     return res.redirect('/admin/category');

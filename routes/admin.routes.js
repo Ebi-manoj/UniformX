@@ -15,6 +15,7 @@ import {
   deleteCategory,
   editCategory,
   getCategory,
+  toggleCategoryStatus,
 } from '../controllers/admin_controllers/category_admin.controller.js';
 import {
   addClub,
@@ -44,6 +45,7 @@ router.post(
   categoryUpload.single('image'),
   editCategory
 );
+router.post('/toggle-category/:id', isProtected, toggleCategoryStatus);
 router.patch('/delete-category/:id', isProtected, deleteCategory);
 router.get('/club-category', isProtected, getClubCategory);
 router.post('/add-club', isProtected, clubUpload.single('image'), addClub);
@@ -53,5 +55,5 @@ router.post(
   clubUpload.single('image'),
   editClub
 );
-router.patch('/delete-club/:id', isProtected, deleteClub);
+router.delete('/delete-club/:id', isProtected, deleteClub);
 export default router;
