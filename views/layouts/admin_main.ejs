@@ -9,7 +9,8 @@
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- css file renderinggg -->
+
+    <!------------------------- css file renderinggg-------------------------------------------- -->
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -19,14 +20,17 @@
     <% } %>
     <link rel="stylesheet" href="/styles/admin/common.css" />
 
-    <!-- js file rendering... -->
+    <!------------------------------------- js file rendering-------------------------------- -->
     <script src="/js/admin/common.js" defer></script>
     <script src="/js/alert.js" defer></script>
+    <script src="/js/spinner.js" defer></script>
     <% if (js_file) { %>
     <script type="module" src="/js/admin/<%= js_file %>.js" defer></script>
     <% } %>
+    <!-- ------------------------------------------------------------------------------------------ -->
   </head>
   <body>
-    <%- include('../partials/admin_sidebar') %> <%- body %>
+    <%- include('../partials/spinner') %> <%-
+    include('../partials/admin_sidebar') %> <%- body %>
   </body>
 </html>

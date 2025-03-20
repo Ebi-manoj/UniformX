@@ -26,7 +26,7 @@ const clubStorage = new CloudinaryStorage({
   params: {
     folder: 'uniformx/clubs',
     format: async (req, file) => 'webp',
-    transformation: [{ width: 500, crop: 'limit' }],
+    transformation: [{ width: 720, height: 720, crop: 'fill' }],
   },
 });
 

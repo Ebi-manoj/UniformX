@@ -67,6 +67,9 @@ app.use(expressLayouts);
 app.set('view engine', 'ejs');
 app.set('layout', 'layouts/admin_main');
 // routes
+app.get('/spinner', (req, res) => {
+  res.render('partials/spinner', { cssFile: null, js_file: null });
+});
 app.use('/admin', adminRoutes);
 
 // error Handling
