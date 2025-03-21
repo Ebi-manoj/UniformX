@@ -8,35 +8,25 @@
 
     <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
       <!-- Search Bar -->
-      <div class="relative flex-grow">
+      <div class="relative">
         <input
           type="text"
           id="searchInput"
-          placeholder="Search products"
-          class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+          class="border p-2 w-full"
+          placeholder="Search..."
+          value="<%= searchQuery %>"
         />
-        <div
-          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+        <button
+          id="clearButton"
+          class="absolute right-2 top-2 text-gray-500 hidden"
         >
-          <svg
-            class="h-5 w-5 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
+          ✖
+        </button>
       </div>
 
       <!-- Add Product Button -->
       <button
-        class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center transition-colors duration-200"
+        class="bg-black hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg flex items-center justify-center transition-colors duration-200"
       >
         <svg
           class="w-5 h-5 mr-2"
@@ -71,11 +61,9 @@
           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
         >
           <option value="">All Categories</option>
-          <% if (products.categories && products.categories.length > 0) { %> <%
-          products.categories.forEach(category => { %>
-          <option value="<%= products.category._id %>">
-            <%= products.category.name %>
-          </option>
+          <% if (categories && categories.length > 0) { %> <%
+          categories.forEach(category => { %>
+          <option value="<%= category._id %>"><%= category.name %></option>
           <% }); %> <% } %>
         </select>
       </div>
@@ -92,11 +80,8 @@
           class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
         >
           <option value="">All Clubs</option>
-          <% if (products.clubs && products.clubs.length > 0) { %> <%
-          products.clubs.forEach(club => { %>
-          <option value="<%= products.club._id %>">
-            <%= products.club.name %>
-          </option>
+          <% if (clubs && clubs.length > 0) { %> <% clubs.forEach(club => { %>
+          <option value="<%= club._id %>"><%= club.name %></option>
           <% }); %> <% } %>
         </select>
       </div>
@@ -179,7 +164,7 @@
 
         <!-- Stock Status Badge -->
         <div class="absolute top-2 left-2">
-          <% if (product.stock_status === 'In Stock') { %>
+          <% if (products.stock_status === 'In Stock') { %>
           <span
             class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full"
           >
@@ -332,100 +317,40 @@
   </div>
 
   <!-- Pagination -->
-  <div class="mt-8 flex justify-center">
-    <nav class="flex items-center space-x-1">
-      <% if (currentPage > 1) { %>
-      <a
-        href="?page=<%= currentPage - 1 %>"
-        class="px-3 py-2 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50"
-      >
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+  <% if (totalPages > 1) { %>
+  <div class="px-6 py-4 bg-white border-t border-gray-200">
+    <div class="flex justify-between items-center">
+      <div class="text-sm text-gray-600">
+        Showing <%= (currentPage - 1) * limit + 1 %> to <%= Math.min(currentPage
+        * limit, totalCount) %> of <%= totalCount %> results
+      </div>
+      <div class="flex space-x-1">
+        <% if (currentPage > 1) { %>
+        <a
+          href="/admin/club-category?page=<%= currentPage - 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+          class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </a>
-      <% } else { %>
-      <span
-        class="px-3 py-2 rounded-md bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed"
-      >
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+          <
+        </a>
+        <% } %> <% for(let i = 1; i <= totalPages; i++) { %>
+        <a
+          href="/admin/club-category?page=<%= i %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+          class="px-3 py-1 rounded-md border <%= currentPage === i ? 'bg-black text-white' : 'border-gray-300 text-gray-600 hover:bg-gray-100' %>"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-      </span>
-      <% } %> <% for(let i = 1; i <= totalPages; i++) { %> <% if (i ===
-      currentPage) { %>
-      <span class="px-3 py-2 rounded-md bg-purple-600 text-white">
-        <%= i %>
-      </span>
-      <% } else if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <=
-      currentPage + 1)) { %>
-      <a
-        href="?page=<%= i %>"
-        class="px-3 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
-      >
-        <%= i %>
-      </a>
-      <% } else if (i === currentPage - 2 || i === currentPage + 2) { %>
-      <span class="px-3 py-2">...</span>
-      <% } %> <% } %> <% if (currentPage < totalPages) { %>
-      <a
-        href="?page=<%= currentPage + 1 %>"
-        class="px-3 py-2 rounded-md bg-white border border-gray-300 text-gray-500 hover:bg-gray-50"
-      >
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+          <%= i %>
+        </a>
+        <% } %> <% if (currentPage < totalPages) { %>
+        <a
+          href="/admin/club-category?page=<%= currentPage + 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+          class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </a>
-      <% } else { %>
-      <span
-        class="px-3 py-2 rounded-md bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed"
-      >
-        <svg
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5l7 7-7 7"
-          />
-        </svg>
-      </span>
-      <% } %>
-    </nav>
+          Next
+        </a>
+        <% } %>
+      </div>
+    </div>
   </div>
+  <% } %>
 </div>
 
 <!-- Image Modal -->
