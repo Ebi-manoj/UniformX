@@ -30,7 +30,7 @@ export const getProducts = asyncHandler(async (req, res) => {
     category: 'main',
     cssFile: null,
     js_file: 'product',
-    products: null,
+    products,
     categories,
     clubs,
     currentPage: page,

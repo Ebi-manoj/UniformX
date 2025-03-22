@@ -179,15 +179,111 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /////Add Product Modal
+// Available sizes
+const availableSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+let sizeCounter = 0;
+
+// Open the modal
 function openAddProductModal() {
   document.getElementById('addProductModal').classList.remove('hidden');
   document.body.style.overflow = 'hidden'; // Prevent scrolling
+
+  // Add initial size row
+  if (document.querySelectorAll('.size-row').length === 0) {
+    addSizeRow();
+  }
 }
 
 // Close the modal
 function closeAddProductModal() {
   document.getElementById('addProductModal').classList.add('hidden');
   document.body.style.overflow = ''; // Restore scrolling
+}
+
+// Add a new size row
+function addSizeRow() {
+  const sizesContainer = document.getElementById('sizesContainer');
+  const rowId = `size-row-${sizeCounter++}`;
+
+  const row = document.createElement('div');
+  row.className = 'size-row flex items-center gap-4 p-3 bg-gray-50 rounded-md';
+  row.id = rowId;
+
+  // Create size dropdown
+  const sizeSelectWrapper = document.createElement('div');
+  sizeSelectWrapper.className = 'w-1/3';
+
+  const sizeLabel = document.createElement('label');
+  sizeLabel.className = 'block text-xs font-medium text-gray-500 mb-1';
+  sizeLabel.textContent = 'Size';
+
+  const sizeSelect = document.createElement('select');
+  sizeSelect.className =
+    'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+  sizeSelect.name = 'sizes[][size]';
+  sizeSelect.required = true;
+
+  // Add default option
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'Select size';
+  sizeSelect.appendChild(defaultOption);
+
+  // Add size options
+  availableSizes.forEach(size => {
+    const option = document.createElement('option');
+    option.value = size;
+    option.textContent = size;
+    sizeSelect.appendChild(option);
+  });
+
+  sizeSelectWrapper.appendChild(sizeLabel);
+  sizeSelectWrapper.appendChild(sizeSelect);
+
+  // Create quantity input
+  const quantityWrapper = document.createElement('div');
+  quantityWrapper.className = 'w-1/3';
+
+  const quantityLabel = document.createElement('label');
+  quantityLabel.className = 'block text-xs font-medium text-gray-500 mb-1';
+  quantityLabel.textContent = 'Quantity';
+
+  const quantityInput = document.createElement('input');
+  quantityInput.type = 'number';
+  quantityInput.className =
+    'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+  quantityInput.name = 'sizes[][stock_quantity]';
+  quantityInput.min = '0';
+  quantityInput.required = true;
+
+  quantityWrapper.appendChild(quantityLabel);
+  quantityWrapper.appendChild(quantityInput);
+
+  // Create remove button
+  const removeButtonWrapper = document.createElement('div');
+  removeButtonWrapper.className = 'flex items-end pb-1';
+
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'text-red-500 hover:text-red-700 focus:outline-none';
+  removeButton.innerHTML = `
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+    `;
+  removeButton.onclick = function () {
+    document.getElementById(rowId).remove();
+  };
+
+  removeButtonWrapper.appendChild(removeButton);
+
+  // Add all elements to the row
+  row.appendChild(sizeSelectWrapper);
+  row.appendChild(quantityWrapper);
+  row.appendChild(removeButtonWrapper);
+
+  // Add row to container
+  sizesContainer.appendChild(row);
 }
 
 // Handle image preview
@@ -237,26 +333,100 @@ function handleImagePreview(input) {
     });
   }
 }
-// Add product when Clicking
-document
-  .getElementById('addProductBtn')
-  .addEventListener('click', openAddProductModal);
 
-// Close modal when clicking outside
-document
-  .getElementById('addProductModal')
-  .addEventListener('click', function (event) {
-    if (event.target === this) {
+// Initialize event listeners
+document.addEventListener('DOMContentLoaded', function () {
+  // Add Size button
+  document.getElementById('addSizeBtn').addEventListener('click', addSizeRow);
+
+  // Close modal when clicking outside
+  document
+    .getElementById('addProductModal')
+    .addEventListener('click', function (event) {
+      if (event.target === this) {
+        closeAddProductModal();
+      }
+    });
+
+  // Close modal with Escape key
+  document.addEventListener('keydown', function (event) {
+    if (
+      event.key === 'Escape' &&
+      !document.getElementById('addProductModal').classList.contains('hidden')
+    ) {
       closeAddProductModal();
     }
   });
+  //   Show the modal
+  document
+    .getElementById('addProductBtn')
+    .addEventListener('click', openAddProductModal);
 
-// Close modal with Escape key
-document.addEventListener('keydown', function (event) {
-  if (
-    event.key === 'Escape' &&
-    !document.getElementById('addProductModal').classList.contains('hidden')
-  ) {
-    closeAddProductModal();
-  }
+  //   add colors
+
+  const colorPicker = document.getElementById('customColorPicker');
+  const colorBox = document.getElementById('customColorBox');
+
+  colorPicker.addEventListener('input', function () {
+    colorBox.style.backgroundColor = colorPicker.value;
+  });
+
+  // Form submission
+  document
+    .getElementById('addProductForm')
+    .addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      // Validate form
+      const form = this;
+      const formData = new FormData(form);
+
+      // Convert form data to match your schema
+      const productData = {
+        title: formData.get('title'),
+        price: formData.get('price'),
+        description: formData.get('description'),
+        category_id: formData.get('category_id'),
+        club_id: formData.get('club_id'),
+        type: formData.get('type'),
+        color: formData.getAll('color'),
+        sizes: [],
+      };
+
+      // Get all size rows
+      const sizeRows = document.querySelectorAll('.size-row');
+      let hasEmptyFields = false;
+
+      // Check if we have at least one size
+      if (sizeRows.length === 0) {
+        alert('Please add at least one size with stock quantity');
+        return;
+      }
+
+      // Process each size row
+      sizeRows.forEach(row => {
+        const sizeSelect = row.querySelector('select[name="sizes[][size]"]');
+        const quantityInput = row.querySelector(
+          'input[name="sizes[][stock_quantity]"]'
+        );
+
+        if (!sizeSelect.value || !quantityInput.value) {
+          hasEmptyFields = true;
+          return;
+        }
+
+        productData.sizes.push({
+          size: sizeSelect.value,
+          stock_quantity: parseInt(quantityInput.value, 10),
+        });
+      });
+
+      if (hasEmptyFields) {
+        alert('Please fill in all size and quantity fields');
+        return;
+      }
+
+      // Submit the form
+      form.submit();
+    });
 });

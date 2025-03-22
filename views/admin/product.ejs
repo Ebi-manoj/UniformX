@@ -441,6 +441,7 @@
   </div>
 </div>
 
+<!-- Add Product Modal -->
 <div
   id="addProductModal"
   class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden"
@@ -510,22 +511,6 @@
             />
           </div>
 
-          <!-- Available quantity -->
-          <div class="col-span-1">
-            <label
-              for="stock_quantity"
-              class="block text-sm font-medium text-gray-700 mb-1"
-              >Available quantity</label
-            >
-            <input
-              type="number"
-              id="stock_quantity"
-              name="stock_quantity"
-              required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
           <!-- Category -->
           <div class="col-span-1">
             <label
@@ -557,6 +542,7 @@
             <select
               id="club_id"
               name="club_id"
+              required
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a club</option>
@@ -630,84 +616,50 @@
               >Colors</label
             >
             <div class="flex flex-wrap gap-2">
-              <% const colors = [ { value: 'blue', class: 'bg-blue-400' }, {
-              value: 'yellow', class: 'bg-yellow-300' }, { value: 'green',
-              class: 'bg-green-500' }, { value: 'indigo', class: 'bg-indigo-500'
-              } ] %> <% colors.forEach(color => { %>
+              <!-- Custom Color Picker -->
               <label class="color-option cursor-pointer">
                 <input
-                  type="radio"
-                  name="color"
-                  value="<%= color.value %>"
-                  class="sr-only peer"
+                  type="color"
+                  id="customColorPicker"
+                  name="customColor"
+                  class="sr-only"
                 />
                 <span
-                  class="inline-block w-8 h-8 rounded-full <%= color.class %> border-2 border-transparent peer-checked:border-gray-800"
+                  id="customColorBox"
+                  class="inline-block w-8 h-8 rounded-full border-2 border-gray-400"
                 ></span>
               </label>
-              <% }); %>
             </div>
           </div>
 
-          <!-- Sizes -->
+          <!-- Sizes with Stock Quantities -->
           <div class="col-span-2">
             <label class="block text-sm font-medium text-gray-700 mb-2"
-              >Sizes</label
+              >Sizes & Stock Quantities</label
             >
-            <div class="flex flex-wrap gap-2">
-              <% const sizes = ['S', 'M', 'X', 'XL', 'XXL'] %> <%
-              sizes.forEach(size => { %>
-              <label class="size-option cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="sizes"
-                  value="<%= size %>"
-                  class="sr-only peer"
-                />
-                <span
-                  class="inline-block px-4 py-2 text-sm border border-gray-300 rounded-md peer-checked:bg-gray-800 peer-checked:text-white"
-                  ><%= size %></span
-                >
-              </label>
-              <% }); %>
+            <div id="sizesContainer" class="space-y-3">
+              <!-- Size template will be added here by JavaScript -->
             </div>
-          </div>
-
-          <!-- Stock Status -->
-          <div class="col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2"
-              >Stock Status</label
+            <button
+              type="button"
+              id="addSizeBtn"
+              class="mt-3 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
             >
-            <div class="flex gap-4">
-              <label class="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="stock_status"
-                  value="In Stock"
-                  class="form-radio text-blue-600"
-                  checked
+              <svg
+                class="w-4 h-4 inline-block mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
-                <span class="ml-2">In Stock</span>
-              </label>
-              <label class="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="stock_status"
-                  value="Out of Stock"
-                  class="form-radio text-blue-600"
-                />
-                <span class="ml-2">Out of Stock</span>
-              </label>
-              <label class="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="stock_status"
-                  value="Low Stock"
-                  class="form-radio text-blue-600"
-                />
-                <span class="ml-2">Low Stock</span>
-              </label>
-            </div>
+              </svg>
+              Add Size
+            </button>
           </div>
         </div>
 
@@ -719,7 +671,6 @@
           >
             Save Product
           </button>
-
           <button
             type="button"
             class="ml-4 px-6 py-2 bg-white text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
