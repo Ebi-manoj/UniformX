@@ -1,3 +1,5 @@
+import { showToast } from '../toast.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Product js loaded');
 
@@ -219,8 +221,8 @@ function addSizeRow() {
 
   const sizeSelect = document.createElement('select');
   sizeSelect.className =
-    'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
-  sizeSelect.name = 'sizes[][size]';
+    'size-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+  sizeSelect.name = 'sizesSize';
   sizeSelect.required = true;
 
   // Add default option
@@ -251,8 +253,8 @@ function addSizeRow() {
   const quantityInput = document.createElement('input');
   quantityInput.type = 'number';
   quantityInput.className =
-    'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
-  quantityInput.name = 'sizes[][stock_quantity]';
+    'stock-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+  quantityInput.name = 'sizesStock';
   quantityInput.min = '0';
   quantityInput.required = true;
 
@@ -375,62 +377,85 @@ document.addEventListener('DOMContentLoaded', function () {
       handleImagePreview(imageInput);
     });
   }
+
+  //Form Validation
+  const validateAddProductForm = function () {
+    const title = document.getElementById('title').value.trim();
+    const type = document.getElementById('type').value.trim();
+    const price = document.getElementById('price').value.trim();
+    const category = document.getElementById('category_id').value;
+    const club = document.getElementById('club_id').value;
+    const description = document.getElementById('description').value.trim();
+    const images = document.getElementById('productImages').files.length;
+    const sizesContainer = document.getElementById('sizesContainer');
+    const sizes = sizesContainer.querySelectorAll('.size-input');
+    const stockQuantities = sizesContainer.querySelectorAll('.stock-input');
+    if (!title) {
+      showToast('Title is required!', 'warning');
+      return false;
+    }
+
+    if (!type) {
+      showToast('Type is required!', 'warning');
+      return false;
+    }
+
+    if (!price || parseFloat(price) <= 0) {
+      showToast('Valid Price is required!', 'warning');
+      return false;
+    }
+
+    if (!category) {
+      showToast('Category is required!', 'warning');
+      return false;
+    }
+
+    if (!club) {
+      showToast('Club is required!', 'warning');
+      return false;
+    }
+
+    if (!description) {
+      showToast('Description is required!', 'warning');
+      return false;
+    }
+
+    if (images === 0) {
+      showToast('At least one image is required!', 'warning');
+      return false;
+    }
+
+    if (sizes.length < 1 || stockQuantities.length < 1) {
+      showToast('At least one size and stock quantity is required!', 'warning');
+      return false;
+    }
+
+    let isValidSizes = true;
+    sizes.forEach((sizeInput, index) => {
+      const sizeValue = sizeInput.value.trim();
+      const stockValue = stockQuantities[index].value.trim();
+
+      if (!sizeValue || !stockValue || parseInt(stockValue) < 1) {
+        isValidSizes = false;
+      }
+    });
+
+    if (!isValidSizes) {
+      showToast('All sizes must have valid stock quantities!', 'warning');
+      return false;
+    }
+
+    return true;
+  };
+
   // Form submission
   document
     .getElementById('addProductForm')
     .addEventListener('submit', function (event) {
       event.preventDefault();
-
-      // Validate form
-      const form = this;
-      const formData = new FormData(form);
-
-      // Convert form data to match your schema
-      const productData = {
-        title: formData.get('title'),
-        price: formData.get('price'),
-        description: formData.get('description'),
-        category_id: formData.get('category_id'),
-        club_id: formData.get('club_id'),
-        type: formData.get('type'),
-        color: formData.getAll('color'),
-        sizes: [],
-      };
-
-      // Get all size rows
-      const sizeRows = document.querySelectorAll('.size-row');
-      let hasEmptyFields = false;
-
-      // Check if we have at least one size
-      if (sizeRows.length === 0) {
-        alert('Please add at least one size with stock quantity');
-        return;
+      if (validateAddProductForm()) {
+        this.submit();
+        closeAddProductModal();
       }
-
-      // Process each size row
-      sizeRows.forEach(row => {
-        const sizeSelect = row.querySelector('select[name="sizes[][size]"]');
-        const quantityInput = row.querySelector(
-          'input[name="sizes[][stock_quantity]"]'
-        );
-
-        if (!sizeSelect.value || !quantityInput.value) {
-          hasEmptyFields = true;
-          return;
-        }
-
-        productData.sizes.push({
-          size: sizeSelect.value,
-          stock_quantity: parseInt(quantityInput.value, 10),
-        });
-      });
-
-      if (hasEmptyFields) {
-        alert('Please fill in all size and quantity fields');
-        return;
-      }
-
-      // Submit the form
-      form.submit();
     });
 });

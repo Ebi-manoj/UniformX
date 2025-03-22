@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     description: String,
-    color: [String],
+    color: String,
     sizes: [{ size: String, stock_quantity: Number }],
     category_id: {
       type: mongoose.Schema.Types.ObjectId,

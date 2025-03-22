@@ -24,8 +24,15 @@ import {
   getClubCategory,
   toggleClubStatus,
 } from '../controllers/admin_controllers/club_admin.controller.js';
-import { categoryUpload, clubUpload } from '../config/cloudinary.js';
-import { getProducts } from '../controllers/admin_controllers/product_admin.controller.js';
+import {
+  categoryUpload,
+  clubUpload,
+  productUpload,
+} from '../config/cloudinary.js';
+import {
+  addProducts,
+  getProducts,
+} from '../controllers/admin_controllers/product_admin.controller.js';
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -65,6 +72,11 @@ router.post('/toggle-club/:id', isProtected, toggleClubStatus);
 router.delete('/delete-club/:id', isProtected, deleteClub);
 
 // Product routes
-
 router.get('/products', isProtected, getProducts);
+router.post(
+  '/add-products',
+  isProtected,
+  productUpload.array('images', 5),
+  addProducts
+);
 export default router;
