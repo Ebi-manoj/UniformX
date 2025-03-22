@@ -29,8 +29,8 @@ export const getProducts = asyncHandler(async (req, res) => {
   res.render('admin/product', {
     category: 'main',
     cssFile: null,
-    js_file: null,
-    products,
+    js_file: 'product',
+    products: null,
     categories,
     clubs,
     currentPage: page,
