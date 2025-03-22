@@ -1,3 +1,5 @@
+import { showToast } from '../toast.js';
+
 // DOM Elements
 const modal = document.getElementById('modal');
 const deleteModal = document.getElementById('deleteModal');
@@ -5,18 +7,6 @@ const addCategoryBtn = document.getElementById('addCategoryBtn');
 const closeBtn = document.getElementById('closeBtn');
 const cancelDelete = document.getElementById('cancelDelete');
 const categoryForm = document.getElementById('categoryForm');
-
-// Toast notification function
-const showToast = function (message, icon = 'error') {
-  Swal.fire({
-    position: 'bottom-end',
-    icon: icon,
-    title: message,
-    showConfirmButton: false,
-    timer: 3000,
-    toast: true,
-  });
-};
 
 // Modal functions
 const openModal = function () {

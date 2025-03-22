@@ -289,7 +289,6 @@ function addSizeRow() {
 // Handle image preview
 function handleImagePreview(input) {
   const previewContainer = document.getElementById('imagePreviewContainer');
-  previewContainer.innerHTML = '';
 
   if (input.files) {
     Array.from(input.files).forEach((file, index) => {
@@ -313,13 +312,11 @@ function handleImagePreview(input) {
           'absolute -top-1 -right-1 bg-white rounded-full p-1 shadow-md text-gray-500 hover:text-red-500';
         removeBtn.type = 'button';
         removeBtn.innerHTML = `
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          `;
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            `;
         removeBtn.onclick = function () {
-          // This is a bit tricky since we can't directly modify the FileList
-          // In a real implementation, you'd track which files to exclude when submitting
           previewWrapper.remove();
         };
 
@@ -370,7 +367,14 @@ document.addEventListener('DOMContentLoaded', function () {
   colorPicker.addEventListener('input', function () {
     colorBox.style.backgroundColor = colorPicker.value;
   });
+  //   image preview working
+  const imageInput = document.getElementById('productImages');
 
+  if (imageInput) {
+    imageInput.addEventListener('change', function () {
+      handleImagePreview(imageInput);
+    });
+  }
   // Form submission
   document
     .getElementById('addProductForm')
