@@ -25,9 +25,9 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const categories = await Category.find({}, 'name');
   const clubs = await Club.find({}, 'name');
+  console.log(products);
 
   res.render('admin/product', {
-    category: 'main',
     cssFile: null,
     js_file: 'product',
     products,
