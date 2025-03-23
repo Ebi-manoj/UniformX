@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { Product } from '../../model/product_model.js';
 import { Category } from '../../model/category_model.js';
 import { Club } from '../../model/club_model.js';
+import { generateSlug } from '../../utilities/slugify.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
   const page = req.params.page || 1;
@@ -55,7 +56,7 @@ export const getProducts = asyncHandler(async (req, res) => {
   });
 });
 
-export const addProducts = asyncHandler(async (req, res) => {
+export const addProducts = asyncHandler(async (req, res, next) => {
   console.log(req.body);
   console.log(req.files);
 
@@ -81,10 +82,17 @@ export const addProducts = asyncHandler(async (req, res) => {
 
   // Map image URLs from req.files (Cloudinary response)
   const imageUrls = req.files ? req.files.map(file => file.path) : [];
+  let slug;
+  try {
+    slug = await generateSlug(req.body.title);
+  } catch (error) {
+    next(error);
+  }
 
   // Create new product object matching the schema
   const newProduct = new Product({
     title: req.body.title,
+    slug,
     price: parseFloat(req.body.price),
     description: req.body.description,
     color: req.body.customColorName,
