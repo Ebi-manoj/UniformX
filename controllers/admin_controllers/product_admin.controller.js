@@ -10,8 +10,23 @@ export const getProducts = asyncHandler(async (req, res) => {
   const searchQuery = req.query.search || '';
   let query = {};
 
+  if (req.query.category) {
+    query.category_id = req.query.category;
+  }
+  if (req.query.club) {
+    query.club_id = req.query.club;
+  }
+  if (req.query.stock === 'instock') {
+    query.$expr = {
+      $gt: [{ $sum: '$sizes.stock_quantity' }, 0],
+    };
+  } else if (req.query.stock === 'outstock') {
+    query.$expr = {
+      $lt: [{ $sum: '$sizes.stock_quantity' }, 1],
+    };
+  }
   if (searchQuery) {
-    query.name = { $regex: searchQuery, $options: 'i' };
+    query.title = { $regex: searchQuery, $options: 'i' };
   }
   const totalCount = await Product.countDocuments(query);
   const totalPages = Math.ceil(totalCount / limit);
@@ -25,7 +40,6 @@ export const getProducts = asyncHandler(async (req, res) => {
 
   const categories = await Category.find({}, 'name');
   const clubs = await Club.find({}, 'name');
-  console.log(products);
 
   res.render('admin/product', {
     cssFile: null,

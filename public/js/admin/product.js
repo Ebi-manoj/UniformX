@@ -18,15 +18,24 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('input', debounce(applyFilters, 300));
 
   function applyFilters() {
-    const categoryId = mainCategoryFilter.value;
+    const categorySelect = document.getElementById('mainCategoryFilter');
     const clubId = clubFilter.value;
     const stockStatus = stockFilter.value;
     const searchTerm = searchInput.value.trim().toLowerCase();
 
+    // Get selected categories as an array
+    const selectedCategories = Array.from(categorySelect.selectedOptions).map(
+      option => option.value
+    );
+
     // Build query string
     const queryParams = new URLSearchParams(window.location.search);
 
-    if (categoryId) queryParams.set('category', categoryId);
+    if (selectedCategories.length > 0)
+      queryParams.set(
+        'category',
+        selectedCategories.join(',')
+      ); // Multiple categories
     else queryParams.delete('category');
 
     if (clubId) queryParams.set('club', clubId);
@@ -45,6 +54,28 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href =
       window.location.pathname + '?' + queryParams.toString();
   }
+
+  // Restore selected filters after page reload
+  window.onload = function () {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Restore selected categories
+    const selectedCategories = urlParams.get('category')
+      ? urlParams.get('category').split(',')
+      : [];
+    const categorySelect = document.getElementById('mainCategoryFilter');
+
+    if (categorySelect) {
+      Array.from(categorySelect.options).forEach(option => {
+        option.selected = selectedCategories.includes(option.value);
+      });
+    }
+
+    // Restore other filters
+    if (urlParams.get('club')) clubFilter.value = urlParams.get('club');
+    if (urlParams.get('stock')) stockFilter.value = urlParams.get('stock');
+    if (urlParams.get('search')) searchInput.value = urlParams.get('search');
+  };
 
   // Debounce function to limit how often a function can be called
   function debounce(func, delay) {
