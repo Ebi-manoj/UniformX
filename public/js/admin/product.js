@@ -1,5 +1,89 @@
 import { showToast } from '../toast.js';
 
+// Filter functionality
+const mainCategoryFilter = document.getElementById('mainCategoryFilter');
+const clubFilter = document.getElementById('clubFilter');
+const stockFilter = document.getElementById('stockFilter');
+const searchInput = document.getElementById('searchInput');
+
+// Apply filters when changed
+[mainCategoryFilter, clubFilter, stockFilter].forEach(filter => {
+  filter.addEventListener('change', applyFilters);
+});
+
+// Apply search when typing
+searchInput.addEventListener('input', debounce(applyFilters, 300));
+
+function applyFilters() {
+  const categorySelect = document.getElementById('mainCategoryFilter');
+  const clubId = clubFilter.value;
+  const stockStatus = stockFilter.value;
+  const searchTerm = searchInput.value.trim().toLowerCase();
+
+  // Get selected categories as an array
+  const selectedCategories = Array.from(categorySelect.selectedOptions).map(
+    option => option.value
+  );
+
+  // Build query string
+  const queryParams = new URLSearchParams(window.location.search);
+
+  if (selectedCategories.length > 0)
+    queryParams.set(
+      'category',
+      selectedCategories.join(',')
+    ); // Multiple categories
+  else queryParams.delete('category');
+
+  if (clubId) queryParams.set('club', clubId);
+  else queryParams.delete('club');
+
+  if (stockStatus) queryParams.set('stock', stockStatus);
+  else queryParams.delete('stock');
+
+  if (searchTerm) queryParams.set('search', searchTerm);
+  else queryParams.delete('search');
+
+  // Reset to page 1 when filters change
+  queryParams.set('page', '1');
+
+  // Redirect with new filters
+  window.location.href =
+    window.location.pathname + '?' + queryParams.toString();
+}
+
+// Restore selected filters after page reload
+window.onload = function () {
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Restore selected categories
+  const selectedCategories = urlParams.get('category')
+    ? urlParams.get('category').split(',')
+    : [];
+  const categorySelect = document.getElementById('mainCategoryFilter');
+
+  if (categorySelect) {
+    Array.from(categorySelect.options).forEach(option => {
+      option.selected = selectedCategories.includes(option.value);
+    });
+  }
+
+  // Restore other filters
+  if (urlParams.get('club')) clubFilter.value = urlParams.get('club');
+  if (urlParams.get('stock')) stockFilter.value = urlParams.get('stock');
+  if (urlParams.get('search')) searchInput.value = urlParams.get('search');
+};
+
+// Debounce function to limit how often a function can be called
+function debounce(func, delay) {
+  let timeout;
+  return function () {
+    const args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
 // Available sizes
 const availableSizes = ['S', 'M', 'L', 'XL', 'XXL'];
 let sizeCounter = 0;
