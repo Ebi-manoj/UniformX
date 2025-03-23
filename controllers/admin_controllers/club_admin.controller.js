@@ -121,7 +121,7 @@ export const editClub = asyncHandler(async (req, res) => {
 export const toggleClubStatus = async (req, res) => {
   const clubId = req.params.id;
   const club = await Club.findById(clubId);
-  if (!club) return res.status(404).send('Category not found');
+  if (!club) return res.status(404).json({ message: 'Category not found' });
 
   club.isActive = !club.isActive;
   await club.save();

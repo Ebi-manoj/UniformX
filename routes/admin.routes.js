@@ -31,7 +31,10 @@ import {
 } from '../config/cloudinary.js';
 import {
   addProducts,
+  getEditProduct,
   getProducts,
+  toggleProduct,
+  updateProduct,
 } from '../controllers/admin_controllers/product_admin.controller.js';
 const router = express.Router();
 
@@ -73,10 +76,18 @@ router.delete('/delete-club/:id', isProtected, deleteClub);
 
 // Product routes
 router.get('/products', isProtected, getProducts);
+router.get('/product/:id', isProtected, getEditProduct);
 router.post(
   '/add-products',
   isProtected,
   productUpload.array('images', 5),
   addProducts
 );
+router.post(
+  '/product/:id',
+  isProtected,
+  productUpload.array('images', 5),
+  updateProduct
+);
+router.patch('/toggle-product/:id', isProtected, toggleProduct);
 export default router;

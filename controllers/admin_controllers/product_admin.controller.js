@@ -3,9 +3,10 @@ import { Product } from '../../model/product_model.js';
 import { Category } from '../../model/category_model.js';
 import { Club } from '../../model/club_model.js';
 import { generateSlug } from '../../utilities/slugify.js';
+import { validateId } from '../../utilities/validateId.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
-  const page = req.params.page || 1;
+  const page = parseInt(req.query.page) || 1;
   const limit = 4;
   const skip = (page - 1) * limit;
   const searchQuery = req.query.search || '';
@@ -104,7 +105,94 @@ export const addProducts = asyncHandler(async (req, res, next) => {
   });
 
   const savedProduct = await newProduct.save();
-  console.log(savedProduct);
-  req.flash('success', 'Product added Successfully');
-  res.redirect('/admin/products');
+  res.status(201).json({
+    message: 'Product added successfully',
+    product: savedProduct,
+  });
+});
+
+export const getEditProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  if (!validateId(id)) {
+    return res.status(404).json({ error: 'Not Valid Id' });
+  }
+  const product = await Product.findById(id)
+    .populate('category_id', 'name')
+    .populate('club_id', 'name');
+  if (!product) {
+    return res.status(404).json({ error: 'Product not found' });
+  }
+  console.log('yess');
+  res.json(product);
+});
+
+export const updateProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) {
+    return res.status(404).json({ error: 'Product not found' });
+  }
+  // Update fields
+  product.title = req.body.title || product.title;
+  product.price = req.body.price ? parseFloat(req.body.price) : product.price;
+  product.description = req.body.description || product.description;
+  product.color = req.body.customColorName || product.color;
+  product.type = req.body.type || product.type;
+  product.category_id = req.body.category_id || product.category_id;
+  product.club_id = req.body.club_id || product.club_id;
+
+  // Update sizes
+  const sizes = [];
+  if (req.body.sizesSize && req.body.sizesStock) {
+    // If sizes are sent as single values (not arrays), wrap them
+    const sizeValues = Array.isArray(req.body.sizesSize)
+      ? req.body.sizesSize
+      : [req.body.sizesSize];
+    const stockValues = Array.isArray(req.body.sizesStock)
+      ? req.body.sizesStock
+      : [req.body.sizesStock];
+
+    // Combine into array of objects
+    for (let i = 0; i < sizeValues.length; i++) {
+      sizes.push({
+        size: sizeValues[i],
+        stock_quantity: parseInt(stockValues[i], 10),
+      });
+    }
+  }
+  product.sizes = sizes ?? product.sizes;
+
+  // Update images if new ones are uploaded
+  if (req.files && req.files.length > 0) {
+    if (product.image_url && product.image_url.length > 0) {
+      for (const url of product.image_url) {
+        const publicId = url.split('/').pop().split('.')[0];
+        await cloudinary.v2.uploader.destroy(`uniformx/products/${publicId}`);
+      }
+    }
+    product.image_url = req.files.map(file => file.path);
+  }
+
+  // Regenerate slug if title changed
+  if (req.body.title && req.body.title !== product.title) {
+    product.slug = await generateSlug(req.body.title);
+  }
+
+  const updatedProduct = await product.save();
+  console.log('hai');
+
+  res.json({
+    message: 'Product updated successfully',
+    product: updatedProduct,
+  });
+});
+
+export const toggleProduct = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const product = await Product.findById(id);
+  if (!product) return res.status(404).json({ message: 'Product Not found' });
+
+  product.is_deleted = !product.is_deleted;
+  await product.save();
+  res.status(200).json({ success: true });
 });

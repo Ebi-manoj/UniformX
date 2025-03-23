@@ -246,24 +246,27 @@
               <!-- Actions -->
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex space-x-3">
-                  <button class="text-blue-500 hover:text-blue-700 view-product-btn" data-id="<%= product._id %>">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  </button>
+                  <button
+                  class="toggle-product-btn text-yellow-500 hover:text-red-400"
+                  data-id="<%= product._id %>"
+                >
+                  <% if (!product.is_deleted) { %>
+                  <i class="fas fa-ban"></i> Disable <% } else { %>
+                  <span class="text-green-500 hover:text-green-700">
+                    <i class="fas fa-check"></i> Enable
+                  </span>
+                  <% } %>
+                </button>
+              
+                  <!-- Edit Button (Always active) -->
                   <button class="text-gray-500 hover:text-gray-700 edit-product-btn" data-id="<%= product._id %>">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button class="text-red-500 hover:text-red-700 delete-product-btn" data-id="<%= product._id %>">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
                 </div>
               </td>
+              
             </tr>
           <% }); %>
         <% } else { %>
@@ -279,36 +282,40 @@
 
   <!-- Pagination -->
   <% if (totalPages > 1) { %>
-    <div class="px-6 py-4 bg-white border-t border-gray-200 mt-4 rounded-lg shadow-sm">
+    <div class="px-6 py-4 bg-white border-t border-gray-200">
       <div class="flex justify-between items-center">
         <div class="text-sm text-gray-600">
-          Showing <%= (currentPage - 1) * limit + 1 %> to <%= Math.min(currentPage * limit, totalCount) %> of <%= totalCount %> results
+          Showing <%= (currentPage - 1) * limit + 1 %> to <%=
+          Math.min(currentPage * limit, totalCount) %> of <%= totalCount %>
+          results
         </div>
         <div class="flex space-x-1">
           <% if (currentPage > 1) { %>
-            <a href="/admin/club-category?page=<%= currentPage - 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>" 
-               class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100">
-              <
-            </a>
-          <% } %>
-          
-          <% for(let i = 1; i <= totalPages; i++) { %>
-            <a href="/admin/club-category?page=<%= i %><%= searchQuery ? `&search=${searchQuery}` : '' %>" 
-               class="px-3 py-1 rounded-md border <%= currentPage === i ? 'bg-black text-white' : 'border-gray-300 text-gray-600 hover:bg-gray-100' %>">
-              <%= i %>
-            </a>
-          <% } %>
-          
-          <% if (currentPage < totalPages) { %>
-            <a href="/admin/club-category?page=<%= currentPage + 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>" 
-               class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100">
-              Next
-            </a>
+          <a
+            href="/admin/products?page=<%= currentPage - 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+            class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
+          >
+            <
+          </a>
+          <% } %> <% for(let i = 1; i <= totalPages; i++) { %>
+          <a
+            href="/admin/products?page=<%= i %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+            class="px-3 py-1 rounded-md border <%= currentPage === i ? 'bg-black text-white' : 'border-gray-300 text-gray-600 hover:bg-gray-100' %>"
+          >
+            <%= i %>
+          </a>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <a
+            href="/admin/products?page=<%= currentPage + 1 %><%= searchQuery ? `&search=${searchQuery}` : '' %>"
+            class="px-3 py-1 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-100"
+          >
+            Next
+          </a>
           <% } %>
         </div>
       </div>
     </div>
-  <% } %>
+    <% } %>
 </div>
 
 <!-- Image Modal -->
@@ -363,17 +370,20 @@
   >
     <!-- Modal Header -->
     <div class="p-6 border-b border-gray-200">
-      <h2 class="text-xl font-semibold text-gray-800">Add Product</h2>
+      <h2 id="modalTitle" class="text-xl font-semibold text-gray-800">Add Product</h2>
     </div>
 
     <!-- Modal Body -->
     <div class="p-6">
       <form
         id="addProductForm"
-        action="/admin/add-products"
         method="POST"
         enctype="multipart/form-data"
       >
+        <!-- Hidden fields to track mode and product ID -->
+        <input type="hidden" id="formMode" name="formMode" value="add" />
+        <input type="hidden" id="productId" name="productId" value="" />
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Title -->
           <div class="col-span-1">
@@ -437,10 +447,11 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a category</option>
-              <% if (categories && categories.length > 0) { %> <%
-              categories.forEach(category => { %>
+              <% if (categories && categories.length > 0) { %>
+              <% categories.forEach(category => { %>
               <option value="<%= category._id %>"><%= category.name %></option>
-              <% }); %> <% } %>
+              <% }); %>
+              <% } %>
             </select>
           </div>
 
@@ -458,10 +469,11 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select a club</option>
-              <% if (clubs && clubs.length > 0) { %> <% clubs.forEach(club => {
-              %>
+              <% if (clubs && clubs.length > 0) { %>
+              <% clubs.forEach(club => { %>
               <option value="<%= club._id %>"><%= club.name %></option>
-              <% }); %> <% } %>
+              <% }); %>
+              <% } %>
             </select>
           </div>
 
@@ -580,9 +592,9 @@
             Save Product
           </button>
           <button
+            id="closeBtn"
             type="button"
             class="ml-4 px-6 py-2 bg-white text-gray-700 font-medium rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
-            onclick="closeAddProductModal()"
           >
             Cancel
           </button>
