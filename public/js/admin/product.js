@@ -29,10 +29,8 @@ function applyFilters() {
   const queryParams = new URLSearchParams(window.location.search);
 
   if (selectedCategories.length > 0)
-    queryParams.set(
-      'category',
-      selectedCategories.join(',')
-    ); // Multiple categories
+    queryParams.set('category', selectedCategories.join(','));
+  // Multiple categories
   else queryParams.delete('category');
 
   if (clubId) queryParams.set('club', clubId);
@@ -149,6 +147,7 @@ function openAddProductModal() {
   form.reset();
   document.getElementById('imagePreviewContainer').innerHTML = '';
   document.getElementById('sizesContainer').innerHTML = '';
+  document.getElementById('customColorBox').style.backgroundColor = '';
 
   // Set to "add" mode
   modalTitle.textContent = 'Add Product';
@@ -184,11 +183,13 @@ async function openEditProductModal(slug) {
     form.reset();
     document.getElementById('imagePreviewContainer').innerHTML = '';
     document.getElementById('sizesContainer').innerHTML = '';
+    console.log(modalTitle);
 
     // Set to "edit" mode
+    modalTitle.innerHTML = '';
     modalTitle.textContent = 'Edit Product';
     form.action = `/admin/product/${slug}`;
-    form.method = 'POST'; // We'll override this to PUT in the form submission
+    form.method = 'POST';
     formMode.value = 'edit';
     productIdInput.value = product._id;
 

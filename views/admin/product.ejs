@@ -178,24 +178,38 @@
               
               <!-- Category, Club & Description -->
               <td class="px-6 py-4">
-                <div class="text-sm text-gray-900">
-                  <div class="flex flex-wrap gap-1 mb-1">
-                    <% if (product.category) { %>
-                      <span class="inline-block bg-gray-100 rounded-full px-2 py-0.5 text-xs text-gray-600">
-                        <%= typeof product.category === 'object' ? product.category.name : 'Category' %>
+                <div class="text-sm space-y-2">
+                  <!-- Categories and Clubs -->
+                  <div class="flex flex-wrap gap-1.5">
+                    <% if (product.category_id) { %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
+                        <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        <%= typeof product.category_id === 'object' ? product.category_id.name : 'Category' %>
                       </span>
                     <% } %>
-                    <% if (product.club) { %>
-                      <span class="inline-block bg-gray-200 rounded-full px-2 py-0.5 text-xs text-gray-700">
-                        <%= typeof product.club === 'object' ? product.club.name : 'Club' %>
+                    
+                    <% if (product.club_id) { %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                        <svg class="w-2.5 h-2.5 mr-1" fill="currentColor" viewBox="0 0 8 8">
+                          <circle cx="4" cy="4" r="3" />
+                        </svg>
+                        <%= typeof product.club_id === 'object' ? product.club_id.name : 'Club' %>
                       </span>
                     <% } %>
                   </div>
-                  <p class="text-sm text-gray-600 line-clamp-2 mt-1">
-                    <%= product.description || 'No description available' %>
-                  </p>
+                  
+                  <!-- Description -->
+                  <div class="group">
+                    <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed group-hover:text-gray-800 transition-colors duration-150">
+                      <%= product.description || 'No description available' %>
+                    </p>
+                  </div>
                 </div>
               </td>
+              
+              
               
               <!-- Stock Status -->
               <td class="px-6 py-4 whitespace-nowrap">
@@ -323,7 +337,6 @@
   <div class="bg-white rounded-lg max-w-4xl w-full mx-4 overflow-hidden">
     <!-- Modal Header -->
     <div class="flex justify-between items-center p-4 border-b">
-      <h3 id="modalTitle" class="text-lg font-semibold text-gray-800"></h3>
       <button id="closeModal" class="text-gray-500 hover:text-gray-700">
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
