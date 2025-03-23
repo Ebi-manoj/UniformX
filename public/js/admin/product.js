@@ -363,12 +363,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
   //   add colors
 
-  const colorPicker = document.getElementById('customColorPicker');
+  const colorInput = document.getElementById('customColorInput');
   const colorBox = document.getElementById('customColorBox');
 
-  colorPicker.addEventListener('input', function () {
-    colorBox.style.backgroundColor = colorPicker.value;
+  // Sync input field with preview box
+  colorInput.addEventListener('input', () => {
+    const colorValue = colorInput.value.trim().toLowerCase();
+    colorBox.style.backgroundColor = colorValue;
   });
+
   //   image preview working
   const imageInput = document.getElementById('productImages');
 

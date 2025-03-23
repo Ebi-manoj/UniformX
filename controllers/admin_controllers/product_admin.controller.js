@@ -73,7 +73,7 @@ export const addProducts = asyncHandler(async (req, res) => {
     title: req.body.title,
     price: parseFloat(req.body.price),
     description: req.body.description,
-    color: req.body.customColor,
+    color: req.body.customColorName,
     sizes,
     category_id: req.body.category_id,
     club_id: req.body.club_id,
