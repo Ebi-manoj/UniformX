@@ -99,6 +99,9 @@ export const addProducts = asyncHandler(async (req, res, next) => {
     description: req.body.description,
     color: req.body.customColorName,
     sizes,
+    discountPercentage: req.body.discountPercentage
+      ? parseFloat(req.body.discountPercentage)
+      : null,
     category_id: req.body.category_id,
     club_id: req.body.club_id,
     type: req.body.type,
@@ -141,6 +144,8 @@ export const updateProduct = asyncHandler(async (req, res) => {
   product.type = req.body.type || product.type;
   product.category_id = req.body.category_id || product.category_id;
   product.club_id = req.body.club_id || product.club_id;
+  product.discountPercentage =
+    parseFloat(req.body.discountPercentage) || product.discountPercentage;
 
   // Update sizes
   const sizes = [];

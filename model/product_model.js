@@ -30,6 +30,12 @@ const productSchema = new mongoose.Schema(
       ref: 'clubs',
       required: true,
     },
+    discountPercentage: {
+      type: Number,
+      default: null,
+      min: 0,
+      max: 100,
+    },
     type: String,
     image_url: [String],
     is_deleted: {

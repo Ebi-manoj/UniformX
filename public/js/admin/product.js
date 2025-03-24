@@ -204,6 +204,8 @@ async function openEditProductModal(slug) {
     document.getElementById('customColorInput').value = product.color || '';
     document.getElementById('customColorBox').style.backgroundColor =
       product.color || '';
+    document.getElementById('discountPercentage').value =
+      product.discountPercentage || '';
 
     // Prefill sizes
     if (product.sizes && product.sizes.length > 0) {
