@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('signupForm');
+  const form = document.getElementById('sign_loginForm');
   const nameInput = document.getElementById('name');
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
   const mobileInput = document.getElementById('mobile');
   const errorMessage = document.querySelector('.errorMessage');
+
   if (form) {
     form.addEventListener('submit', function (event) {
       event.preventDefault();
@@ -13,17 +14,29 @@ document.addEventListener('DOMContentLoaded', function () {
       errorMessage.classList.add('hidden');
       errorMessage.textContent = '';
 
-      // Validation rules
-      const name = nameInput.value.trim();
+      // Get input values
+      const name = nameInput ? nameInput.value.trim() : null;
       const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
-      const mobile = mobileInput.value.trim();
+      const mobile = mobileInput ? mobileInput.value.trim() : null;
 
-      if (name.length < 3) {
-        showError('Name must be at least 3 characters long.');
-        return;
+      // Check if it's login or signup based on available fields
+      const isSignup = nameInput !== null && mobileInput !== null;
+
+      // Validation rules for signup
+      if (isSignup) {
+        if (name.length < 3) {
+          showError('Name must be at least 3 characters long.');
+          return;
+        }
+
+        if (!/^\d{10}$/.test(mobile)) {
+          showError('Mobile number must be exactly 10 digits.');
+          return;
+        }
       }
 
+      // Common validation for both login & signup
       if (!validateEmail(email)) {
         showError('Enter a valid email address.');
         return;
@@ -31,11 +44,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (password.length < 6) {
         showError('Password must be at least 6 characters long.');
-        return;
-      }
-
-      if (!/^\d{10}$/.test(mobile)) {
-        showError('Mobile number must be exactly 10 digits.');
         return;
       }
 

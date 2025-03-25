@@ -4,7 +4,7 @@ export const generateOTP = function () {
 };
 
 export const generateExpiry = function () {
-  return new Date(Date.now() + 10 * 60 * 1000);
+  return new Date(Date.now() + 2 * 60 * 1000);
 };
 
 export const sendOTP = async function (email, otp) {

@@ -32,17 +32,21 @@
         </button>
     </form>
         <!-- Resend OTP option -->
+        <form action="/auth/resend-otp" method="post">
         <div class="mt-4 text-center">
             <p class="text-sm text-gray-600">
                 Didn't receive the code? 
-                <button 
+               
+                    <button 
                     id="resend-btn" 
                     class="text-blue-600 font-medium hover:underline disabled:text-gray-400 disabled:cursor-not-allowed disabled:no-underline"
                     disabled
-                >
+                    >
                     Resend OTP
                 </button>
+            
             </p>
         </div>
+    </form>
     </div>
 </div>

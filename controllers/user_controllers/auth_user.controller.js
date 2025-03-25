@@ -6,10 +6,12 @@ import {
   generateOTP,
   sendOTP,
 } from '../../utilities/generator.js';
+import { generateToken } from '../../config/jwt.js';
 
 const userLogin = './layouts/user_login';
 
 export const getLogin = asyncHandler(async (req, res) => {
+  if (req.cookies.token) return res.redirect('/');
   res.render('user/login', { layout: userLogin, js_file: 'auth' });
 });
 export const getSignup = asyncHandler(async (req, res) => {
@@ -19,7 +21,11 @@ export const getHome = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('/auth/login');
   res.send('Home Page');
 });
+export const getForgotPassword = asyncHandler(async (req, res) => {
+  res.render('user/forgot_password', { layout: userLogin, js_file: 'auth' });
+});
 
+////////////////////////////////////////////////////
 // Get verify OTP page
 export const getVerifyOTP = asyncHandler(async (req, res) => {
   if (!req.session.signupData) {
@@ -79,7 +85,7 @@ export const signUpHandler = asyncHandler(async (req, res, next) => {
     await sendOTP(email, otp);
 
     // Redirect to OTP verification page
-    res.redirect('/auth/verify-otp');
+    res.redirect('/auth/verify-otp?purpose=signup');
   } catch (error) {
     next(error);
   }
@@ -91,17 +97,18 @@ export const signUpHandler = asyncHandler(async (req, res, next) => {
 export const verifyOTP = asyncHandler(async (req, res, next) => {
   const otp = req.body.otp;
   const { email } = req.session.signupData;
+  const { purpose } = req.query;
   console.log('session data', req.session.signupData);
 
-  if (!email || !otp) {
+  if (!email || !otp || !purpose) {
     req.flash('error', 'Invalid OTP request');
     req.session.save(() => {
-      return res.redirect('/auth/verify-otp');
+      return res.redirect(`/auth/verify-otp/${purpose}`);
     });
   }
 
   try {
-    const otpEntry = await OTP.findOne({ email, purpose: 'signup' });
+    const otpEntry = await OTP.findOne({ email, purpose });
 
     if (!otpEntry || otpEntry.expiresAt < new Date()) {
       req.flash('error', 'OTP expired. Please request a new one.');
@@ -142,3 +149,70 @@ export const verifyOTP = asyncHandler(async (req, res, next) => {
     next(error);
   }
 });
+
+///////////////////////////////////////////////////////
+///Resend OTP
+export const resendOTP = asyncHandler(async (req, res, next) => {
+  try {
+    const { email } = req.session.signupData || {};
+
+    if (!email) {
+      req.flash('error', 'Session expired. Please restart the signup process.');
+      return res.redirect('/auth/signup');
+    }
+
+    // Generate new OTP and expiry
+    const otp = generateOTP();
+    const expiresAt = generateExpiry();
+
+    // Remove any previous OTPs for this email (signup purpose)
+    await OTP.deleteMany({ email, purpose: 'signup' });
+
+    // Save new OTP in the database
+    await new OTP({
+      email,
+      otp,
+      purpose: 'signup',
+      expiresAt,
+    }).save();
+
+    // Send OTP email
+    await sendOTP(email, otp);
+
+    req.flash('success', 'A new OTP has been sent to your email.');
+    res.redirect('/auth/verify-otp');
+  } catch (error) {
+    next(error);
+  }
+});
+
+/////////////////////////////////////////////////
+/////Login Handler
+
+export const LoginHandler = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    req.flash('error', 'Email and Password required');
+    return res.redirect('/auth/login');
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    req.flash('error', 'Invalid Credintials!');
+    return res.redirect('/auth/login');
+  }
+  const isMatch = await user.comparePassword(password);
+  if (!isMatch) {
+    req.flash('error', 'Invalid Credintials!');
+    return res.redirect('/auth/login');
+  }
+  const token = generateToken(user._id);
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+  res.redirect('/');
+});
+
+/////////////////////////////////////////////////////////////////////
+////////Forgot Password
