@@ -22,7 +22,12 @@ export const getHome = asyncHandler(async (req, res) => {
 
 // Get verify OTP page
 export const getVerifyOTP = asyncHandler(async (req, res) => {
-  const { email } = req.query;
+  if (!req.session.signupData) {
+    req.flash('error', 'Session expired. Please sign up again.');
+    return res.redirect('/auth/signup');
+  }
+
+  const { email } = req.session.signupData;
   // Fetch the latest OTP entry for the user
   const otpEntry = await OTP.findOne({ email });
 
@@ -37,6 +42,7 @@ export const getVerifyOTP = asyncHandler(async (req, res) => {
   });
 });
 
+/////////////////////////////////////////////
 //signup Handler
 export const signUpHandler = asyncHandler(async (req, res, next) => {
   console.log(req.body);
@@ -73,7 +79,65 @@ export const signUpHandler = asyncHandler(async (req, res, next) => {
     await sendOTP(email, otp);
 
     // Redirect to OTP verification page
-    res.redirect(`/auth/verify-otp?email=${email}`);
+    res.redirect('/auth/verify-otp');
+  } catch (error) {
+    next(error);
+  }
+});
+
+/////////////////////////////////////////////////////
+///OTP Verification
+
+export const verifyOTP = asyncHandler(async (req, res, next) => {
+  const otp = req.body.otp;
+  const { email } = req.session.signupData;
+  console.log('session data', req.session.signupData);
+
+  if (!email || !otp) {
+    req.flash('error', 'Invalid OTP request');
+    req.session.save(() => {
+      return res.redirect('/auth/verify-otp');
+    });
+  }
+
+  try {
+    const otpEntry = await OTP.findOne({ email, purpose: 'signup' });
+
+    if (!otpEntry || otpEntry.expiresAt < new Date()) {
+      req.flash('error', 'OTP expired. Please request a new one.');
+      return res.redirect('/auth/signup');
+    }
+
+    if (otpEntry.otp !== otp) {
+      req.flash('error', 'Invalid OTP. Please try again.');
+      return res.redirect('/auth/verify-otp');
+    }
+
+    // If OTP is correct, create user from session data
+    if (!req.session.signupData) {
+      req.flash('error', 'Session expired. Please sign up again.');
+      return res.redirect('/auth/signup');
+    }
+
+    const { name, password, mobile } = req.session.signupData;
+
+    // Save user to database
+    const user = new User({
+      full_name: name,
+      email,
+      password,
+      phone: mobile,
+      isVerified: true,
+    });
+
+    await user.save();
+
+    // Clear OTP and session data
+    await OTP.deleteMany({ email, purpose: 'signup' });
+    req.session.signupData = null;
+
+    req.flash('success', 'Signup successful. Please log in.');
+    res.redirect('/auth/login');
   } catch (error) {
     next(error);
   }
