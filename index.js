@@ -12,6 +12,7 @@ import { errorhandling } from './middlewares/error_handling.js';
 import { connectDB } from './config/db.js';
 import { Admin } from './model/admin_model.js';
 import adminRoutes from './routes/admin.routes.js';
+import authRoutes from './routes/auth.routes.js';
 import { Product } from './model/product_model.js';
 
 dotenv.config();
@@ -70,7 +71,9 @@ app.set('layout', 'layouts/admin_main');
 app.get('/spinner', (req, res) => {
   res.render('partials/spinner', { cssFile: null, js_file: null });
 });
+
 app.use('/admin', adminRoutes);
+app.use('/auth', authRoutes);
 
 // error Handling
 app.use(errorhandling);

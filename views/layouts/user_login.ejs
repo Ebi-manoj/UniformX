@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                dark: '#0f172a',
+              },
+            },
+          },
+        };
+      </script>
+</head>
+<body class="bg-gray-100">
+    <header class="bg-white py-4 px-6 shadow-sm">
+        <div class="container mx-auto flex items-center justify-center">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <img
+              class="w-40 h-auto max-w-xs"
+              src="/images/logo.png"
+              alt="Logo"
+            />
+          </div>
+        </div>
+      </header>
+    <%- body %>
+    <%- include('../partials/footer') %>
+</body>
+</html>

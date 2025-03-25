@@ -18,7 +18,14 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    required: function () {
+      return !this.googleId;
+    },
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
   },
   is_blocked: {
     type: Boolean,
@@ -43,5 +50,8 @@ userSchema.pre('save', async function (next) {
     next(error);
   }
 });
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 export const User = mongoose.model('user', userSchema);
