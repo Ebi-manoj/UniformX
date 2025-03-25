@@ -35,7 +35,7 @@
           <td class="p-3"><%= user.full_name %></td>
           <td class="p-3"><%= user.email %></td>
           <td class="p-3">
-            <%= new Date(user.join_date).toLocaleDateString("en-GB", { day:
+            <%= new Date(user.createdAt).toLocaleDateString("en-GB", { day:
             "2-digit", month: "short", year: "numeric" }) %>
           </td>
           <td class="p-3 flex justify-center">

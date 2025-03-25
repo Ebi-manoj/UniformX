@@ -24,7 +24,7 @@ export const getUser = asyncHandler(async (req, res) => {
   const totalPages = Math.ceil(totalUsers / limit);
 
   const users = await User.find(query)
-    .sort({ join_date: -1 })
+    .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
   res.render('admin/userManage', {

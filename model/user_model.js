@@ -28,10 +28,6 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true,
     },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
     is_blocked: {
       type: Boolean,
       default: false,

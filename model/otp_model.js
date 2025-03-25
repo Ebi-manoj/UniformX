@@ -4,7 +4,15 @@ const otpSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: function () {
+      return this.purpose !== 'signup';
+    },
+  },
+  email: {
+    type: String,
+    required: function () {
+      return this.purpose === 'signup';
+    },
   },
   otp: {
     type: String,
