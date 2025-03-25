@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
           theme: {
@@ -16,8 +17,15 @@
           },
         };
       </script>
+      <script src="/js/alert.js" defer></script>
+      <!-------------------------- js---------------------------->
+      <% if (js_file) { %>
+       <script src="/js/user/<%= js_file %>.js" defer></script>
+      <% } %>
+ 
 </head>
 <body class="bg-gray-100">
+  <%- include('../partials/error_message') %>
     <header class="bg-white py-4 px-6 shadow-sm">
         <div class="container mx-auto flex items-center justify-center">
           <!-- Logo -->

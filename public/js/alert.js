@@ -1,6 +1,7 @@
 window.onload = function () {
   const successInput = document.getElementById('successMessage');
   const errorInput = document.getElementById('errorMessage');
+  console.log('hai');
 
   if (
     successInput &&

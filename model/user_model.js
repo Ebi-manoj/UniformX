@@ -1,45 +1,44 @@
 // models/userModel.js
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-const userSchema = new mongoose.Schema({
-  full_name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  phone: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: function () {
-      return !this.googleId;
+const userSchema = new mongoose.Schema(
+  {
+    full_name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: function () {
+        return !this.googleId;
+      },
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    is_blocked: {
+      type: Boolean,
+      default: false,
     },
   },
-  googleId: {
-    type: String,
-    unique: true,
-    sparse: true,
-  },
-  is_blocked: {
-    type: Boolean,
-    default: false,
-  },
-  join_date: {
-    type: Date,
-    default: Date.now,
-  },
-  status: {
-    type: String,
-    default: 'active',
-  },
-});
+  { timestamps: true }
+);
 userSchema.pre('save', async function (next) {
   try {
     if (this.isModified('password')) {
