@@ -22,6 +22,7 @@ export const getSignup = asyncHandler(async (req, res) => {
 });
 export const getHome = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('/auth/login');
+
   res.render('user/home', { layout: userMain });
 });
 export const getForgotPassword = asyncHandler(async (req, res) => {
