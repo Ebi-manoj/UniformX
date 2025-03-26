@@ -11,6 +11,7 @@ import { generateToken } from '../../config/jwt.js';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Club } from '../../model/club_model.js';
+import { Product } from '../../model/product_model.js';
 
 const userLogin = './layouts/user_login';
 const userMain = './layouts/user_main';
@@ -26,8 +27,75 @@ export const getHome = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('/auth/login');
   const categories = await Category.find();
   const clubs = await Club.find();
-
-  res.render('user/home', { layout: userMain, categories, clubs });
+  const bestSelling = await Product.aggregate([
+    {
+      $lookup: {
+        from: 'reviews',
+        localField: '_id',
+        foreignField: 'product_id',
+        as: 'reviews',
+      },
+    },
+    {
+      $addFields: {
+        averageRating: { $avg: '$reviews.rating' },
+        reviewCount: { $size: '$reviews' },
+      },
+    },
+    { $sort: { price: -1 } },
+    { $limit: 4 },
+    {
+      $project: {
+        title: 1,
+        slug: 1,
+        price: 1,
+        description: 1,
+        image_url: 1,
+        category_id: 1,
+        averageRating: 1,
+        reviewCount: 1,
+        discountPercentage: 1,
+      },
+    },
+  ]);
+  const features = await Product.aggregate([
+    {
+      $lookup: {
+        from: 'reviews',
+        localField: '_id',
+        foreignField: 'product_id',
+        as: 'reviews',
+      },
+    },
+    {
+      $addFields: {
+        averageRating: { $avg: '$reviews.rating' },
+        reviewCount: { $size: '$reviews' },
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $limit: 4 },
+    {
+      $project: {
+        title: 1,
+        slug: 1,
+        price: 1,
+        description: 1,
+        image_url: 1,
+        category_id: 1,
+        averageRating: 1,
+        reviewCount: 1,
+        discountPercentage: 1,
+      },
+    },
+  ]);
+  res.render('user/home', {
+    layout: userMain,
+    categories,
+    clubs,
+    bestSelling,
+    features,
+  });
 });
 export const getForgotPassword = asyncHandler(async (req, res) => {
   res.render('auth/forgot_password', { layout: userLogin });

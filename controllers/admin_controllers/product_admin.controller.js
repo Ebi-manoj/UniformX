@@ -4,6 +4,7 @@ import { Category } from '../../model/category_model.js';
 import { Club } from '../../model/club_model.js';
 import { generateSlug } from '../../utilities/slugify.js';
 import { validateId } from '../../utilities/validateId.js';
+import { cloudinary } from '../../config/cloudinary.js';
 
 export const getProducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -41,9 +42,7 @@ export const getProducts = asyncHandler(async (req, res) => {
     .populate('club_id', 'name');
 
   const categories = await Category.find({}, 'name');
-  const clubs = await Club.find({}, 'name category_id');
-
-  console.log(products);
+  const clubs = await Club.find({}, 'category_id name');
 
   res.render('admin/product', {
     cssFile: null,
@@ -131,6 +130,8 @@ export const getEditProduct = asyncHandler(async (req, res) => {
   res.json(product);
 });
 
+// Update Product
+
 export const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const product = await Product.findById(id);
@@ -174,7 +175,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
     if (product.image_url && product.image_url.length > 0) {
       for (const url of product.image_url) {
         const publicId = url.split('/').pop().split('.')[0];
-        await cloudinary.v2.uploader.destroy(`uniformx/products/${publicId}`);
+        await cloudinary.uploader.destroy(`uniformx/products/${publicId}`);
       }
     }
     product.image_url = req.files.map(file => file.path);
