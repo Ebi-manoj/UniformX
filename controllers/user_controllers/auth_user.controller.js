@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { User } from '../../model/user_model.js';
 import { OTP } from '../../model/otp_model.js';
+import { Category } from '../../model/category_model.js';
 import {
   generateExpiry,
   generateOTP,
@@ -9,6 +10,7 @@ import {
 import { generateToken } from '../../config/jwt.js';
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Club } from '../../model/club_model.js';
 
 const userLogin = './layouts/user_login';
 const userMain = './layouts/user_main';
@@ -22,8 +24,10 @@ export const getSignup = asyncHandler(async (req, res) => {
 });
 export const getHome = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('/auth/login');
+  const categories = await Category.find();
+  const clubs = await Club.find();
 
-  res.render('user/home', { layout: userMain });
+  res.render('user/home', { layout: userMain, categories, clubs });
 });
 export const getForgotPassword = asyncHandler(async (req, res) => {
   res.render('auth/forgot_password', { layout: userLogin });

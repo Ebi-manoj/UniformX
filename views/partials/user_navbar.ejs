@@ -15,51 +15,30 @@
       </div>
 
       <!-- Navigation -->
-      <nav class="hidden md:flex space-x-6">
-        <a href="#" class="text-gray-700 hover:text-gray-900">Home</a>
-        <a
-          href="#"
-          class="text-gray-700 hover:text-gray-900 flex items-center"
-        >
-          Categories
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 ml-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </a>
-        <a
-          href="#"
-          class="text-gray-700 hover:text-gray-900 flex items-center"
-        >
-          Clubs
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-4 w-4 ml-1"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </a>
-        <a href="#" class="text-gray-700 hover:text-gray-900">About</a>
-        <a href="#" class="text-gray-700 hover:text-gray-900">Contact</a>
-      </nav>
+      <!-- Navigation -->
+<nav class="hidden md:flex space-x-6">
+    <a href="#" class="w-32 text-center text-gray-700 hover:text-gray-900">Home</a>
+    
+    <select id="category" class="w-32 text-center text-gray-700 hover:text-gray-900">
+      <option value="">Category</option>
+      <% categories.forEach(category => { %>
+        <option value="<%= category._id %>"><%= category.name %></option>
+      <% }); %>
+    </select>
+  
+    <div class="hidden" id="clubData" data-clubs='<%= JSON.stringify(clubs) %>'></div>
+  
+    <select id="club" class="w-32 text-center text-gray-700 hover:text-gray-900">
+      <option value="">Club</option>
+      <% clubs.forEach(club => { %>
+        <option value="<%= club._id %>"><%= club.name %></option>
+      <% }); %>
+    </select>
+  
+    <a href="#" class="w-32 text-center text-gray-700 hover:text-gray-900">About</a>
+    <a href="#" class="w-32 text-center text-gray-700 hover:text-gray-900">Contact</a>
+  </nav>
+  
 
       <!-- Search and Cart -->
       <div class="flex items-center space-x-4">

@@ -41,7 +41,8 @@ export const getProducts = asyncHandler(async (req, res) => {
     .populate('club_id', 'name');
 
   const categories = await Category.find({}, 'name');
-  const clubs = await Club.find({}, 'name');
+  const clubs = await Club.find({}, 'name category_id');
+
   console.log(products);
 
   res.render('admin/product', {
