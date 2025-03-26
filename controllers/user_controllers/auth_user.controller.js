@@ -24,27 +24,43 @@ export const getHome = asyncHandler(async (req, res) => {
 export const getForgotPassword = asyncHandler(async (req, res) => {
   res.render('user/forgot_password', { layout: userLogin, js_file: 'auth' });
 });
+export const getResetPassword = asyncHandler(async (req, res) => {
+  res.render('user/reset_password', { layout: userLogin, js_file: 'auth' });
+});
 
 ////////////////////////////////////////////////////
 // Get verify OTP page
 export const getVerifyOTP = asyncHandler(async (req, res) => {
-  if (!req.session.signupData) {
-    req.flash('error', 'Session expired. Please sign up again.');
-    return res.redirect('/auth/signup');
+  const { purpose } = req.query;
+
+  // Determine which session data to use based on the purpose
+  let email;
+  if (purpose === 'signup' && req.session.signupData) {
+    email = req.session.signupData.email;
+  } else if (purpose === 'reset-password' && req.session.resetEmail) {
+    email = req.session.resetEmail;
+  } else {
+    req.flash('error', 'Session expired. Please request OTP again.');
+    return res.redirect(
+      purpose === 'signup' ? '/auth/signup' : '/auth/forgot-password'
+    );
   }
 
-  const { email } = req.session.signupData;
   // Fetch the latest OTP entry for the user
-  const otpEntry = await OTP.findOne({ email });
+  const otpEntry = await OTP.findOne({ email, purpose });
 
   if (!otpEntry) {
-    req.flash('error', 'An error occured');
-    res.redirect('/auth/signup');
+    req.flash('error', 'An error occurred. Please request a new OTP.');
+    return res.redirect(
+      purpose === 'signup' ? '/auth/signup' : '/auth/forgot-password'
+    );
   }
+
   res.render('user/otp', {
     layout: userLogin,
     js_file: 'auth',
     expiresAt: otpEntry.expiresAt,
+    purpose,
   });
 });
 
@@ -93,58 +109,78 @@ export const signUpHandler = asyncHandler(async (req, res, next) => {
 
 /////////////////////////////////////////////////////
 ///OTP Verification
-
 export const verifyOTP = asyncHandler(async (req, res, next) => {
-  const otp = req.body.otp;
-  const { email } = req.session.signupData;
-  const { purpose } = req.query;
-  console.log('session data', req.session.signupData);
-
-  if (!email || !otp || !purpose) {
-    req.flash('error', 'Invalid OTP request');
-    req.session.save(() => {
-      return res.redirect(`/auth/verify-otp/${purpose}`);
-    });
-  }
-
   try {
+    const { otp } = req.body;
+    const { purpose } = req.query;
+
+    if (!purpose || !otp) {
+      req.flash('error', 'Invalid OTP request');
+      return res.redirect('/auth/verify-otp?purpose=signup');
+    }
+
+    let email;
+
+    // Handle Signup OTP verification
+    if (purpose === 'signup') {
+      if (!req.session.signupData) {
+        req.flash('error', 'Session expired. Please sign up again.');
+        return res.redirect('/auth/signup');
+      }
+      email = req.session.signupData.email;
+    }
+
+    // Handle Reset Password OTP verification
+    if (purpose === 'reset-password') {
+      if (!req.session.resetEmail) {
+        req.flash('error', 'Session expired. Please request OTP again.');
+        return res.redirect('/auth/forgot-password');
+      }
+      email = req.session.resetEmail;
+    }
+
     const otpEntry = await OTP.findOne({ email, purpose });
 
     if (!otpEntry || otpEntry.expiresAt < new Date()) {
       req.flash('error', 'OTP expired. Please request a new one.');
-      return res.redirect('/auth/signup');
+      return res.redirect(`/auth/verify-otp?purpose=${purpose}`);
     }
 
     if (otpEntry.otp !== otp) {
       req.flash('error', 'Invalid OTP. Please try again.');
-      return res.redirect('/auth/verify-otp');
+      return res.redirect(`/auth/verify-otp?purpose=${purpose}`);
     }
 
-    // If OTP is correct, create user from session data
-    if (!req.session.signupData) {
-      req.flash('error', 'Session expired. Please sign up again.');
-      return res.redirect('/auth/signup');
+    // OTP Verified - Handle based on purpose
+    if (purpose === 'signup') {
+      const { name, password, mobile } = req.session.signupData;
+
+      const user = new User({
+        full_name: name,
+        email,
+        password,
+        phone: mobile,
+      });
+
+      await user.save();
+
+      // Clear OTP and session data
+      await OTP.deleteMany({ email, purpose });
+      req.session.signupData = null;
+
+      req.flash('success', 'Signup successful. Please log in.');
+      return res.redirect('/auth/login');
     }
 
-    const { name, password, mobile } = req.session.signupData;
+    if (purpose === 'reset-password') {
+      req.session.isVerifiedForReset = true;
 
-    // Save user to database
-    const user = new User({
-      full_name: name,
-      email,
-      password,
-      phone: mobile,
-      isVerified: true,
-    });
+      // Clear OTP entry after verification
+      await OTP.deleteMany({ email, purpose });
 
-    await user.save();
-
-    // Clear OTP and session data
-    await OTP.deleteMany({ email, purpose: 'signup' });
-    req.session.signupData = null;
-
-    req.flash('success', 'Signup successful. Please log in.');
-    res.redirect('/auth/login');
+      req.flash('success', 'OTP verified. Please reset your password.');
+      return res.redirect('/auth/reset-password');
+    }
   } catch (error) {
     next(error);
   }
@@ -216,3 +252,93 @@ export const LoginHandler = asyncHandler(async (req, res) => {
 
 /////////////////////////////////////////////////////////////////////
 ////////Forgot Password
+export const forgotPasswordHandler = asyncHandler(async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      req.flash('error', 'Email is required');
+      return res.redirect('/auth/forgot-password');
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      req.flash('error', 'No account found with this email');
+      return res.redirect('/auth/forgot-password');
+    }
+
+    // Generate OTP
+    const otp = generateOTP();
+    const expiresAt = generateExpiry();
+
+    // Delete existing OTPs for the email
+    await OTP.deleteMany({ email, purpose: 'reset-password' });
+
+    // Save OTP to the database
+    await new OTP({
+      email,
+      otp,
+      purpose: 'reset-password',
+      expiresAt,
+    }).save();
+
+    // Send OTP email
+    await sendOTP(email, otp);
+    // Store email in session for verification
+    req.session.resetEmail = email;
+
+    req.session.save(() => {
+      req.flash('success', 'OTP sent to your email. Please verify.');
+      return res.redirect('/auth/verify-otp?purpose=reset-password');
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/////////////////////////////////////////////////////////
+///////////Reset Password
+
+export const resetPassword = asyncHandler(async (req, res) => {
+  try {
+    if (!req.session.isVerifiedForReset) {
+      req.flash('error', 'Session expired. Request a new one!');
+      return res.redirect('/auth/forgot-password');
+    }
+
+    const { newPassword, confirmPassword } = req.body;
+
+    // Validate input
+    if (!newPassword || !confirmPassword) {
+      req.flash('error', 'All fields are required.');
+      return res.redirect('/auth/reset-password');
+    }
+
+    if (newPassword !== confirmPassword) {
+      req.flash('error', 'Passwords do not match.');
+      return res.redirect('/auth/reset-password');
+    }
+
+    // Get the user's email from session
+    const email = req.session.resetEmail;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      req.flash('error', 'User not found.');
+      return res.redirect('/auth/reset-password');
+    }
+
+    user.password = confirmPassword;
+    await user.save();
+
+    // Clear session data related to reset verification
+    req.session.isVerifiedForReset = null;
+    req.session.resetEmail = null;
+
+    req.flash('success', 'Password reset successful. Please log in.');
+    return res.redirect('/auth/login');
+  } catch (error) {
+    next(error);
+  }
+});

@@ -1,11 +1,14 @@
 import express from 'express';
 import {
+  forgotPasswordHandler,
   getForgotPassword,
   getLogin,
+  getResetPassword,
   getSignup,
   getVerifyOTP,
   LoginHandler,
   resendOTP,
+  resetPassword,
   signUpHandler,
   verifyOTP,
 } from '../controllers/user_controllers/auth_user.controller.js';
@@ -19,6 +22,9 @@ router.post('/signup', signUpHandler);
 router.get('/verify-otp', getVerifyOTP);
 router.post('/verify-otp', verifyOTP);
 router.get('/forgot-password', getForgotPassword);
+router.post('/forgot-password', forgotPasswordHandler);
 router.post('/resend-otp', resendOTP);
+router.get('/reset-password', getResetPassword);
+router.post('/reset-password', resetPassword);
 
 export default router;

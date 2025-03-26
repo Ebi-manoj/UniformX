@@ -1,18 +1,9 @@
 import mongoose from 'mongoose';
 
 const otpSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: function () {
-      return this.purpose !== 'signup';
-    },
-  },
   email: {
     type: String,
-    required: function () {
-      return this.purpose === 'signup';
-    },
+    required: true,
   },
   otp: {
     type: String,
@@ -20,7 +11,7 @@ const otpSchema = new mongoose.Schema({
   },
   purpose: {
     type: String,
-    enum: ['signup', 'forgotPassword'],
+    enum: ['signup', 'reset-password'],
     required: true,
   },
   expiresAt: {

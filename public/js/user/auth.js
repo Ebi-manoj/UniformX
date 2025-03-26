@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Email validation function
+  function validateEmail(email) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailPattern.test(email);
+  }
+
+  // Show error message
+  function showError(message) {
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('hidden');
+  }
+
   const form = document.getElementById('sign_loginForm');
   const nameInput = document.getElementById('name');
   const emailInput = document.getElementById('email');
@@ -49,18 +61,40 @@ document.addEventListener('DOMContentLoaded', function () {
 
       form.submit();
     });
+  }
 
-    // Email validation function
-    function validateEmail(email) {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailPattern.test(email);
-    }
+  /////////////////////////////////////
+  // resetPassword
+  const resetForm = document.getElementById('reset-password');
+  const newPasswordInput = document.getElementById('newPassword');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  console.log(resetForm);
 
-    // Show error message
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.classList.remove('hidden');
-    }
+  if (resetForm) {
+    resetForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      console.log('hai');
+
+      errorMessage.classList.add('hidden');
+      errorMessage.textContent = '';
+
+      const newPassword = newPasswordInput.value.trim();
+      const confirmPassword = confirmPasswordInput.value.trim();
+      if (!newPassword && !confirmPassword) {
+        showError('All fields required');
+        return;
+      }
+      if (newPassword.length < 6) {
+        showError('Password must be at least 6 characters long.');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        showError('Passwords should be match');
+        return;
+      }
+
+      resetForm.submit();
+    });
   }
 
   ///////////////////////////////////////////////////////////
