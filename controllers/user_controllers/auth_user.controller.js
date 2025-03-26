@@ -11,23 +11,24 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 const userLogin = './layouts/user_login';
+const userMain = './layouts/user_main';
 
 export const getLogin = asyncHandler(async (req, res) => {
   if (req.cookies.token) return res.redirect('/');
-  res.render('user/login', { layout: userLogin, js_file: 'auth' });
+  res.render('auth/login', { layout: userLogin });
 });
 export const getSignup = asyncHandler(async (req, res) => {
-  res.render('user/signup', { layout: userLogin, js_file: 'auth' });
+  res.render('auth/signup', { layout: userLogin });
 });
 export const getHome = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('/auth/login');
-  res.send('Home Page');
+  res.render('user/home', { layout: userMain });
 });
 export const getForgotPassword = asyncHandler(async (req, res) => {
-  res.render('user/forgot_password', { layout: userLogin, js_file: 'auth' });
+  res.render('auth/forgot_password', { layout: userLogin });
 });
 export const getResetPassword = asyncHandler(async (req, res) => {
-  res.render('user/reset_password', { layout: userLogin, js_file: 'auth' });
+  res.render('auth/reset_password', { layout: userLogin });
 });
 
 ////////////////////////////////////////////////////
@@ -58,7 +59,7 @@ export const getVerifyOTP = asyncHandler(async (req, res) => {
     );
   }
 
-  res.render('user/otp', {
+  res.render('auth/otp', {
     layout: userLogin,
     js_file: 'auth',
     expiresAt: otpEntry.expiresAt,
