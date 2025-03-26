@@ -7,6 +7,8 @@ import {
   sendOTP,
 } from '../../utilities/generator.js';
 import { generateToken } from '../../config/jwt.js';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
 const userLogin = './layouts/user_login';
 
@@ -236,6 +238,10 @@ export const LoginHandler = asyncHandler(async (req, res) => {
     req.flash('error', 'Invalid Credintials!');
     return res.redirect('/auth/login');
   }
+  if (user.is_blocked) {
+    req.flash('error', 'Your account has been blocked. Contact admin.');
+    return res.redirect('/auth/login');
+  }
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
     req.flash('error', 'Invalid Credintials!');
@@ -341,4 +347,78 @@ export const resetPassword = asyncHandler(async (req, res) => {
   } catch (error) {
     next(error);
   }
+});
+
+//////////////////////////////////////////////////////////////////////////
+///Google Authentication
+
+// Google OAuth Strategy Configuration
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: 'http://localhost:3001/auth/google/callback',
+      passReqToCallback: true,
+    },
+    async (req, accessToken, refreshToken, profile, done) => {
+      try {
+        let user = await User.findOne({
+          $or: [{ googleId: profile.id }, { email: profile.emails[0].value }],
+        });
+
+        if (!user) {
+          user = new User({
+            full_name: profile.displayName,
+            email: profile.emails[0].value,
+            googleId: profile.id,
+            phone: profile.id,
+          });
+
+          await user.save();
+        } else if (!user.googleId) {
+          user.googleId = profile.id;
+          await user.save();
+        }
+        if (user.is_blocked) {
+          return done(null, false, {
+            message: 'Your account has been blocked. Contact admin.',
+          });
+        }
+        return done(null, user);
+      } catch (error) {
+        return done(error, false);
+      }
+    }
+  )
+);
+
+// Google Login Route Handler
+export const googleLogin = passport.authenticate('google', {
+  scope: ['profile', 'email'],
+});
+
+// Google Callback Route Handler
+export const googleCallback = asyncHandler(async (req, res, next) => {
+  passport.authenticate('google', async (err, user, info) => {
+    if (err) {
+      req.flash('error', 'Authentication failed!');
+      return res.redirect('/auth/login');
+    }
+
+    if (!user) {
+      req.flash('error', info?.message || 'User not found');
+      return res.redirect('/auth/login');
+    }
+
+    // Generate JWT token
+    const token = generateToken(user._id);
+
+    // Set cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.redirect('/');
+  })(req, res, next);
 });

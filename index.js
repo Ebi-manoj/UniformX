@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import passport from 'passport';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import nocache from 'nocache';
@@ -15,6 +16,7 @@ import adminRoutes from './routes/admin.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import { Product } from './model/product_model.js';
+import { User } from './model/user_model.js';
 
 dotenv.config();
 connectDB();
@@ -38,6 +40,22 @@ app.use(
     },
   })
 );
+// passport config
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
 
 app.use(flash());
 

@@ -6,6 +6,8 @@ import {
   getResetPassword,
   getSignup,
   getVerifyOTP,
+  googleCallback,
+  googleLogin,
   LoginHandler,
   resendOTP,
   resetPassword,
@@ -26,5 +28,9 @@ router.post('/forgot-password', forgotPasswordHandler);
 router.post('/resend-otp', resendOTP);
 router.get('/reset-password', getResetPassword);
 router.post('/reset-password', resetPassword);
+
+// Google OAuth Routes
+router.get('/google', googleLogin);
+router.get('/google/callback', googleCallback);
 
 export default router;
