@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
   const clubsData = JSON.parse(document.getElementById('clubsData').value);
   const clubDropdown = document.getElementById('clubFilter');
+  const sortDropdown = document.getElementById('sortDropdown');
   let selectedColors = new Set();
   let selectedSizes = new Set();
 
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ? clubsData
         : clubsData.filter(club =>
             selectedCategories.includes(String(club.category_id))
-          ); // Ensure category_id is a string
+          );
 
     clubDropdown.innerHTML = '<option value="">All Clubs</option>';
 
@@ -152,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
       clubDropdown.appendChild(option);
     });
 
-    restoreSelectedClub(); // Restore selected club after updating
+    restoreSelectedClub();
   }
 
   function restoreSelectedClub() {
@@ -166,16 +167,13 @@ document.addEventListener('DOMContentLoaded', function () {
   function restoreFiltersFromQuery() {
     const queryParams = new URLSearchParams(window.location.search);
 
-    // Restore selected categories
     const selectedCategories = queryParams.get('categories')?.split(',') || [];
     document.querySelectorAll('.category-checkbox').forEach(checkbox => {
       checkbox.checked = selectedCategories.includes(checkbox.value);
     });
 
-    // Restore selected club
     restoreSelectedClub();
 
-    // Restore selected colors
     const selectedColorsFromQuery = queryParams.get('colors')?.split(',') || [];
     selectedColors = new Set(selectedColorsFromQuery);
     document.querySelectorAll('.color-btn').forEach(button => {
@@ -184,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Restore selected sizes
     const selectedSizesFromQuery = queryParams.get('sizes')?.split(',') || [];
     selectedSizes = new Set(selectedSizesFromQuery);
     document.querySelectorAll('.size-btn').forEach(button => {
@@ -197,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Restore price range
     if (queryParams.get('minPrice')) {
       document.getElementById('fromSlider').value = queryParams.get('minPrice');
       document.getElementById('minPriceText').textContent = `₹${queryParams.get(
@@ -211,11 +207,15 @@ document.addEventListener('DOMContentLoaded', function () {
       )}`;
     }
     fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+
+    // Restore sorting selection
+    if (queryParams.get('sort')) {
+      sortDropdown.value = queryParams.get('sort');
+    }
   }
 
   function applyFilters() {
-    const queryParams = new URLSearchParams();
-
+    const queryParams = new URLSearchParams(window.location.search);
     const selectedCategories = Array.from(
       document.querySelectorAll('.category-checkbox:checked')
     ).map(checkbox => checkbox.value);
@@ -241,11 +241,15 @@ document.addEventListener('DOMContentLoaded', function () {
     queryParams.set('minPrice', minPrice);
     queryParams.set('maxPrice', maxPrice);
 
+    // Add sorting parameter
+    queryParams.set('sort', sortDropdown.value);
+
     window.location.href =
       window.location.pathname + '?' + queryParams.toString();
   }
 
-  // **Event Listeners for Colors and Sizes**
+  sortDropdown.addEventListener('change', applyFilters);
+
   document.querySelectorAll('.color-btn').forEach(button => {
     button.addEventListener('click', function () {
       const color = button.dataset.color;
@@ -282,7 +286,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
   document.querySelector('.filter-btn').addEventListener('click', applyFilters);
 
-  // Call updateClubs first, then restore filters
   updateClubs();
   restoreFiltersFromQuery();
+
+  const clearBtn = document.querySelector('.clear-btn');
+
+  function toggleClearButton() {
+    const queryParams = new URLSearchParams(window.location.search);
+
+    if (queryParams.toString()) {
+      clearBtn.style.display = 'inline-block';
+    } else {
+      clearBtn.style.display = 'none';
+    }
+  }
+
+  // Run on page load
+  toggleClearButton();
 });

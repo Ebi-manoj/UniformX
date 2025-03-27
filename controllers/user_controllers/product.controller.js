@@ -9,13 +9,17 @@ const userMain = './layouts/user_main';
 export const listProducts = asyncHandler(async (req, res) => {
   const {
     search,
-    category,
+    categories, // Now supporting multiple categories
+    club, // Club filter
+    colors, // Colors filter
+    sizes, // Sizes filter
     minPrice,
     maxPrice,
     sort,
     page = 1,
     limit = 10,
   } = req.query;
+  console.log(req.query);
 
   // Build query object
   const query = { is_deleted: false };
@@ -28,9 +32,29 @@ export const listProducts = asyncHandler(async (req, res) => {
     ];
   }
 
-  // Category filter
-  if (category) {
-    query.category_id = mongoose.Types.ObjectId(category);
+  // Category filtering (supporting multiple categories)
+  if (categories) {
+    const categoryArray = categories
+      .split(',')
+      .map(id => new mongoose.Types.ObjectId(id));
+    query.category_id = { $in: categoryArray };
+  }
+
+  // Club filtering
+  if (club) {
+    query.club_id = new mongoose.Types.ObjectId(club);
+  }
+
+  // Color filtering (supporting multiple colors)
+  if (colors) {
+    const colorArray = colors.split(',');
+    query.color = { $in: colorArray };
+  }
+
+  // Size filtering (supporting multiple sizes)
+  if (sizes) {
+    const sizeArray = sizes.split(',');
+    query['sizes.size'] = { $in: sizeArray };
   }
 
   // Price range filter
@@ -42,12 +66,12 @@ export const listProducts = asyncHandler(async (req, res) => {
 
   // Sorting logic
   const sortOptions = {
-    'price-asc': { price: 1 },
-    'price-desc': { price: -1 },
-    'name-asc': { title: 1 },
-    'name-desc': { title: -1 },
+    priceLowToHigh: { discountedPrice: 1 },
+    priceHighToLow: { discountedPrice: -1 },
+    aToZ: { title: 1 },
+    zToA: { title: -1 },
+    recommended: { createdAt: -1 },
   };
-
   const sortCriteria = sortOptions[sort] || { createdAt: -1 };
 
   // Pagination
@@ -55,7 +79,7 @@ export const listProducts = asyncHandler(async (req, res) => {
   const limitNumber = parseInt(limit);
   const skip = (pageNumber - 1) * limitNumber;
 
-  // Fetch Products
+  // Fetch Products with filters, sorting, and pagination
   const products = await Product.aggregate([
     { $match: query },
     {
@@ -70,6 +94,14 @@ export const listProducts = asyncHandler(async (req, res) => {
       $addFields: {
         averageRating: { $avg: '$reviews.rating' },
         reviewCount: { $size: '$reviews' },
+        discountedPrice: {
+          $subtract: [
+            '$price',
+            {
+              $multiply: ['$price', { $divide: ['$discountPercentage', 100] }],
+            },
+          ],
+        },
       },
     },
     { $sort: sortCriteria },
@@ -83,7 +115,9 @@ export const listProducts = asyncHandler(async (req, res) => {
         description: 1,
         image_url: 1,
         category_id: 1,
+        club_id: 1,
         colors: 1,
+        sizes: 1,
         averageRating: 1,
         reviewCount: 1,
         discountPercentage: 1,
@@ -92,25 +126,32 @@ export const listProducts = asyncHandler(async (req, res) => {
   ]);
 
   // Fetch Unique Colors from Products
-  const colors = await Product.distinct('color', query);
-  // Fetch Categories & Clubs
-  const categories = await Category.find();
-  const clubs = await Club.find();
+  const uniqueColors = await Product.distinct('color');
 
+  // Fetch Categories & Clubs
+  const categoriesList = await Category.find();
+  const clubsList = await Club.find();
+
+  // Fetch Total Product Count for Pagination
+  const totalProducts = await Product.countDocuments(query);
+  const totalPages = Math.ceil(totalProducts / limitNumber);
+
+  // Render Page
   res.render('user/productlist', {
     layout: userMain,
     css_file: 'products',
     js_file: 'products',
     products,
     currentPage: pageNumber,
-    totalPages: Math.ceil((await Product.countDocuments(query)) / limitNumber),
-    totalProducts: await Product.countDocuments(query),
+    totalPages,
+    totalProducts,
     limit,
-    categories,
-    clubs,
-    colors,
+    categories: categoriesList,
+    clubs: clubsList,
+    colors: uniqueColors,
   });
 });
+
 // Get Product Details
 export const getProductDetails = asyncHandler(async (req, res) => {
   const { slug } = req.params;
