@@ -1,0 +1,466 @@
+ <!-- Navigation -->
+ <nav class="bg-[#f6f6f6] py-3 px-4">
+  <div class="container mx-auto flex items-center space-x-4">
+    <a href="#" class="text-gray-700 hover:text-gray-900">Main</a>
+    <span class="text-gray-400">›</span>
+    <a href="#" class="text-gray-700 hover:text-gray-900">Search</a>
+  </div>
+</nav>
+
+<div class="container mx-auto px-4 py-6">
+  <div class="flex flex-col md:flex-row gap-8">
+    <!-- Sidebar Filters -->
+    <div class="w-full md:w-64 flex-shrink-0">
+      <!-- Categories -->
+      <div class="mb-8">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">Categories</h3>
+        <ul class="space-y-2">
+          <li>
+            <label class="custom-checkbox">
+              <input type="checkbox" checked />
+              <span class="checkmark"></span>
+              All
+            </label>
+          </li>
+          <li>
+            <label class="custom-checkbox">
+              <input type="checkbox" />
+              <span class="checkmark"></span>
+              Cricket
+            </label>
+          </li>
+          <li>
+            <label class="custom-checkbox">
+              <input type="checkbox" />
+              <span class="checkmark"></span>
+              Football
+            </label>
+          </li>
+          <li>
+            <label class="custom-checkbox">
+              <input type="checkbox" />
+              <span class="checkmark"></span>
+              Basketball
+            </label>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Select Clubs -->
+      <div class="mb-8">
+        <h3 class="text-sm font-medium text-gray-700 uppercase mb-3">
+          Select Clubs
+        </h3>
+        <div class="dropdown w-full">
+          <button
+            class="dropdown-toggle w-full justify-between"
+            onclick="toggleDropdown('clubsDropdown')"
+          >
+            <span>Select Club</span>
+            <i class="fas fa-chevron-down text-xs"></i>
+          </button>
+          <div id="clubsDropdown" class="dropdown-menu w-full">
+            <a href="#" class="dropdown-item">Barcelona</a>
+            <a href="#" class="dropdown-item">Real Madrid</a>
+            <a href="#" class="dropdown-item">Manchester United</a>
+            <a href="#" class="dropdown-item">Liverpool</a>
+            <a href="#" class="dropdown-item">Bayern Munich</a>
+            <a href="#" class="dropdown-item">PSG</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Color -->
+      <div class="mb-8">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">Color</h3>
+        <div class="flex space-x-2">
+          <button
+            class="w-6 h-6 rounded-full bg-white border border-gray-300"
+          ></button>
+          <button
+            class="w-6 h-6 rounded-full bg-blue-500 border border-gray-300"
+          ></button>
+          <button
+            class="w-6 h-6 rounded-full bg-blue-300 border border-gray-300"
+          ></button>
+        </div>
+      </div>
+
+      <!-- Size -->
+      <div class="mb-8">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">Size</h3>
+        <div class="flex space-x-2">
+          <button
+            class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:border-blue-500"
+          >
+            S
+          </button>
+          <button
+            class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:border-blue-500"
+          >
+            M
+          </button>
+          <button
+            class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:border-blue-500"
+          >
+            L
+          </button>
+          <button
+            class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded hover:border-blue-500"
+          >
+            XL
+          </button>
+        </div>
+      </div>
+
+      <!-- Price (Updated with Dual Sliders) -->
+      <div class="mb-8">
+        <h3 class="text-sm font-medium text-gray-700 mb-3">Price</h3>
+        <div class="range_container">
+          <div
+            class="price_display flex justify-between text-[12px] mb-3 px-2"
+          >
+            <span id="minPriceText">$0</span>
+            <span id="maxPriceText">$100</span>
+          </div>
+          <div class="sliders_control">
+            <input
+              id="fromSlider"
+              type="range"
+              value="0"
+              min="0"
+              max="100"
+            />
+            <input
+              id="toSlider"
+              type="range"
+              value="100"
+              min="0"
+              max="100"
+            />
+          </div>
+        </div>
+
+        <button
+          class="mt-3 bg-gray-800 text-white text-xs py-1 px-3 rounded hover:bg-gray-700 transition-colors"
+        >
+          FILTER
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1">
+      <!-- Applied Filters -->
+      <div class="mb-6">
+        <h2 class="text-lg font-medium text-gray-800 mb-3">
+          Applied Filters
+        </h2>
+        <div
+          class="flex flex-wrap md:flex-nowrap justify-between items-center"
+        >
+          <div class="flex flex-wrap mb-2 md:mb-0">
+            <div class="filter-tag mb-2">
+              <span class="text-sm text-gray-600">Football</span>
+              <button aria-label="Remove filter">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="filter-tag mb-2">
+              <span class="text-sm text-gray-600">Size: M</span>
+              <button aria-label="Remove filter">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+          <div class="text-sm text-gray-600 mb-2 md:mb-0">
+            Showing 1-9 of 36 Results
+          </div>
+          <div class="flex items-center">
+            <span class="text-sm text-gray-600 mr-2">SORT BY</span>
+            <div class="custom-select">
+              <select
+                class="text-sm border border-gray-300 rounded px-3 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option>Featured</option>
+                <option>Price: Low to High</option>
+                <option>Price: High to Low</option>
+                <option>Newest</option>
+                <option>Best Selling</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Product 1 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$70.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 3 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 4 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 5 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 6 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 7 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 8 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product 9 -->
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3">
+            <img
+              src="/placeholder.svg?height=200&width=200"
+              alt="Barcelona 2023"
+              class="w-full h-48 object-contain"
+            />
+          </div>
+          <h3 class="font-medium text-gray-800 mb-1">Barcelona 2023</h3>
+          <div class="flex text-yellow-400 mb-1">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="far fa-star"></i>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">IN STOCK</span>
+            <div>
+              <span class="text-gray-500 line-through text-sm">$75.00</span>
+              <span class="text-gray-800 font-medium ml-1">$60.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-center mt-8">
+        <nav class="flex items-center space-x-1">
+          <a
+            href="#"
+            class="px-3 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+            >1</a
+          >
+          <a
+            href="#"
+            class="px-3 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+            >2</a
+          >
+          <a
+            href="#"
+            class="px-3 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+            >3</a
+          >
+          <span class="px-3 py-1 text-gray-600">...</span>
+          <a
+            href="#"
+            class="px-3 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+            >10</a
+          >
+          <a
+            href="#"
+            class="px-3 py-1 rounded border border-gray-300 text-gray-600 hover:bg-gray-50"
+            >→</a
+          >
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

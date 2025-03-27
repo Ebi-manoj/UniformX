@@ -1,7 +1,10 @@
 import { Product } from '../../model/product_model.js';
-import { Review } from '../../model/review_model.js';
 import asyncHandler from 'express-async-handler';
+import { Review } from '../../model/review.js';
 import mongoose from 'mongoose';
+import { Category } from '../../model/category_model.js';
+import { Club } from '../../model/club_model.js';
+const userMain = './layouts/user_main';
 
 export const listProducts = asyncHandler(async (req, res) => {
   const {
@@ -16,7 +19,7 @@ export const listProducts = asyncHandler(async (req, res) => {
 
   // Build query object
   const query = {
-    is_deleted: false, // Exclude deleted products
+    is_deleted: false,
   };
 
   // Search logic
@@ -45,9 +48,6 @@ export const listProducts = asyncHandler(async (req, res) => {
     'price-desc': { price: -1 },
     'name-asc': { title: 1 },
     'name-desc': { title: -1 },
-    newest: { createdAt: -1 },
-    popularity: { reviewCount: -1 }, // Requires additional aggregation
-    rating: { averageRating: -1 }, // Requires additional aggregation
   };
 
   const sortCriteria = sortOptions[sort] || { createdAt: -1 };
@@ -99,12 +99,19 @@ export const listProducts = asyncHandler(async (req, res) => {
 
   // Get total count for pagination
   const totalProducts = await Product.countDocuments(query);
+  const categories = await Category.find();
+  const clubs = await Club.find();
 
-  res.json({
+  res.render('user/productlist', {
+    layout: userMain,
+    css_file: 'products',
+    js_file: 'products',
     products,
     currentPage: pageNumber,
     totalPages: Math.ceil(totalProducts / limitNumber),
     totalProducts,
+    categories,
+    clubs,
   });
 });
 

@@ -23,6 +23,16 @@ export const getLogin = asyncHandler(async (req, res) => {
 export const getSignup = asyncHandler(async (req, res) => {
   res.render('auth/signup', { layout: userLogin });
 });
+
+export const getForgotPassword = asyncHandler(async (req, res) => {
+  res.render('auth/forgot_password', { layout: userLogin });
+});
+export const getResetPassword = asyncHandler(async (req, res) => {
+  res.render('auth/reset_password', { layout: userLogin });
+});
+
+///////////////////////////////////////////////
+//Get Home
 export const getHome = asyncHandler(async (req, res) => {
   if (!req.cookies.token) return res.redirect('/auth/login');
   const categories = await Category.find();
@@ -97,13 +107,6 @@ export const getHome = asyncHandler(async (req, res) => {
     features,
   });
 });
-export const getForgotPassword = asyncHandler(async (req, res) => {
-  res.render('auth/forgot_password', { layout: userLogin });
-});
-export const getResetPassword = asyncHandler(async (req, res) => {
-  res.render('auth/reset_password', { layout: userLogin });
-});
-
 ////////////////////////////////////////////////////
 // Get verify OTP page
 export const getVerifyOTP = asyncHandler(async (req, res) => {
