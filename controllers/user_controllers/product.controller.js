@@ -18,9 +18,7 @@ export const listProducts = asyncHandler(async (req, res) => {
   } = req.query;
 
   // Build query object
-  const query = {
-    is_deleted: false,
-  };
+  const query = { is_deleted: false };
 
   // Search logic
   if (search) {
@@ -57,10 +55,9 @@ export const listProducts = asyncHandler(async (req, res) => {
   const limitNumber = parseInt(limit);
   const skip = (pageNumber - 1) * limitNumber;
 
-  // Aggregation pipeline for comprehensive product listing
+  // Fetch Products
   const products = await Product.aggregate([
     { $match: query },
-    // Lookup reviews for rating and review count
     {
       $lookup: {
         from: 'reviews',
@@ -69,19 +66,15 @@ export const listProducts = asyncHandler(async (req, res) => {
         as: 'reviews',
       },
     },
-    // Calculate average rating and review count
     {
       $addFields: {
         averageRating: { $avg: '$reviews.rating' },
         reviewCount: { $size: '$reviews' },
       },
     },
-    // Sort
     { $sort: sortCriteria },
-    // Pagination
     { $skip: skip },
     { $limit: limitNumber },
-    // Project only needed fields
     {
       $project: {
         title: 1,
@@ -90,6 +83,7 @@ export const listProducts = asyncHandler(async (req, res) => {
         description: 1,
         image_url: 1,
         category_id: 1,
+        colors: 1,
         averageRating: 1,
         reviewCount: 1,
         discountPercentage: 1,
@@ -97,8 +91,9 @@ export const listProducts = asyncHandler(async (req, res) => {
     },
   ]);
 
-  // Get total count for pagination
-  const totalProducts = await Product.countDocuments(query);
+  // Fetch Unique Colors from Products
+  const colors = await Product.distinct('color', query);
+  // Fetch Categories & Clubs
   const categories = await Category.find();
   const clubs = await Club.find();
 
@@ -108,14 +103,14 @@ export const listProducts = asyncHandler(async (req, res) => {
     js_file: 'products',
     products,
     currentPage: pageNumber,
-    totalPages: Math.ceil(totalProducts / limitNumber),
-    totalProducts,
+    totalPages: Math.ceil((await Product.countDocuments(query)) / limitNumber),
+    totalProducts: await Product.countDocuments(query),
     limit,
     categories,
     clubs,
+    colors,
   });
 });
-
 // Get Product Details
 export const getProductDetails = asyncHandler(async (req, res) => {
   const { slug } = req.params;

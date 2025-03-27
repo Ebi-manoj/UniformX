@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const clubsData = JSON.parse(document.getElementById('clubsData').value);
   const clubDropdown = document.getElementById('clubFilter');
 
-  if (!clubDropdown) return;
-
   function updateClubs() {
     let selectedCategories = [];
 
@@ -42,6 +40,23 @@ document.addEventListener('DOMContentLoaded', function () {
     checkbox.addEventListener('change', updateClubs);
   });
 
+  // Colors selection
+  document.querySelectorAll('.color-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      this.classList.toggle('ring-2');
+      this.classList.toggle('ring-blue-500');
+    });
+  });
+
+  // Size selection
+  document.querySelectorAll('.size-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      this.classList.toggle('border-blue-500');
+      this.classList.toggle('text-blue-500');
+      this.classList.toggle('font-semibold');
+    });
+  });
+
   updateClubs(); // Initial call to populate all clubs on page load
 });
 
@@ -53,9 +68,9 @@ function controlFromSlider(fromSlider, toSlider, minPriceText) {
 
   if (from > to) {
     fromSlider.value = to;
-    minPriceText.textContent = `$${to}`;
+    minPriceText.textContent = `₹${to}`;
   } else {
-    minPriceText.textContent = `$${from}`;
+    minPriceText.textContent = `₹${from}`;
   }
 }
 
@@ -65,9 +80,9 @@ function controlToSlider(fromSlider, toSlider, maxPriceText) {
 
   if (from > to) {
     toSlider.value = from;
-    maxPriceText.textContent = `$${from}`;
+    maxPriceText.textContent = `₹${from}`;
   } else {
-    maxPriceText.textContent = `$${to}`;
+    maxPriceText.textContent = `₹${to}`;
   }
 }
 
@@ -106,3 +121,85 @@ fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
 fromSlider.oninput = () =>
   controlFromSlider(fromSlider, toSlider, minPriceText);
 toSlider.oninput = () => controlToSlider(fromSlider, toSlider, maxPriceText);
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////Apply filters logic
+
+////////////////////////////////////////////////////////////////////////////////////////
+// Store selected colors and sizes
+let selectedColors = new Set();
+let selectedSizes = new Set();
+
+function getQueryParams() {
+  const queryParams = new URLSearchParams();
+
+  // Get selected categories
+  const selectedCategories = Array.from(
+    document.querySelectorAll('.category-checkbox:checked')
+  ).map(checkbox => checkbox.value);
+  if (selectedCategories.length) {
+    queryParams.set('categories', selectedCategories.join(','));
+  }
+
+  // Get selected club
+  const selectedClub = document.getElementById('clubFilter').value;
+  if (selectedClub) {
+    queryParams.set('club', selectedClub);
+  }
+
+  // Get selected colors
+  if (selectedColors.size) {
+    queryParams.set('colors', Array.from(selectedColors).join(','));
+  }
+
+  // Get selected sizes
+  if (selectedSizes.size) {
+    queryParams.set('sizes', Array.from(selectedSizes).join(','));
+  }
+
+  // Get price range
+  const minPrice = document.getElementById('fromSlider').value;
+  const maxPrice = document.getElementById('toSlider').value;
+  queryParams.set('minPrice', minPrice);
+  queryParams.set('maxPrice', maxPrice);
+
+  return queryParams.toString();
+}
+
+// Function to fetch filtered data
+function applyFilters() {
+  const queryString = getQueryParams();
+  console.log(queryString);
+
+  // Reload the page with updated query parameters
+  window.location.href = window.location.pathname + '?' + queryString;
+}
+
+// Event listener for the "FILTER" button
+document.querySelector('.filter-btn').addEventListener('click', applyFilters);
+
+// Event listener for color buttons
+document.querySelectorAll('.color-btn').forEach(button => {
+  button.addEventListener('click', function () {
+    const color = this.dataset.color; // Get color from data attribute
+
+    if (selectedColors.has(color)) {
+      selectedColors.delete(color); // Deselect if already selected
+    } else {
+      selectedColors.add(color); // Select new color
+    }
+  });
+});
+
+// Event listener for size buttons
+document.querySelectorAll('.size-btn').forEach(button => {
+  button.addEventListener('click', function () {
+    const size = this.textContent.trim();
+
+    if (selectedSizes.has(size)) {
+      selectedSizes.delete(size);
+    } else {
+      selectedSizes.add(size);
+    }
+  });
+});
