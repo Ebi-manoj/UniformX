@@ -124,82 +124,165 @@ toSlider.oninput = () => controlToSlider(fromSlider, toSlider, maxPriceText);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////Apply filters logic
+document.addEventListener('DOMContentLoaded', function () {
+  const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+  const clubsData = JSON.parse(document.getElementById('clubsData').value);
+  const clubDropdown = document.getElementById('clubFilter');
+  let selectedColors = new Set();
+  let selectedSizes = new Set();
 
-////////////////////////////////////////////////////////////////////////////////////////
-// Store selected colors and sizes
-let selectedColors = new Set();
-let selectedSizes = new Set();
+  function updateClubs() {
+    let selectedCategories = Array.from(
+      document.querySelectorAll('.category-checkbox:checked')
+    ).map(checkbox => checkbox.value);
 
-function getQueryParams() {
-  const queryParams = new URLSearchParams();
+    let filteredClubs =
+      selectedCategories.length === 0
+        ? clubsData
+        : clubsData.filter(club =>
+            selectedCategories.includes(String(club.category_id))
+          ); // Ensure category_id is a string
 
-  // Get selected categories
-  const selectedCategories = Array.from(
-    document.querySelectorAll('.category-checkbox:checked')
-  ).map(checkbox => checkbox.value);
-  if (selectedCategories.length) {
-    queryParams.set('categories', selectedCategories.join(','));
+    clubDropdown.innerHTML = '<option value="">All Clubs</option>';
+
+    filteredClubs.forEach(club => {
+      const option = document.createElement('option');
+      option.value = club._id;
+      option.textContent = club.name;
+      clubDropdown.appendChild(option);
+    });
+
+    restoreSelectedClub(); // Restore selected club after updating
   }
 
-  // Get selected club
-  const selectedClub = document.getElementById('clubFilter').value;
-  if (selectedClub) {
-    queryParams.set('club', selectedClub);
-  }
-
-  // Get selected colors
-  if (selectedColors.size) {
-    queryParams.set('colors', Array.from(selectedColors).join(','));
-  }
-
-  // Get selected sizes
-  if (selectedSizes.size) {
-    queryParams.set('sizes', Array.from(selectedSizes).join(','));
-  }
-
-  // Get price range
-  const minPrice = document.getElementById('fromSlider').value;
-  const maxPrice = document.getElementById('toSlider').value;
-  queryParams.set('minPrice', minPrice);
-  queryParams.set('maxPrice', maxPrice);
-
-  return queryParams.toString();
-}
-
-// Function to fetch filtered data
-function applyFilters() {
-  const queryString = getQueryParams();
-  console.log(queryString);
-
-  // Reload the page with updated query parameters
-  window.location.href = window.location.pathname + '?' + queryString;
-}
-
-// Event listener for the "FILTER" button
-document.querySelector('.filter-btn').addEventListener('click', applyFilters);
-
-// Event listener for color buttons
-document.querySelectorAll('.color-btn').forEach(button => {
-  button.addEventListener('click', function () {
-    const color = this.dataset.color; // Get color from data attribute
-
-    if (selectedColors.has(color)) {
-      selectedColors.delete(color); // Deselect if already selected
-    } else {
-      selectedColors.add(color); // Select new color
+  function restoreSelectedClub() {
+    const queryParams = new URLSearchParams(window.location.search);
+    const selectedClub = queryParams.get('club');
+    if (selectedClub) {
+      clubDropdown.value = selectedClub;
     }
-  });
-});
+  }
 
-// Event listener for size buttons
-document.querySelectorAll('.size-btn').forEach(button => {
-  button.addEventListener('click', function () {
-    const size = this.textContent.trim();
+  function restoreFiltersFromQuery() {
+    const queryParams = new URLSearchParams(window.location.search);
 
-    if (selectedSizes.has(size)) {
-      selectedSizes.delete(size);
-    } else {
-      selectedSizes.add(size);
+    // Restore selected categories
+    const selectedCategories = queryParams.get('categories')?.split(',') || [];
+    document.querySelectorAll('.category-checkbox').forEach(checkbox => {
+      checkbox.checked = selectedCategories.includes(checkbox.value);
+    });
+
+    // Restore selected club
+    restoreSelectedClub();
+
+    // Restore selected colors
+    const selectedColorsFromQuery = queryParams.get('colors')?.split(',') || [];
+    selectedColors = new Set(selectedColorsFromQuery);
+    document.querySelectorAll('.color-btn').forEach(button => {
+      if (selectedColors.has(button.dataset.color)) {
+        button.classList.add('ring-2', 'ring-blue-500');
+      }
+    });
+
+    // Restore selected sizes
+    const selectedSizesFromQuery = queryParams.get('sizes')?.split(',') || [];
+    selectedSizes = new Set(selectedSizesFromQuery);
+    document.querySelectorAll('.size-btn').forEach(button => {
+      if (selectedSizes.has(button.textContent.trim())) {
+        button.classList.add(
+          'border-blue-500',
+          'text-blue-500',
+          'font-semibold'
+        );
+      }
+    });
+
+    // Restore price range
+    if (queryParams.get('minPrice')) {
+      document.getElementById('fromSlider').value = queryParams.get('minPrice');
+      document.getElementById('minPriceText').textContent = `₹${queryParams.get(
+        'minPrice'
+      )}`;
     }
+    if (queryParams.get('maxPrice')) {
+      document.getElementById('toSlider').value = queryParams.get('maxPrice');
+      document.getElementById('maxPriceText').textContent = `₹${queryParams.get(
+        'maxPrice'
+      )}`;
+    }
+    fillSlider(fromSlider, toSlider, '#C6C6C6', '#25daa5', toSlider);
+  }
+
+  function applyFilters() {
+    const queryParams = new URLSearchParams();
+
+    const selectedCategories = Array.from(
+      document.querySelectorAll('.category-checkbox:checked')
+    ).map(checkbox => checkbox.value);
+    if (selectedCategories.length) {
+      queryParams.set('categories', selectedCategories.join(','));
+    }
+
+    const selectedClub = clubDropdown.value;
+    if (selectedClub) {
+      queryParams.set('club', selectedClub);
+    }
+
+    if (selectedColors.size) {
+      queryParams.set('colors', Array.from(selectedColors).join(','));
+    }
+
+    if (selectedSizes.size) {
+      queryParams.set('sizes', Array.from(selectedSizes).join(','));
+    }
+
+    const minPrice = document.getElementById('fromSlider').value;
+    const maxPrice = document.getElementById('toSlider').value;
+    queryParams.set('minPrice', minPrice);
+    queryParams.set('maxPrice', maxPrice);
+
+    window.location.href =
+      window.location.pathname + '?' + queryParams.toString();
+  }
+
+  // **Event Listeners for Colors and Sizes**
+  document.querySelectorAll('.color-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const color = button.dataset.color;
+      if (selectedColors.has(color)) {
+        selectedColors.delete(color);
+        button.classList.remove('ring-2', 'ring-blue-500');
+      } else {
+        selectedColors.add(color);
+        button.classList.add('ring-2', 'ring-blue-500');
+      }
+    });
   });
+
+  document.querySelectorAll('.size-btn').forEach(button => {
+    button.addEventListener('click', function () {
+      const size = button.textContent.trim();
+      if (selectedSizes.has(size)) {
+        selectedSizes.delete(size);
+        button.classList.remove(
+          'border-blue-500',
+          'text-blue-500',
+          'font-semibold'
+        );
+      } else {
+        selectedSizes.add(size);
+        button.classList.add(
+          'border-blue-500',
+          'text-blue-500',
+          'font-semibold'
+        );
+      }
+    });
+  });
+
+  document.querySelector('.filter-btn').addEventListener('click', applyFilters);
+
+  // Call updateClubs first, then restore filters
+  updateClubs();
+  restoreFiltersFromQuery();
 });
