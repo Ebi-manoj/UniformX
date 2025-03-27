@@ -110,6 +110,7 @@ export const listProducts = asyncHandler(async (req, res) => {
     currentPage: pageNumber,
     totalPages: Math.ceil(totalProducts / limitNumber),
     totalProducts,
+    limit,
     categories,
     clubs,
   });
