@@ -100,6 +100,8 @@ export const getHome = asyncHandler(async (req, res) => {
     },
   ]);
   res.render('user/home', {
+    css_file: null,
+    js_file: null,
     layout: userMain,
     categories,
     clubs,

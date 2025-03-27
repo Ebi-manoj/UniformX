@@ -1,29 +1,48 @@
-console.log('hai this is');
+document.addEventListener('DOMContentLoaded', function () {
+  const categoryCheckboxes = document.querySelectorAll('.category-checkbox');
+  const clubsData = JSON.parse(document.getElementById('clubsData').value);
+  const clubDropdown = document.getElementById('clubFilter');
 
-// Toggle dropdown function
-function toggleDropdown(id) {
-  const dropdown = document.getElementById(id);
-  if (dropdown.classList.contains('show')) {
-    dropdown.classList.remove('show');
-  } else {
-    // Close all dropdowns first
-    const dropdowns = document.querySelectorAll('.dropdown-menu');
-    dropdowns.forEach(d => d.classList.remove('show'));
+  if (!clubDropdown) return;
 
-    // Open the clicked dropdown
-    dropdown.classList.add('show');
+  function updateClubs() {
+    let selectedCategories = [];
+
+    // Collect selected categories
+    document
+      .querySelectorAll('.category-checkbox:checked')
+      .forEach(checkbox => {
+        selectedCategories.push(checkbox.value);
+      });
+
+    // If no category is selected, show all clubs
+    let filteredClubs =
+      selectedCategories.length === 0
+        ? clubsData
+        : clubsData.filter(club =>
+            selectedCategories.includes(String(club.category_id))
+          );
+
+    console.log('Filtered Clubs:', filteredClubs);
+
+    // Clear previous options
+    clubDropdown.innerHTML = '<option value="">All Clubs</option>';
+
+    // Populate dropdown with filtered clubs
+    filteredClubs.forEach(club => {
+      const option = document.createElement('option');
+      option.value = club._id;
+      option.textContent = club.name;
+      clubDropdown.appendChild(option);
+    });
   }
-}
 
-// Close dropdowns when clicking outside
-window.addEventListener('click', function (e) {
-  if (
-    !e.target.matches('.dropdown-toggle') &&
-    !e.target.closest('.dropdown-menu')
-  ) {
-    const dropdowns = document.querySelectorAll('.dropdown-menu');
-    dropdowns.forEach(d => d.classList.remove('show'));
-  }
+  // Event listeners for category checkboxes
+  categoryCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateClubs);
+  });
+
+  updateClubs(); // Initial call to populate all clubs on page load
 });
 
 ///////////////////////////////////////////////////////////////////////////////////

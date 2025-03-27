@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Get category from URL params
   const urlParams = new URLSearchParams(window.location.search);
   const selectedCategoryId = urlParams.get('category');
-
-  // Populate club dropdown based on category
   const clubDropdown = document.getElementById('clubFilter');
   if (!clubDropdown) return;
 
@@ -29,5 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
       option.textContent = club.name;
       clubDropdown.appendChild(option);
     });
+
+    // Populate club dropdown based on category
   }
 });

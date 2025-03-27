@@ -15,60 +15,30 @@
       <div class="mb-8">
         <h3 class="text-sm font-medium text-gray-700 mb-3">Categories</h3>
         <ul class="space-y-2">
-          <li>
-            <label class="custom-checkbox">
-              <input type="checkbox" checked />
-              <span class="checkmark"></span>
-              All
-            </label>
-          </li>
-          <li>
-            <label class="custom-checkbox">
-              <input type="checkbox" />
-              <span class="checkmark"></span>
-              Cricket
-            </label>
-          </li>
-          <li>
-            <label class="custom-checkbox">
-              <input type="checkbox" />
-              <span class="checkmark"></span>
-              Football
-            </label>
-          </li>
-          <li>
-            <label class="custom-checkbox">
-              <input type="checkbox" />
-              <span class="checkmark"></span>
-              Basketball
-            </label>
-          </li>
+          <% categories.forEach(category => { %>
+            <li>
+              <label class="custom-checkbox">
+                <input 
+                  type="checkbox" 
+                  class="category-checkbox" 
+                  value="<%= category.id %>" 
+                  data-category="<%= category.name %>"
+                />
+                <span class="checkmark"></span>
+                <%= category.name %>
+              </label>
+            </li>
+          <% }); %>
         </ul>
       </div>
-
+      
+      <!-- Hidden Input to Store All Clubs Data -->
+      <input type="hidden" id="clubsData" value='<%= JSON.stringify(clubs) %>'>
+      
       <!-- Select Clubs -->
-      <div class="mb-8">
-        <h3 class="text-sm font-medium text-gray-700 uppercase mb-3">
-          Select Clubs
-        </h3>
-        <div class="dropdown w-full">
-          <button
-            class="dropdown-toggle w-full justify-between"
-            onclick="toggleDropdown('clubsDropdown')"
-          >
-            <span>Select Club</span>
-            <i class="fas fa-chevron-down text-xs"></i>
-          </button>
-          <div id="clubsDropdown" class="dropdown-menu w-full">
-            <a href="#" class="dropdown-item">Barcelona</a>
-            <a href="#" class="dropdown-item">Real Madrid</a>
-            <a href="#" class="dropdown-item">Manchester United</a>
-            <a href="#" class="dropdown-item">Liverpool</a>
-            <a href="#" class="dropdown-item">Bayern Munich</a>
-            <a href="#" class="dropdown-item">PSG</a>
-          </div>
-        </div>
-      </div>
+      <select id="clubFilter" class="w-32 mb-8 p-2 text-center border border-slate-100 text-gray-700 hover:text-gray-900">
+        <option value="">All Clubs</option>
+      </select>
 
       <!-- Color -->
       <div class="mb-8">
