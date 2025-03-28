@@ -48,3 +48,18 @@ function search() {
 }
 
 document.addEventListener('DOMContentLoaded', search);
+
+// Dropdwon
+document.getElementById('category').addEventListener('change', function () {
+  const selectedCategory = this.value;
+  if (selectedCategory) {
+    window.location.href = `/products?categories=${selectedCategory}`;
+  }
+});
+
+document.getElementById('club').addEventListener('change', function () {
+  const selectedClub = this.value;
+  if (selectedClub) {
+    window.location.href = `/products?club=${selectedClub}`;
+  }
+});

@@ -31,22 +31,26 @@ export const isUserAuthenticated = asyncHandler(async (req, res, next) => {
 
 // Admin Auth
 export const isProtected = asyncHandler(async (req, res, next) => {
-  const token = req.cookies.token;
+  const token = req.cookies.adminToken;
+
   if (!token) {
-    console.log('no token');
-    return res.redirect('login');
+    console.log('No admin token found');
+    return res.redirect('/admin/login');
   }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
     req.admin = await Admin.findById(decoded.id).select('-password');
+
     if (!req.admin) {
-      console.log('User not found');
-      return res.redirect('login');
+      console.log('Admin not found');
+      return res.redirect('/admin/login');
     }
-    next();
+
+    next(); // Move to next middleware
   } catch (error) {
-    console.log('Token expired redirected to login');
-    res.clearCookie('token', { httpOnly: true, sameSite: 'strict' });
-    res.redirect('login');
+    console.log('Admin token expired, redirecting to admin login');
+    res.clearCookie('adminToken', { httpOnly: true, sameSite: 'strict' });
+    res.redirect('/admin/login');
   }
 });

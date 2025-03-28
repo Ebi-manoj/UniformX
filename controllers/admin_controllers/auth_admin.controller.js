@@ -7,7 +7,7 @@ const adminLogin_layout = './layouts/admin_login';
 
 // Get Login Page
 export const getLogin = asyncHandler(async (req, res) => {
-  if (req.cookies.token) return res.redirect('dashboard');
+  if (req.cookies.adminToken) return res.redirect('dashboard');
   res.render('admin/admin_login', { layout: adminLogin_layout });
 });
 // Verify Login
@@ -33,7 +33,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
   }
   const token = generateToken(admin._id);
 
-  res.cookie('token', token, {
+  res.cookie('adminToken', token, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
   });
