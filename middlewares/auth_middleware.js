@@ -39,6 +39,10 @@ export const isProtected = asyncHandler(async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
     req.admin = await Admin.findById(decoded.id).select('-password');
+    if (!req.admin) {
+      console.log('User not found');
+      return res.redirect('login');
+    }
     next();
   } catch (error) {
     console.log('Token expired redirected to login');
