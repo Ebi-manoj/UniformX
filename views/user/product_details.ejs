@@ -1,0 +1,537 @@
+    <style>
+        /* Image Zoom Functionality */
+        .img-zoom-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .img-zoom-lens {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            width: 100px;
+            height: 100px;
+            background-color: rgba(255, 255, 255, 0.2);
+            cursor: none;
+            display: none;
+        }
+        
+        .img-zoom-result {
+            position: absolute;
+            top: 0;
+            left: 105%;
+            width: 400px;
+            height: 400px;
+            border: 1px solid #d4d4d4;
+            background-color: white;
+            display: none;
+            z-index: 50;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Image Slider */
+        .slider-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        .slider-main {
+            width: 100%;
+            position: relative;
+        }
+        
+        .slider-nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        
+        .slider-nav-item {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #d1d5db;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .slider-nav-item.active {
+            background-color: #111827;
+        }
+        
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .slider-arrow.prev {
+            left: 10px;
+        }
+        
+        .slider-arrow.next {
+            right: 10px;
+        }
+        
+        /* Tabs */
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Size selector */
+        .size-option {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .size-option.selected {
+            background-color: #111827;
+            color: white;
+        }
+        
+        /* Quantity selector */
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+            -moz-appearance: textfield;
+        }
+        
+        .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Reviews */
+        .star-rating {
+            color: #f59e0b;
+        }
+        
+        .star-empty {
+            color: #d1d5db;
+        }
+    </style>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-6 text-sm">
+            <a href="/products" class="text-gray-500 hover:text-gray-700">Product</a>
+            <span class="mx-2 text-gray-500">/</span>
+            <span class="text-gray-900"><%= product.slug %></span>
+        </nav>
+        
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Product Images -->
+            <div class="w-full md:w-1/2">
+                <div class="slider-container">
+                    <div class="slider-arrow prev" onclick="changeSlide(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+            
+                    <div class="slider-main img-zoom-container" id="imageContainer">
+                        <div class="img-zoom-lens" id="lens"></div>
+                        <img id="currentSlide" src="<%= product.image_url[0] %>" alt="Product Image" class="w-full h-100 bg-gray-100">
+                        <input type="hidden" value='<%= JSON.stringify(product.image_url) %>' id="imageArray">
+                        <div class="img-zoom-result" id="zoomResult"></div>
+                    </div>
+            
+                    <div class="slider-arrow next" onclick="changeSlide(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+            
+                    <div class="slider-nav mt-4">
+                        <% product.image_url.forEach((image, index) => { %>
+                            <div class="slider-nav-item <%= index === 0 ? 'active' : '' %>" onclick="goToSlide(<%= index %>)"></div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <!-- Product Info -->
+            <div class="w-full md:w-1/2">
+                <div class="flex items-center mb-2">
+                    <div class="star-rating flex mr-2">
+                        <% for(let i = 0; i < 5; i++) { %>
+                            <% if (i < Math.floor(product.averageRating)) { %>
+                                <i class="fas fa-star text-yellow-500"></i>
+                            <% } else if (i < product.averageRating) { %>
+                                <i class="fas fa-star-half-alt text-yellow-500"></i>
+                            <% } else { %>
+                                <i class="far fa-star text-yellow-500"></i>
+                            <% } %>
+                        <% } %>
+                    </div>
+                    <span class="text-sm text-gray-600">(<%= product.reviewCount %> Reviews)</span>
+                </div>
+                
+                
+                <h1 class="text-2xl font-bold text-gray-900 mb-2"><%= product.title %></h1>
+                
+                <div class="text-sm mb-4 
+                <%= product.stockStatus === 'Out of Stock' ? 'text-red-600' : 'text-gray-600' %>">
+                <%= product.stockStatus.toUpperCase() %>
+            </div>
+            
+                
+                
+            <div class="text-xl font-bold text-gray-900 mb-1">
+                <% if (product.discountPercentage) { %>
+                    <span class="mr-2 text-gray-900">₹ <%= (product.price - (product.price * product.discountPercentage / 100)).toFixed(2) %></span>
+                    <span class="line-through text-gray-500 text-base">₹ <%= product.price.toFixed(2) %></span>
+                    <span class="text-green-600 font-medium text-sm"> (<%= product.discountPercentage %>% Off)</span>
+                <% } else { %>
+                    ₹ <%= product.price.toFixed(2) %>
+                <% } %>
+            </div>
+            
+            <% if (product.discountPercentage) { %>
+                <div class="text-sm mb-5 text-red-500">
+                    You save ₹ <%= (product.price * product.discountPercentage / 100).toFixed(2) %>
+                </div>
+            <% } %>
+            
+            
+                
+                
+                <!-- Available Types -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-2">AVAILABLE TYPES</h3>
+                    <div class="flex space-x-2">
+                      <% if (product.relatedProducts && product.relatedProducts.length > 0) { %>
+                        <% product.relatedProducts.forEach(relatedProduct => { %>
+                          <a href="/product/<%= relatedProduct.slug %>">
+                            <button class="px-4 py-2 border border-gray-300 rounded text-sm font-medium <%= relatedProduct.type === product.type ? 'bg-gray-900 text-white' : 'bg-gray-100' %>">
+                              <%= relatedProduct.type || 'Unknown Type' %>
+                            </button>
+                          </a>
+                        <% }); %>
+                      <% } else { %>
+                        <button class="px-4 py-2 border border-gray-300 rounded text-sm font-medium bg-gray-900 text-white">
+                          <%= product.type || 'Unknown Type' %>
+                        </button>
+                      <% } %>
+                    </div>
+                  </div>
+                
+                <!-- Select Size -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-2">SELECT SIZE</h3>
+                    <div class="flex space-x-2">
+                        <% product.sizes.forEach(size => { %>
+                            <div class="size-option w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer" onclick="selectSize(this)">
+                                <%= size.size %>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+                
+                
+                <!-- Quantity -->
+                <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-2">QUANTITY</h3>
+                    <div class="flex items-center">
+                        <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l" onclick="decrementQuantity()">
+                            <i class="fas fa-minus text-xs"></i>
+                        </button>
+                        <input type="number" id="quantity" class="quantity-input h-8 border-t border-b border-gray-300" value="1" min="1">
+                        <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r" onclick="incrementQuantity()">
+                            <i class="fas fa-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                 <!-- Color -->
+                 <div class="mb-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-2">COLOR</h3>
+                    <div class="flex space-x-2">
+                        <div class="w-6 h-6 rounded-full border border-gray-300 cursor-pointer" style="background-color: <%= product.color %>;"></div>
+                    </div>
+                </div>
+                
+                <!-- Add to Cart -->
+                <div class="flex space-x-4 mb-6">
+                    <button class="flex-1 bg-gray-900 text-white py-3 px-6 rounded hover:bg-gray-800 transition-colors">
+                        ADD TO CART
+                    </button>
+                    <button class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+                
+                <div class="text-sm text-gray-600 mb-8">
+                    + FREE SHIPPING ON ORDERS $50+
+                </div>
+                
+               
+                
+            </div>
+        </div>
+        
+        <!-- Product Details Tabs -->
+        <div class="mt-12">
+            <div class="border-b border-gray-200">
+                <div class="flex space-x-8">
+                    <button class="tab-button py-4 px-1 border-b-2 border-gray-900 font-medium text-sm text-gray-900" onclick="openTab(event, 'detail')">Detail</button>
+                    <button class="tab-button py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700" onclick="openTab(event, 'reviews')">Reviews</button>
+                </div>
+            </div>
+            
+            <div id="detail" class="tab-content active py-6">
+                <% 
+                    // Splitting the description into main content and key features
+                    let parts = product.description.split('Key Features:'); 
+                    let mainDescription = parts[0].trim(); 
+                    let keyFeatures = parts[1] ? parts[1].split('-').filter(f => f.trim() !== '') : [];
+                %>
+            
+                <!-- Main Description -->
+                <p class="text-gray-700 mb-4">
+                    <%= mainDescription %>
+                </p>
+            
+                <!-- Key Features as Bullet Points -->
+                <% if (keyFeatures.length > 0) { %>
+                    <ul class="list-disc pl-5 text-gray-700 space-y-2">
+                        <% keyFeatures.forEach(feature => { %>
+                            <li><%= feature.trim() %></li>
+                        <% }) %>
+                    </ul>
+                <% } %>
+            </div>
+            
+            
+            
+            <div id="reviews" class="tab-content py-6">
+                <div class="mb-8">
+                    <div class="flex items-center mb-4">
+                        <div class="star-rating flex mr-3">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <span class="text-lg font-medium">4.5 out of 5</span>
+                    </div>
+                    <p class="text-gray-600">Based on 24 reviews</p>
+                </div>
+                
+                <!-- Individual Reviews -->
+                <div class="space-y-6">
+                    <div class="border-b border-gray-200 pb-6">
+                        <div class="flex items-center mb-2">
+                            <div class="star-rating flex mr-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="font-medium">Great quality!</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">John D. - 2 weeks ago</p>
+                        <p class="text-gray-700">
+                            The jersey is exactly as described. The material feels premium and the fit is perfect. I've worn it to several games now and received many compliments. Highly recommend!
+                        </p>
+                    </div>
+                    
+                    <div class="border-b border-gray-200 pb-6">
+                        <div class="flex items-center mb-2">
+                            <div class="star-rating flex mr-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star" class="star-empty"></i>
+                            </div>
+                            <span class="font-medium">Good but sizing runs small</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">Sarah M. - 1 month ago</p>
+                        <p class="text-gray-700">
+                            The jersey looks great and the quality is good, but I found the sizing to run a bit small. I usually wear a medium but had to exchange for a large. Other than that, I'm very happy with my purchase.
+                        </p>
+                    </div>
+                    
+                    <div class="pb-6">
+                        <div class="flex items-center mb-2">
+                            <div class="star-rating flex mr-2">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="font-medium">Excellent jersey, fast shipping</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">Michael T. - 3 weeks ago</p>
+                        <p class="text-gray-700">
+                            I'm very impressed with both the quality of the jersey and the speed of delivery. The colors are vibrant and the material is comfortable even during hot weather. Will definitely buy from here again.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image Slider
+        const imageArrayInput = document.getElementById("imageArray").value;
+        const slides = imageArrayInput ? JSON.parse(imageArrayInput) : [];
+        
+        let currentSlideIndex = 0;
+        
+        function changeSlide(n) {
+            goToSlide(currentSlideIndex + n);
+        }
+        
+        function goToSlide(n) {
+            const navItems = document.querySelectorAll('.slider-nav-item');
+            
+            // Remove active class from all nav items
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Calculate the new slide index
+            if (n >= slides.length) {
+                currentSlideIndex = 0;
+            } else if (n < 0) {
+                currentSlideIndex = slides.length - 1;
+            } else {
+                currentSlideIndex = n;
+            }
+            
+            // Update the current slide image
+            document.getElementById('currentSlide').src = slides[currentSlideIndex];
+            
+            // Add active class to current nav item
+            navItems[currentSlideIndex].classList.add('active');
+        }
+        
+        // Image Zoom Functionality
+        function showZoom() {
+            const lens = document.getElementById('lens');
+            const result = document.getElementById('zoomResult');
+            
+            lens.style.display = "block";
+            result.style.display = "block";
+            
+            // Set up the zoom effect
+            const img = document.getElementById('currentSlide');
+            const cx = result.offsetWidth / lens.offsetWidth;
+            const cy = result.offsetHeight / lens.offsetHeight;
+            
+            // Set background properties for the result div
+            result.style.backgroundImage = "url('" + img.src + "')";
+            result.style.backgroundSize = (img.width * cx) + "px " + (img.height * cy) + "px";
+            
+            // Execute the zoom function when the mouse moves over the image
+            img.parentElement.addEventListener("mousemove", moveLens);
+            
+            function moveLens(e) {
+                // Prevent any other actions that may occur when moving over the image
+                e.preventDefault();
+                
+                // Get the cursor's position
+                const pos = getCursorPos(e);
+                
+                // Calculate the position of the lens
+                let x = pos.x - (lens.offsetWidth / 2);
+                let y = pos.y - (lens.offsetHeight / 2);
+                
+                // Prevent the lens from being positioned outside the image
+                if (x > img.width - lens.offsetWidth) {x = img.width - lens.offsetWidth;}
+                if (x < 0) {x = 0;}
+                if (y > img.height - lens.offsetHeight) {y = img.height - lens.offsetHeight;}
+                if (y < 0) {y = 0;}
+                
+                // Set the position of the lens
+                lens.style.left = x + "px";
+                lens.style.top = y + "px";
+                
+                // Display what the lens "sees"
+                result.style.backgroundPosition = "-" + (x * cx) + "px -" + (y * cy) + "px";
+            }
+            
+            function getCursorPos(e) {
+                let a, x = 0, y = 0;
+                e = e || window.event;
+                
+                // Get the x and y positions of the image
+                a = img.getBoundingClientRect();
+                
+                // Calculate the cursor's x and y coordinates, relative to the image
+                x = e.pageX - a.left - window.pageXOffset;
+                y = e.pageY - a.top - window.pageYOffset;
+                
+                return {x : x, y : y};
+            }
+        }
+        
+        function hideZoom() {
+            document.getElementById('lens').style.display = "none";
+            document.getElementById('zoomResult').style.display = "none";
+        }
+        
+        // Tabs Functionality
+        function openTab(evt, tabName) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.getElementsByClassName('tab-button');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('border-gray-900', 'text-gray-900');
+                tabButtons[i].classList.add('border-transparent', 'text-gray-500');
+            }
+            
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to the clicked button
+            evt.currentTarget.classList.remove('border-transparent', 'text-gray-500');
+            evt.currentTarget.classList.add('border-gray-900', 'text-gray-900');
+        }
+        
+        // Size Selection
+        function selectSize(element) {
+            // Remove selected class from all size options
+            const sizeOptions = document.getElementsByClassName('size-option');
+            for (let i = 0; i < sizeOptions.length; i++) {
+                sizeOptions[i].classList.remove('selected');
+            }
+            
+            // Add selected class to the clicked option
+            element.classList.add('selected');
+        }
+        
+        // Quantity Selector
+        function incrementQuantity() {
+            const input = document.getElementById('quantity');
+            input.value = parseInt(input.value) + 1;
+        }
+        
+        function decrementQuantity() {
+            const input = document.getElementById('quantity');
+            const value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        }
+    </script>

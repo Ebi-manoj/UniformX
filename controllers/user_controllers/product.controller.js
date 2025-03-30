@@ -4,6 +4,7 @@ import { Review } from '../../model/review.js';
 import mongoose from 'mongoose';
 import { Category } from '../../model/category_model.js';
 import { Club } from '../../model/club_model.js';
+import { productDetails } from '../../utilities/DbQueries.js';
 const userMain = './layouts/user_main';
 
 export const listProducts = asyncHandler(async (req, res) => {
@@ -127,6 +128,7 @@ export const listProducts = asyncHandler(async (req, res) => {
 
   // Fetch Unique Colors from Products
   const uniqueColors = await Product.distinct('color');
+  console.log(uniqueColors);
 
   // Fetch Categories & Clubs
   const categoriesList = await Category.find();
@@ -156,58 +158,21 @@ export const listProducts = asyncHandler(async (req, res) => {
 export const getProductDetails = asyncHandler(async (req, res) => {
   const { slug } = req.params;
 
-  const product = await Product.aggregate([
-    { $match: { slug, is_deleted: false } },
-    // Lookup category details
-    {
-      $lookup: {
-        from: 'categories',
-        localField: 'category_id',
-        foreignField: '_id',
-        as: 'category',
-      },
-    },
-    // Lookup reviews
-    {
-      $lookup: {
-        from: 'reviews',
-        localField: '_id',
-        foreignField: 'product_id',
-        as: 'reviews',
-      },
-    },
-    // Unwind category (optional, depends on your schema)
-    { $unwind: '$category' },
-    // Calculate ratings
-    {
-      $addFields: {
-        averageRating: { $avg: '$reviews.rating' },
-        reviewCount: { $size: '$reviews' },
-      },
-    },
-    // Project needed fields
-    {
-      $project: {
-        title: 1,
-        slug: 1,
-        price: 1,
-        description: 1,
-        image_url: 1,
-        category: 1,
-        sizes: 1,
-        color: 1,
-        averageRating: 1,
-        reviewCount: 1,
-        reviews: 1,
-      },
-    },
-  ]);
+  const product = await Product.aggregate(productDetails(slug));
+  console.log(product);
 
-  if (!product.length) {
-    return res.status(404).json({ message: 'Product not found' });
-  }
+  const categoriesList = await Category.find();
+  const clubsList = await Club.find();
 
-  res.json(product[0]);
+  res.render('user/product_details', {
+    layout: userMain,
+    css_file: null,
+    js_file: null,
+    categories: categoriesList,
+    clubs: clubsList,
+    product: product[0],
+    alternativeProduct: product[0]?.alternativeProduct || null,
+  });
 });
 
 // Add Review

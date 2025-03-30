@@ -90,11 +90,13 @@
           <% bestSelling.forEach(product => { %>
             <div class="group border border-gray-100 py-3 px-3 bg-white  rounded-lg overflow-hidden">
               <div class="aspect-w-1 aspect-h-1 bg-white rounded-lg overflow-hidden">
-                <img 
+                <a href="/product/<%= product.slug %>">
+                  <img 
                   src="<%= product.image_url[0] %>" 
                   alt="<%= product.title %>" 
                   class="w-full h-64 object-contain"
                 />
+                </a>
               </div>
               <div class="mt-4">
                 <h3 class="text-base text-gray-700 font-semibold"><%= product.title %></h3>
@@ -183,11 +185,13 @@
           <% features.forEach(product => { %>
             <div class="group border border-gray-100 py-3 px-3 bg-white  rounded-lg overflow-hidden">
               <div class="aspect-w-1 aspect-h-1 bg-white rounded-lg overflow-hidden">
+               <a href="/product/<%= product.slug %>">
                 <img 
-                  src="<%= product.image_url[0] %>" 
-                  alt="<%= product.title %>" 
-                  class="w-full h-64 object-contain"
-                />
+                src="<%= product.image_url[0] %>" 
+                alt="<%= product.title %>" 
+                class="w-full h-64 object-contain"
+              />
+               </a>
               </div>
               <div class="mt-4">
                 <h3 class="text-base text-gray-700 font-semibold"><%= product.title %></h3>

@@ -14,9 +14,13 @@ export const isUserAuthenticated = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
-    req.user = await User.findById(decoded.id).select('-password');
+    req.user = await User.findOne({
+      _id: decoded.id,
+      is_blocked: false,
+    }).select('-password');
 
     if (!req.user) {
+      res.clearCookie('token', { httpOnly: true, sameSite: 'strict' });
       console.log('User not found');
       return res.redirect('/auth/login');
     }
