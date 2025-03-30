@@ -26,7 +26,7 @@ export const getCategory = asyncHandler(async (req, res) => {
 
   res.render('admin/categoryManage', {
     category: 'main',
-    cssFile: null,
+    css_file: null,
     js_file: 'category',
     categories,
     currentPage: page,

@@ -166,8 +166,6 @@ export const getProductDetails = asyncHandler(async (req, res) => {
 
   res.render('user/product_details', {
     layout: userMain,
-    css_file: null,
-    js_file: null,
     categories: categoriesList,
     clubs: clubsList,
     product: product[0],

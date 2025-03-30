@@ -27,7 +27,7 @@ export const getClubCategory = asyncHandler(async (req, res) => {
   const categories = await Category.find({}, { name: 1 });
   res.render('admin/clubCategory', {
     category: 'club',
-    cssFile: 'user_manage',
+    css_file: 'user_manage',
     js_file: 'category',
     currentPage: page,
     totalCount,

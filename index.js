@@ -63,6 +63,8 @@ app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success');
   res.locals.error_msg = req.flash('error');
   res.locals.searchQuery = req.query.search || '';
+  res.locals.css_file = res.locals.css_file || null;
+  res.locals.js_file = res.locals.js_file || null;
   next();
 });
 
