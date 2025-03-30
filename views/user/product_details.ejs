@@ -18,12 +18,12 @@
         .img-zoom-result {
             position: absolute;
             top: 0;
-            left: 105%;
-            width: 400px;
-            height: 400px;
+            left: 100%;
+            width: 600px;
+            height: 600px;
             border: 1px solid #d4d4d4;
             background-color: white;
-            display: none;
+            display: block;
             z-index: 50;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
@@ -141,12 +141,12 @@
                         <i class="fas fa-chevron-left"></i>
                     </div>
             
-                    <div class="slider-main img-zoom-container" id="imageContainer">
+                    <div class="slider-main img-zoom-container w-80" id="imageContainer">
                         <div class="img-zoom-lens" id="lens"></div>
                         <img id="currentSlide" src="<%= product.image_url[0] %>" alt="Product Image" class="w-full h-100 bg-gray-100">
                         <input type="hidden" value='<%= JSON.stringify(product.image_url) %>' id="imageArray">
-                        <div class="img-zoom-result" id="zoomResult"></div>
                     </div>
+                    <div class="img-zoom-result" id="zoomResult"></div>
             
                     <div class="slider-arrow next" onclick="changeSlide(1)">
                         <i class="fas fa-chevron-right"></i>
@@ -388,150 +388,177 @@
 
     <script>
         // Image Slider
-        const imageArrayInput = document.getElementById("imageArray").value;
-        const slides = imageArrayInput ? JSON.parse(imageArrayInput) : [];
+      
+// Image Slider
+const imageArrayInput = document.getElementById("imageArray").value;
+const slides = imageArrayInput ? JSON.parse(imageArrayInput) : [];
+
+let currentSlideIndex = 0;
+
+function changeSlide(n) {
+    goToSlide(currentSlideIndex + n);
+}
+
+function goToSlide(n) {
+    const navItems = document.querySelectorAll('.slider-nav-item');
+    
+    // Remove active class from all nav items
+    navItems.forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Calculate the new slide index
+    if (n >= slides.length) {
+        currentSlideIndex = 0;
+    } else if (n < 0) {
+        currentSlideIndex = slides.length - 1;
+    } else {
+        currentSlideIndex = n;
+    }
+    
+    // Update the current slide image
+    document.getElementById('currentSlide').src = slides[currentSlideIndex];
+    
+    // Add active class to current nav item
+    navItems[currentSlideIndex].classList.add('active');
+    
+}
+
+// Image Zoom Functionality
+function initZoom() {
+    const img = document.getElementById('currentSlide');
+    const lens = document.getElementById('lens');
+    const result = document.getElementById('zoomResult');
+    const container = document.getElementById('imageContainer');
+    
+    // Initial setup - hide lens and result
+    lens.style.display = "none";
+    result.style.display = "none";
+    
+    // Add event listeners
+    container.addEventListener("click", function() {
+        showZoom();
+    });
+    
+    container.addEventListener("mouseleave", function() {
+        hideZoom();
+    });
+    
+    container.addEventListener("mousemove", moveLens);
+    
+    function moveLens(e) {
+        // Prevent any other actions that may occur when moving over the image
+        e.preventDefault();
         
-        let currentSlideIndex = 0;
-        
-        function changeSlide(n) {
-            goToSlide(currentSlideIndex + n);
+        // Make sure image is loaded
+        if (!img.complete || !img.naturalWidth) {
+            return;
         }
         
-        function goToSlide(n) {
-            const navItems = document.querySelectorAll('.slider-nav-item');
-            
-            // Remove active class from all nav items
-            navItems.forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Calculate the new slide index
-            if (n >= slides.length) {
-                currentSlideIndex = 0;
-            } else if (n < 0) {
-                currentSlideIndex = slides.length - 1;
-            } else {
-                currentSlideIndex = n;
-            }
-            
-            // Update the current slide image
-            document.getElementById('currentSlide').src = slides[currentSlideIndex];
-            
-            // Add active class to current nav item
-            navItems[currentSlideIndex].classList.add('active');
-        }
+        // Calculate zoom ratio
+        const cx = result.offsetWidth / lens.offsetWidth;
+        const cy = result.offsetHeight / lens.offsetHeight;
         
-        // Image Zoom Functionality
-        function showZoom() {
-            const lens = document.getElementById('lens');
-            const result = document.getElementById('zoomResult');
-            
-            lens.style.display = "block";
-            result.style.display = "block";
-            
-            // Set up the zoom effect
-            const img = document.getElementById('currentSlide');
-            const cx = result.offsetWidth / lens.offsetWidth;
-            const cy = result.offsetHeight / lens.offsetHeight;
-            
-            // Set background properties for the result div
-            result.style.backgroundImage = "url('" + img.src + "')";
-            result.style.backgroundSize = (img.width * cx) + "px " + (img.height * cy) + "px";
-            
-            // Execute the zoom function when the mouse moves over the image
-            img.parentElement.addEventListener("mousemove", moveLens);
-            
-            function moveLens(e) {
-                // Prevent any other actions that may occur when moving over the image
-                e.preventDefault();
-                
-                // Get the cursor's position
-                const pos = getCursorPos(e);
-                
-                // Calculate the position of the lens
-                let x = pos.x - (lens.offsetWidth / 2);
-                let y = pos.y - (lens.offsetHeight / 2);
-                
-                // Prevent the lens from being positioned outside the image
-                if (x > img.width - lens.offsetWidth) {x = img.width - lens.offsetWidth;}
-                if (x < 0) {x = 0;}
-                if (y > img.height - lens.offsetHeight) {y = img.height - lens.offsetHeight;}
-                if (y < 0) {y = 0;}
-                
-                // Set the position of the lens
-                lens.style.left = x + "px";
-                lens.style.top = y + "px";
-                
-                // Display what the lens "sees"
-                result.style.backgroundPosition = "-" + (x * cx) + "px -" + (y * cy) + "px";
-            }
-            
-            function getCursorPos(e) {
-                let a, x = 0, y = 0;
-                e = e || window.event;
-                
-                // Get the x and y positions of the image
-                a = img.getBoundingClientRect();
-                
-                // Calculate the cursor's x and y coordinates, relative to the image
-                x = e.pageX - a.left - window.pageXOffset;
-                y = e.pageY - a.top - window.pageYOffset;
-                
-                return {x : x, y : y};
-            }
-        }
+        // Get the cursor's position
+        const pos = getCursorPos(e);
         
-        function hideZoom() {
-            document.getElementById('lens').style.display = "none";
-            document.getElementById('zoomResult').style.display = "none";
-        }
+        // Calculate the position of the lens
+        let x = pos.x - (lens.offsetWidth / 2);
+        let y = pos.y - (lens.offsetHeight / 2);
         
-        // Tabs Functionality
-        function openTab(evt, tabName) {
-            // Hide all tab content
-            const tabContents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove('active');
-            }
-            
-            // Remove active class from all tab buttons
-            const tabButtons = document.getElementsByClassName('tab-button');
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].classList.remove('border-gray-900', 'text-gray-900');
-                tabButtons[i].classList.add('border-transparent', 'text-gray-500');
-            }
-            
-            // Show the selected tab content
-            document.getElementById(tabName).classList.add('active');
-            
-            // Add active class to the clicked button
-            evt.currentTarget.classList.remove('border-transparent', 'text-gray-500');
-            evt.currentTarget.classList.add('border-gray-900', 'text-gray-900');
-        }
+        // Prevent the lens from being positioned outside the image
+        const imgRect = img.getBoundingClientRect();
+        if (x > imgRect.width - lens.offsetWidth) {x = imgRect.width - lens.offsetWidth;}
+        if (x < 0) {x = 0;}
+        if (y > imgRect.height - lens.offsetHeight) {y = imgRect.height - lens.offsetHeight;}
+        if (y < 0) {y = 0;}
         
-        // Size Selection
-        function selectSize(element) {
-            // Remove selected class from all size options
-            const sizeOptions = document.getElementsByClassName('size-option');
-            for (let i = 0; i < sizeOptions.length; i++) {
-                sizeOptions[i].classList.remove('selected');
-            }
-            
-            // Add selected class to the clicked option
-            element.classList.add('selected');
-        }
+        // Set the position of the lens
+        lens.style.left = x + "px";
+        lens.style.top = y + "px";
         
-        // Quantity Selector
-        function incrementQuantity() {
-            const input = document.getElementById('quantity');
-            input.value = parseInt(input.value) + 1;
-        }
+        // Display what the lens "sees"
+        result.style.backgroundImage = "url('" + img.src + "')";
+        result.style.backgroundSize = (imgRect.width * cx) + "px " + (imgRect.height * cy) + "px";
+        result.style.backgroundPosition = "-" + (x * cx) + "px -" + (y * cy) + "px";
+    }
+    
+    function getCursorPos(e) {
+        // Get the x and y positions of the image
+        const imgRect = img.getBoundingClientRect();
         
-        function decrementQuantity() {
-            const input = document.getElementById('quantity');
-            const value = parseInt(input.value);
-            if (value > 1) {
-                input.value = value - 1;
-            }
-        }
+        // Calculate the cursor's x and y coordinates, relative to the image
+        const x = e.clientX - imgRect.left;
+        const y = e.clientY - imgRect.top;
+        
+        return {x: x, y: y};
+    }
+}
+
+function showZoom() {
+    const lens = document.getElementById('lens');
+    const result = document.getElementById('zoomResult');
+    
+    lens.style.display = "block";
+    result.style.display = "block";
+}
+
+function hideZoom() {
+    document.getElementById('lens').style.display = "none";
+    document.getElementById('zoomResult').style.display = "none";
+}
+
+// Initialize zoom when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initZoom();
+});
+
+// Tabs Functionality
+function openTab(evt, tabName) {
+    // Hide all tab content
+    const tabContents = document.getElementsByClassName('tab-content');
+    for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+    }
+    
+    // Remove active class from all tab buttons
+    const tabButtons = document.getElementsByClassName('tab-button');
+    for (let i = 0; i < tabButtons.length; i++) {
+        tabButtons[i].classList.remove('border-gray-900', 'text-gray-900');
+        tabButtons[i].classList.add('border-transparent', 'text-gray-500');
+    }
+    
+    // Show the selected tab content
+    document.getElementById(tabName).classList.add('active');
+    
+    // Add active class to the clicked button
+    evt.currentTarget.classList.remove('border-transparent', 'text-gray-500');
+    evt.currentTarget.classList.add('border-gray-900', 'text-gray-900');
+}
+
+// Size Selection
+function selectSize(element) {
+    // Remove selected class from all size options
+    const sizeOptions = document.getElementsByClassName('size-option');
+    for (let i = 0; i < sizeOptions.length; i++) {
+        sizeOptions[i].classList.remove('selected');
+    }
+    
+    // Add selected class to the clicked option
+    element.classList.add('selected');
+}
+
+// Quantity Selector
+function incrementQuantity() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+}
+
+function decrementQuantity() {
+    const input = document.getElementById('quantity');
+    const value = parseInt(input.value);
+    if (value > 1) {
+        input.value = value - 1;
+    }
+}
     </script>
