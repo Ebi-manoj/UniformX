@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import passport from 'passport';
+import morgan from 'morgan';
 import expressLayouts from 'express-ejs-layouts';
 import cookieParser from 'cookie-parser';
 import nocache from 'nocache';
@@ -40,6 +41,7 @@ app.use(
     },
   })
 );
+// app.use(morgan('dev'));
 // passport config
 app.use(passport.initialize());
 app.use(passport.session());

@@ -60,4 +60,19 @@
             </li>
         </ul>
     </nav>
+    <% if (success_msg.length > 0) { %>
+        <input
+          type="hidden"
+          id="successMessage"
+          value="<%= success_msg[0] %>"
+          data-alert="<%= success_msg ?'true' : 'false' %>"
+        />
+        <% } else if (error_msg.length > 0) { %>
+        <input
+          type="hidden"
+          id="errorMessage"
+          value="<%= error_msg[0] %>"
+          data-alert="<%= error_msg ? 'true' : 'false' %>"
+        />
+        <% } %>
 </aside>

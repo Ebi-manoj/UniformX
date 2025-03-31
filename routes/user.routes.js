@@ -7,6 +7,9 @@ import {
   listProducts,
 } from '../controllers/user_controllers/product.controller.js';
 import {
+  addAddress,
+  deleteAddress,
+  editAddress,
   fetchAddress,
   fetchDetails,
 } from '../controllers/user_controllers/profile.controller.js';
@@ -17,6 +20,11 @@ router.use(fetchCategories);
 router.get('', isUserAuthenticated, getHome);
 router.get('/products', isUserAuthenticated, listProducts);
 router.get('/product/:slug', isUserAuthenticated, getProductDetails);
+
+// Account Details
 router.get('/profile', isUserAuthenticated, fetchDetails);
 router.get('/profile/address', isUserAuthenticated, fetchAddress);
+router.post('/profile/add-address', isUserAuthenticated, addAddress);
+router.post('/profile/update-address', isUserAuthenticated, editAddress);
+router.delete('/profile/address/:id', isUserAuthenticated, deleteAddress);
 export default router;
