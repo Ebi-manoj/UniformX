@@ -119,9 +119,14 @@
                             </svg>
                         </div>
                         <div>
-                            <p class="text-xs text-gray-500">Address</p>
-                            <p class="font-medium">123 Main Street, Apt 4B</p>
-                            <p class="text-sm text-gray-500">New York, NY 10001</p>
+                            <% if (defaultAddress) { %>
+                                <p class="text-xs text-gray-500">Address</p>
+                                <p class="font-medium"><%= defaultAddress.street_address %>, <%= defaultAddress.name %></p>
+                                <p class="text-sm text-gray-500"><%= defaultAddress.district %>, <%= defaultAddress.state %> <%= defaultAddress.pincode %></p>
+                              <% } else { %>
+                                <p class="text-xs text-gray-500">No default address set.</p>
+                              <% } %>
+                              
                         </div>
                     </div>
                 </div>
