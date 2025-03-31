@@ -1,3 +1,5 @@
+import { showToast } from '/js/toast.js';
+
 ////////////////////////////////////////////////////////////////
 ///////Address functionality
 
@@ -81,5 +83,105 @@ function AddressFunctionality() {
       inputs[0].focus();
     }
   });
+
+  ///////////////////////////////////////////
+  ////Modal for Add new address
+  const openModalBtn = document.getElementById('addAddressBtn');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const closeModalBtn2 = document.getElementById('closeModalBtn2');
+  const modal = document.getElementById('modalAddress');
+  const backdrop = document.getElementById('modalBackdrop');
+
+  function toggleModal(show) {
+    modal.classList.toggle('hidden', !show);
+    backdrop.classList.toggle('hidden', !show);
+  }
+
+  openModalBtn.addEventListener('click', () => toggleModal(true));
+  closeModalBtn.addEventListener('click', () => toggleModal(false));
+  closeModalBtn2.addEventListener('click', () => toggleModal(false));
+
+  document
+    .getElementById('newAddressForm')
+    .addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (validateAddress()) {
+        e.target.submit();
+      }
+    });
+
+  //////////////////////////////////////////
+  //validation
+  function validateAddress() {
+    const fullName = document.getElementById('fullName');
+    const mobile = document.getElementById('mobile');
+    const address = document.getElementById('street');
+    const district = document.getElementById('district');
+    const state = document.getElementById('state');
+    const country = document.getElementById('country');
+    const pincode = document.getElementById('pincode');
+
+    // Trim values to remove unnecessary spaces
+    const fullNameValue = fullName.value.trim();
+    const mobileValue = mobile.value.trim();
+    const addressValue = address.value.trim();
+    const districtValue = district.value.trim();
+    const stateValue = state.value.trim();
+    const countryValue = country.value.trim();
+    const pincodeValue = pincode.value.trim();
+    console.log('hai');
+
+    console.log(fullNameValue, mobileValue);
+
+    // Check if fields are empty
+    if (fullNameValue.length < 1) {
+      showToast('Full Name is required!', 'error');
+      return false;
+    }
+
+    if (mobileValue.length < 1) {
+      showToast('Mobile number is required!', 'error');
+      return false;
+    }
+
+    if (!/^\d{10}$/.test(mobileValue)) {
+      showToast('Invalid mobile number! Must be 10 digits.', 'error');
+      return false;
+    }
+
+    if (addressValue.length < 1) {
+      showToast('Street Area is required!', 'error');
+      return false;
+    }
+
+    if (districtValue.length < 1) {
+      showToast('District is required!', 'error');
+      return false;
+    }
+
+    if (stateValue.length < 1) {
+      showToast('State is required!', 'error');
+      return false;
+    }
+
+    if (countryValue.length < 1) {
+      showToast('Country is required!', 'error');
+      return false;
+    }
+
+    if (pincodeValue.length < 1) {
+      showToast('Pincode is required!', 'error');
+      return false;
+    }
+
+    if (!/^\d{6}$/.test(pincodeValue)) {
+      showToast('Invalid Pincode! Must be 6 digits.', 'error');
+      return false;
+    }
+
+    // If all validations pass
+    showToast('Address added successfully!', 'success');
+    return true;
+  }
 }
 AddressFunctionality();
