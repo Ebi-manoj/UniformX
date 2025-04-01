@@ -9,14 +9,15 @@
                 <div class="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
                     <div class="relative">
                         <img
-                            src="images/messi.png"
+                            src="<%= user.image?user.image:'/images/profilePic.jpeg' %>"
                             alt="Profile"
                             class="w-24 h-24 rounded-full border-2 border-gray-700 object-cover"
                         />
                         <div class="absolute bottom-0 right-0 bg-white p-1 rounded-full shadow-md">
                             <svg
+                                id="upload-img-btn"
                                 xmlns="http://www.w3.org/2000/svg"
-                                class="h-5 w-5 text-gray-700"
+                                class=" h-5 w-5 text-gray-700 cursor-pointer"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
                             >
@@ -25,6 +26,12 @@
                                 />
                             </svg>
                         </div>
+                        <!-- hiddenForm -->
+                        <form action="/upload-profile" id="uploadProfilePicForm" method="post" class="hidden" enctype="multipart/form-data">
+                            <input type="file" id="profile-pic-input" name="image" accept="image/*" />
+                            <button type="submit">Upload</button>
+                          </form>
+                          <!-- ............ -->
                     </div>
                 </div>
             </div>

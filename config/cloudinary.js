@@ -40,8 +40,21 @@ const productStorage = new CloudinaryStorage({
   },
 });
 
+//For Profile upload
+const profileStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'uniformx/profiles',
+    format: async (req, file) => 'webp',
+    transformation: [
+      { width: 300, height: 300, crop: 'fill', gravity: 'face' },
+    ], // Crop around the face
+  },
+});
+
 // Create multer instances
 export const categoryUpload = multer({ storage: categoryStorage });
 export const productUpload = multer({ storage: productStorage });
 export const clubUpload = multer({ storage: clubStorage });
+export const profileUpload = multer({ storage: profileStorage });
 export { cloudinary };

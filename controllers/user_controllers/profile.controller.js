@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler';
 import { User } from '../../model/user_model.js';
 import Address from '../../model/address.js';
 import { validateId } from '../../utilities/validateId.js';
+import { cloudinary } from '../../config/cloudinary.js';
 const userMain = './layouts/user_main';
 
 ////////////////////////
@@ -10,8 +11,6 @@ export const fetchDetails = asyncHandler(async (req, res) => {
   const user = req.user;
   const addresses = await Address.find({ userId: user._id });
   const defaultAddress = addresses.find(addr => addr.is_default === true);
-  console.log(addresses);
-  console.log(defaultAddress);
 
   res.render('user/profile', {
     layout: userMain,
@@ -26,7 +25,6 @@ export const fetchDetails = asyncHandler(async (req, res) => {
 ///Edit profile
 
 export const editProfile = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { full_name, email, phone, addressId } = req.body;
   if (!full_name || !email || !phone) {
     req.flash('error', 'All fields are required!');
@@ -64,6 +62,36 @@ export const editProfile = asyncHandler(async (req, res) => {
   res.redirect('/profile');
 });
 
+/////////////////////////////////////////
+//Upload Profile Pic
+
+export const uploadProfilePic = asyncHandler(async (req, res, next) => {
+  try {
+    console.log(req.file);
+
+    if (!req.file) {
+      req.flash('error', 'No image found!');
+      return res.redirect('/profile');
+    }
+    const userId = req.user?._id;
+    if (!validateId(userId)) {
+      req.flash('error', 'Session expired');
+      return res.redirect('/profile');
+    }
+
+    const user = await User.findById(userId);
+    if (user?.image) {
+      const publicId = user.image.split('/').pop().split('.')[0]; // Extract public_id
+      await cloudinary.uploader.destroy(`uniformx/profiles/${publicId}`);
+    }
+    user.image = req.file.path;
+    await user.save();
+    req.flash('success', 'Profile image updated');
+    return res.redirect('/profile');
+  } catch (error) {
+    next(error);
+  }
+});
 ////////////////////////////////////////
 //Fetch Address
 export const fetchAddress = asyncHandler(async (req, res) => {

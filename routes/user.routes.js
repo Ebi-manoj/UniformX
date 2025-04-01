@@ -13,7 +13,9 @@ import {
   editProfile,
   fetchAddress,
   fetchDetails,
+  uploadProfilePic,
 } from '../controllers/user_controllers/profile.controller.js';
+import { profileUpload } from '../config/cloudinary.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -25,6 +27,12 @@ router.get('/product/:slug', isUserAuthenticated, getProductDetails);
 // Account Details
 router.get('/profile', isUserAuthenticated, fetchDetails);
 router.post('/edit-profile', isUserAuthenticated, editProfile);
+router.post(
+  '/upload-profile',
+  isUserAuthenticated,
+  profileUpload.single('image'),
+  uploadProfilePic
+);
 router.get('/profile/address', isUserAuthenticated, fetchAddress);
 router.post('/profile/add-address', isUserAuthenticated, addAddress);
 router.post('/profile/update-address', isUserAuthenticated, editAddress);

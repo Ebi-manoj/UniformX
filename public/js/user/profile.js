@@ -19,16 +19,6 @@ function ProfileFunctionality() {
     document.getElementById('editProfileModal').classList.add('hidden');
   }
 
-  function saveProfile() {
-    const fullName = document.getElementById('fullName').value;
-    const email = document.getElementById('email').value;
-    const mobile = document.getElementById('mobile').value;
-    const selectedAddress = document.getElementById('addressSelect').value;
-
-    console.log({ fullName, email, mobile, selectedAddress });
-
-    closeModal();
-  }
   //////////////////////////////////////
   //Dynamic Address
   const addressSelect = document.getElementById('addressSelect');
@@ -48,6 +38,19 @@ function ProfileFunctionality() {
     addressId.value = address._id;
     addressSelect.value = allAddresses.indexOf(address);
   }
+  //////////////////////////////
+  //Upload img
+  const uploadImgBtn = document.getElementById('upload-img-btn');
+  const imgInput = document.getElementById('profile-pic-input');
+  uploadImgBtn.addEventListener('click', function () {
+    imgInput.click();
+  });
+  imgInput.addEventListener('change', function () {
+    console.log('hai');
+
+    if (!this.files.length) return;
+    document.getElementById('uploadProfilePicForm').submit();
+  });
 }
 const isProfile = document.getElementById('profile');
 if (isProfile) {
