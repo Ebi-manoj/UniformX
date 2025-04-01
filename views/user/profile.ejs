@@ -167,13 +167,13 @@
         <h2 class="text-2xl font-semibold flex items-center mb-6">
             <i class="fa-solid fa-pen-to-square"></i> Edit Profile
         </h2>
-
+         <form action="/edit-profile" method="post">
         <!-- Full Name -->
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-300">Full Name</label>
             <div class="relative">
                 <i class="fa-solid fa-user  absolute left-3 top-3"></i>
-                <input type="text" id="fullName" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.full_name %>">
+                <input required type="text" id="fullName" name="full_name" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.full_name %>">
             </div>
         </div>
 
@@ -182,7 +182,7 @@
             <label class="block text-sm font-medium text-gray-300">Email</label>
             <div class="relative">
                 <i class="fa-solid fa-envelope absolute left-3 top-3"></i>
-                <input type="email" id="email" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.email %>">
+                <input required type="email" id="email" name="email" class= "w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.email %>">
             </div>
         </div>
 
@@ -191,7 +191,7 @@
             <label class="block text-sm font-medium text-gray-300">Mobile</label>
             <div class="relative">
                 <i class="fa-solid fa-phone absolute left-3 top-3"></i>
-                <input type="text" id="mobile" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.phone %>">
+                <input required name="phone" type="text" id="mobile" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.phone %>">
             </div>
         </div>
 
@@ -203,6 +203,7 @@
                 <div class="relative pl-10 border border-gray-600 rounded-lg p-2 flex-1 bg-gray-800 text-gray-300 flex items-center">
                     <i class="fa-solid fa-location-dot absolute left-3 top-3"></i>
                     <span id="addressSpan"><%= addresses.length ? addresses.length : "No Address set" %></span>
+                    <input type="hidden" name="addressId" id="addressId" value=''>
                 </div>
                 <select id="addressSelect" class="border border-gray-600 rounded-lg bg-gray-800 text-white p-2">
                     <% addresses.forEach((address,index) => { %>
@@ -216,8 +217,9 @@
 
         <!-- Buttons -->
         <div class="flex justify-end mt-6">
-            <button id="cancel-btn" class="px-4 py-2 border border-cyan-100 text-white rounded-lg mr-2 hover:bg-gray-600 transition">Cancel</button>
+            <button id="cancel-btn" type="button" class="px-4 py-2 border border-cyan-100 text-white rounded-lg mr-2 hover:bg-gray-600 transition">Cancel</button>
             <button id="save-btn" class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-0 transition">Save</button>
         </div>
+        </form>
     </div>
 </div>

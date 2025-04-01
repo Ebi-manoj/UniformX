@@ -33,15 +33,20 @@ function ProfileFunctionality() {
   //Dynamic Address
   const addressSelect = document.getElementById('addressSelect');
   const addressSPan = document.getElementById('addressSpan');
+  const addressId = document.getElementById('addressId');
   const allAddresses = JSON.parse(
     document.getElementById('allAddresses').value
   );
   addressSelect.addEventListener('change', function (e) {
     const index = e.target.value;
     addressSPan.textContent = allAddresses[index].street_address;
+    addressId.value = allAddresses[index]._id;
   });
   if (allAddresses.length > 0) {
-    addressSPan.textContent = allAddresses[0].street_address;
+    const address = allAddresses.find(addr => addr.is_default === true);
+    addressSPan.textContent = address.street_address;
+    addressId.value = address._id;
+    addressSelect.value = allAddresses.indexOf(address);
   }
 }
 const isProfile = document.getElementById('profile');

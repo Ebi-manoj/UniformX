@@ -10,6 +10,7 @@ import {
   addAddress,
   deleteAddress,
   editAddress,
+  editProfile,
   fetchAddress,
   fetchDetails,
 } from '../controllers/user_controllers/profile.controller.js';
@@ -23,6 +24,7 @@ router.get('/product/:slug', isUserAuthenticated, getProductDetails);
 
 // Account Details
 router.get('/profile', isUserAuthenticated, fetchDetails);
+router.post('/edit-profile', isUserAuthenticated, editProfile);
 router.get('/profile/address', isUserAuthenticated, fetchAddress);
 router.post('/profile/add-address', isUserAuthenticated, addAddress);
 router.post('/profile/update-address', isUserAuthenticated, editAddress);

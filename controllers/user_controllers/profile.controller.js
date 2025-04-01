@@ -22,6 +22,48 @@ export const fetchDetails = asyncHandler(async (req, res) => {
   });
 });
 
+////////////////////////////////////////////////
+///Edit profile
+
+export const editProfile = asyncHandler(async (req, res) => {
+  console.log(req.body);
+  const { full_name, email, phone, addressId } = req.body;
+  if (!full_name || !email || !phone) {
+    req.flash('error', 'All fields are required!');
+    return res.redirect('/profile');
+  }
+  const userId = req.user?._id;
+  if (!validateId(userId)) {
+    req.flash('error', 'Session expired!');
+    res.redirect('/profile');
+  }
+  const user = await User.findById(userId);
+  user.full_name = full_name;
+  user.email = email;
+  user.phone = phone;
+  user.save();
+
+  // update address
+  if (addressId) {
+    if (!validateId(addressId)) {
+      req.flash('error', 'Invalid address ID!');
+      return res.redirect('/profile');
+    }
+    const address = await Address.findOne({ _id: addressId, userId });
+
+    if (!address) {
+      req.flash('error', 'Address not found!');
+      return res.redirect('/profile');
+    }
+    await Address.updateMany({ userId }, { $set: { is_default: false } });
+
+    address.is_default = true;
+    await address.save();
+  }
+  req.flash('success', 'Profile updated successfully');
+  res.redirect('/profile');
+});
+
 ////////////////////////////////////////
 //Fetch Address
 export const fetchAddress = asyncHandler(async (req, res) => {
