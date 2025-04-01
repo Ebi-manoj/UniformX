@@ -8,11 +8,13 @@ import {
 } from '../controllers/user_controllers/product.controller.js';
 import {
   addAddress,
+  changePassword,
   deleteAddress,
   editAddress,
   editProfile,
   fetchAddress,
   fetchDetails,
+  getChangePassword,
   uploadProfilePic,
 } from '../controllers/user_controllers/profile.controller.js';
 import { profileUpload } from '../config/cloudinary.js';
@@ -33,6 +35,8 @@ router.post(
   profileUpload.single('image'),
   uploadProfilePic
 );
+router.get('/profile/password', isUserAuthenticated, getChangePassword);
+router.post('/profile/change-password', isUserAuthenticated, changePassword);
 router.get('/profile/address', isUserAuthenticated, fetchAddress);
 router.post('/profile/add-address', isUserAuthenticated, addAddress);
 router.post('/profile/update-address', isUserAuthenticated, editAddress);

@@ -81,7 +81,7 @@ export const uploadProfilePic = asyncHandler(async (req, res, next) => {
 
     const user = await User.findById(userId);
     if (user?.image) {
-      const publicId = user.image.split('/').pop().split('.')[0]; // Extract public_id
+      const publicId = user.image.split('/').pop().split('.')[0];
       await cloudinary.uploader.destroy(`uniformx/profiles/${publicId}`);
     }
     user.image = req.file.path;
@@ -91,6 +91,41 @@ export const uploadProfilePic = asyncHandler(async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+/////////////////////////////////////////////
+//Change Password
+
+// Get Route for Password
+export const getChangePassword = asyncHandler(async (req, res) => {
+  res.render('user/change_password', { layout: userMain });
+});
+
+//Change Password
+export const changePassword = asyncHandler(async (req, res) => {
+  const { oldpassword, newpassword, confirmpassword } = req.body;
+  if (!oldpassword || !newpassword || !confirmpassword) {
+    req.flash('error', 'All fields are required');
+    return res.redirect('/profile/password');
+  }
+  if (newpassword !== confirmpassword) {
+    req.flash('error', 'Password are not matching');
+    return res.redirect('/profile/password');
+  }
+  const id = req.user?._id;
+  if (!validateId(id)) {
+    req.flash('error', 'Session expired');
+    return res.redirect('/profile/password');
+  }
+  const user = await User.findById(id);
+  const isMatch = user.comparePassword(oldpassword);
+  if (!isMatch) {
+    req.flash('error', 'Incorrect password');
+    return res.redirect('/profile/password');
+  }
+  user.password = newpassword;
+  await user.save();
+  req.flash('success', 'Password changed succefully');
+  res.redirect('/profile/password');
 });
 ////////////////////////////////////////
 //Fetch Address

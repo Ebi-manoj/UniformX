@@ -535,30 +535,30 @@ function openTab(evt, tabName) {
     evt.currentTarget.classList.remove('border-transparent', 'text-gray-500');
     evt.currentTarget.classList.add('border-gray-900', 'text-gray-900');
 }
-
 // Size Selection
 function selectSize(element) {
-    // Remove selected class from all size options
-    const sizeOptions = document.getElementsByClassName('size-option');
-    for (let i = 0; i < sizeOptions.length; i++) {
-        sizeOptions[i].classList.remove('selected');
-    }
-    
-    // Add selected class to the clicked option
-    element.classList.add('selected');
+  // Remove selected class from all size options
+  const sizeOptions = document.getElementsByClassName('size-option');
+  for (let i = 0; i < sizeOptions.length; i++) {
+    sizeOptions[i].classList.remove('selected');
+  }
+
+  // Add selected class to the clicked option
+  element.classList.add('selected');
 }
 
 // Quantity Selector
 function incrementQuantity() {
-    const input = document.getElementById('quantity');
-    input.value = parseInt(input.value) + 1;
+  const input = document.getElementById('quantity');
+  input.value = parseInt(input.value) + 1;
 }
 
 function decrementQuantity() {
-    const input = document.getElementById('quantity');
-    const value = parseInt(input.value);
-    if (value > 1) {
-        input.value = value - 1;
-    }
+  const input = document.getElementById('quantity');
+  const value = parseInt(input.value);
+  if (value > 1) {
+    input.value = value - 1;
+  }
 }
+
     </script>
