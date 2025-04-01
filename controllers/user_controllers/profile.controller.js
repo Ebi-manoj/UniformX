@@ -15,6 +15,7 @@ export const fetchDetails = asyncHandler(async (req, res) => {
 
   res.render('user/profile', {
     layout: userMain,
+    js_file: 'profile',
     user,
     addresses,
     defaultAddress,

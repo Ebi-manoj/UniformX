@@ -1,5 +1,55 @@
 import { showToast } from '/js/toast.js';
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+//////EDIT PROFILE
+function ProfileFunctionality() {
+  ////////////////////////
+  //Modal
+  document
+    .getElementById('btn-edit-profile')
+    .addEventListener('click', openModal);
+  document.getElementById('btn-close').addEventListener('click', closeModal);
+  document.getElementById('cancel-btn').addEventListener('click', closeModal);
+
+  function openModal() {
+    document.getElementById('editProfileModal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('editProfileModal').classList.add('hidden');
+  }
+
+  function saveProfile() {
+    const fullName = document.getElementById('fullName').value;
+    const email = document.getElementById('email').value;
+    const mobile = document.getElementById('mobile').value;
+    const selectedAddress = document.getElementById('addressSelect').value;
+
+    console.log({ fullName, email, mobile, selectedAddress });
+
+    closeModal();
+  }
+  //////////////////////////////////////
+  //Dynamic Address
+  const addressSelect = document.getElementById('addressSelect');
+  const addressSPan = document.getElementById('addressSpan');
+  const allAddresses = JSON.parse(
+    document.getElementById('allAddresses').value
+  );
+  addressSelect.addEventListener('change', function (e) {
+    const index = e.target.value;
+    addressSPan.textContent = allAddresses[index].street_address;
+  });
+  if (allAddresses.length > 0) {
+    addressSPan.textContent = allAddresses[0].street_address;
+  }
+}
+const isProfile = document.getElementById('profile');
+if (isProfile) {
+  ProfileFunctionality();
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////ADDRESS FUNCTIONALITY
 function AddressFunctionality() {
   const allAddresses = JSON.parse(
     document.getElementById('allAddresses').value
@@ -236,5 +286,7 @@ function AddressFunctionality() {
     });
   });
 }
-
-AddressFunctionality();
+const isAddress = document.querySelector('#address');
+if (isAddress) {
+  AddressFunctionality();
+}

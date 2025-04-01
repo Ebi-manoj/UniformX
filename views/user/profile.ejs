@@ -2,7 +2,7 @@
     <!-- Sidebar Navigation -->
     <%- include('../partials/profile_sidebar') %> 
     <!-- Main Content -->
-    <main class=" flex flex-1 ml-64 py-0 px-6 items-center justify-center">
+    <main id="profile" class=" flex flex-1 ml-64 py-0 px-6 items-center justify-center">
         <div class="w-full bg-white rounded-xl shadow-lg overflow-hidden">
             <!-- Header with profile image -->
             <div class="relative h-32 bg-cyan-50">
@@ -134,6 +134,7 @@
                 <!-- Edit button -->
                 <div class="mt-8 flex justify-center">
                     <button
+                        id="btn-edit-profile"
                         class="px-6 py-2 bg-gray-900 text-white rounded-lg flex items-center hover:bg-gray-800 transition-colors"
                     >
                         <svg
@@ -152,4 +153,71 @@
             </div>
         </div>
     </main>
+</div>
+
+ <!-- Edit Profile Modal -->
+<div id="editProfileModal" class="fixed inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-gray-900 text-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative animate-fadeIn">
+        <!-- Close Button -->
+        <button id="btn-close" class="absolute top-3 right-3 text-gray-400 hover:text-white">
+            <span class="material-icons text-2xl">x</span>
+        </button>
+
+        <!-- Modal Header -->
+        <h2 class="text-2xl font-semibold flex items-center mb-6">
+            <i class="fa-solid fa-pen-to-square"></i> Edit Profile
+        </h2>
+
+        <!-- Full Name -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300">Full Name</label>
+            <div class="relative">
+                <i class="fa-solid fa-user  absolute left-3 top-3"></i>
+                <input type="text" id="fullName" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.full_name %>">
+            </div>
+        </div>
+
+        <!-- Email -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300">Email</label>
+            <div class="relative">
+                <i class="fa-solid fa-envelope absolute left-3 top-3"></i>
+                <input type="email" id="email" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.email %>">
+            </div>
+        </div>
+
+        <!-- Mobile -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300">Mobile</label>
+            <div class="relative">
+                <i class="fa-solid fa-phone absolute left-3 top-3"></i>
+                <input type="text" id="mobile" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.phone %>">
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300">Address</label>
+            <input type="hidden" id="allAddresses" value='<%- JSON.stringify(addresses) %>'>
+            <div class="flex items-center gap-2">
+                <div class="relative pl-10 border border-gray-600 rounded-lg p-2 flex-1 bg-gray-800 text-gray-300 flex items-center">
+                    <i class="fa-solid fa-location-dot absolute left-3 top-3"></i>
+                    <span id="addressSpan"><%= addresses.length ? addresses.length : "No Address set" %></span>
+                </div>
+                <select id="addressSelect" class="border border-gray-600 rounded-lg bg-gray-800 text-white p-2">
+                    <% addresses.forEach((address,index) => { %>
+                        <option value="<%= index %>"><%= address.name %></option>
+                    <% }) %>
+                    <option value="add_new">+ Add New Address</option>
+                </select>
+            </div>
+        </div>
+       
+
+        <!-- Buttons -->
+        <div class="flex justify-end mt-6">
+            <button id="cancel-btn" class="px-4 py-2 border border-cyan-100 text-white rounded-lg mr-2 hover:bg-gray-600 transition">Cancel</button>
+            <button id="save-btn" class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-0 transition">Save</button>
+        </div>
+    </div>
 </div>
