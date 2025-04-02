@@ -21,8 +21,6 @@ export const fetchCartLength = async (req, res, next) => {
   }
 
   try {
-    console.log(req.user._id);
-
     const cart = await Cart.findOne({ userId: req.user._id });
     res.locals.cartLength = cart ? cart.products.length : 0;
   } catch (err) {

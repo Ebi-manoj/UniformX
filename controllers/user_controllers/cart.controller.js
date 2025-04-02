@@ -4,6 +4,18 @@ import { Cart } from '../../model/cart_model.js';
 import { Wishlist } from '../../model/wishlist.js';
 import { validateId } from '../../utilities/validateId.js';
 
+const userMain = './layouts/user_main';
+////////////////
+//Get cart
+
+export const getCart = asyncHandler(async (req, res) => {
+  const userId = req.user?._id;
+  const cart = await Cart.find({ userId }).populate('products.productId');
+  console.log(cart);
+  res.render('user/cart', { layout: userMain, cart: cart[0] });
+});
+
+//////////////////
 // Add to cart
 export const addToCart = asyncHandler(async (req, res) => {
   const { productId, size } = req.body;

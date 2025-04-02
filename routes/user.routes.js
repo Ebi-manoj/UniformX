@@ -18,7 +18,10 @@ import {
   uploadProfilePic,
 } from '../controllers/user_controllers/profile.controller.js';
 import { profileUpload } from '../config/cloudinary.js';
-import { addToCart } from '../controllers/user_controllers/cart.controller.js';
+import {
+  addToCart,
+  getCart,
+} from '../controllers/user_controllers/cart.controller.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -59,6 +62,7 @@ router.post('/profile/update-address', isUserAuthenticated, editAddress);
 router.delete('/profile/address/:id', isUserAuthenticated, deleteAddress);
 
 // Cart
+router.get('/cart', isUserAuthenticated, fetchCartLength, getCart);
 router.post('/cart/add', isUserAuthenticated, addToCart);
 
 export default router;
