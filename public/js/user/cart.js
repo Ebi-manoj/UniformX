@@ -79,6 +79,7 @@ async function addToCart(e) {
   const data = await response.json();
   if (data.success) {
     showToast(data.message, 'success');
+    document.getElementById('cartText').textContent = data?.cartLength;
   } else {
     showToast(data.message || 'something went wrong');
   }

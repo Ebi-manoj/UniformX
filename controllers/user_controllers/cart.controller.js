@@ -94,6 +94,10 @@ export const addToCart = asyncHandler(async (req, res) => {
   console.log(cart.totalPrice);
 
   // Save cart
-  await cart.save();
-  res.status(200).json({ success: true, message: 'Product added to Cart' });
+  const savedCart = await cart.save();
+  res.status(200).json({
+    success: true,
+    message: 'Product added to Cart',
+    cartLength: savedCart.products.length,
+  });
 });

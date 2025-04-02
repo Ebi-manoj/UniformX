@@ -92,7 +92,8 @@
         </a>
 
         <!-- Cart Button -->
-        <a href="#" class="text-gray-700 hover:text-gray-900">
+        <a href="#" class="relative text-gray-700 hover:text-gray-900">
+          <!-- Cart Icon -->
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-6 w-6"
@@ -107,7 +108,18 @@
               d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
             />
           </svg>
+        
+          <!-- Badge (Cart Item Count) -->
+          <% if (cartLength > 0) { %>
+            <span
+              id="cartText"
+              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full"
+            >
+              <%= cartLength %>
+            </span>
+          <% } %>
         </a>
+        
          <!-- profile -->
         <a href="/profile" class="text-gray-700 hover:text-gray-900">
           <svg
