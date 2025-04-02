@@ -230,25 +230,31 @@
                 <!-- Select Size -->
                 <div class="mb-6">
                     <h3 class="text-sm font-medium text-gray-900 mb-2">SELECT SIZE</h3>
-                    <div class="flex space-x-2">
+                    <div id="btn-size" class="flex space-x-2">
                         <% product.sizes.forEach(size => { %>
-                            <div class="size-option w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer" onclick="selectSize(this)">
+                            <button 
+                                data-quantity="<%= size.stock_quantity %>" 
+                                class="size-option w-10 h-10 flex items-center justify-center border border-gray-300 rounded cursor-pointer
+                                <% if (size.stock_quantity == 0) { %> bg-gray-200 text-gray-400 cursor-not-allowed <% } %>"
+                                <% if (size.stock_quantity == 0) { %> disabled <% } %>
+                            >
                                 <%= size.size %>
-                            </div>
+                            </button>
                         <% }) %>
                     </div>
                 </div>
+                
                 
                 
                 <!-- Quantity -->
                 <div class="mb-6">
                     <h3 class="text-sm font-medium text-gray-900 mb-2">QUANTITY</h3>
                     <div class="flex items-center">
-                        <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l" onclick="decrementQuantity()">
+                        <button id="btn-decrement" class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-l" >
                             <i class="fas fa-minus text-xs"></i>
                         </button>
                         <input type="number" id="quantity" class="quantity-input h-8 border-t border-b border-gray-300" value="1" min="1">
-                        <button class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r" onclick="incrementQuantity()">
+                        <button id="btn-increment" class="w-8 h-8 flex items-center justify-center border border-gray-300 rounded-r">
                             <i class="fas fa-plus text-xs"></i>
                         </button>
                     </div>
@@ -263,7 +269,7 @@
                 
                 <!-- Add to Cart -->
                 <div class="flex space-x-4 mb-6">
-                    <button class="flex-1 bg-gray-900 text-white py-3 px-6 rounded hover:bg-gray-800 transition-colors">
+                    <button id="addToCart" data-productId="<%= product._id %>" class="flex-1 bg-gray-900 text-white py-3 px-6 rounded hover:bg-gray-800 transition-colors cursor-not-allowed disabled">
                         ADD TO CART
                     </button>
                     <button class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors">
@@ -535,30 +541,4 @@ function openTab(evt, tabName) {
     evt.currentTarget.classList.remove('border-transparent', 'text-gray-500');
     evt.currentTarget.classList.add('border-gray-900', 'text-gray-900');
 }
-// Size Selection
-function selectSize(element) {
-  // Remove selected class from all size options
-  const sizeOptions = document.getElementsByClassName('size-option');
-  for (let i = 0; i < sizeOptions.length; i++) {
-    sizeOptions[i].classList.remove('selected');
-  }
-
-  // Add selected class to the clicked option
-  element.classList.add('selected');
-}
-
-// Quantity Selector
-function incrementQuantity() {
-  const input = document.getElementById('quantity');
-  input.value = parseInt(input.value) + 1;
-}
-
-function decrementQuantity() {
-  const input = document.getElementById('quantity');
-  const value = parseInt(input.value);
-  if (value > 1) {
-    input.value = value - 1;
-  }
-}
-
     </script>

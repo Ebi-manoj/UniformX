@@ -159,13 +159,16 @@ export const getProductDetails = asyncHandler(async (req, res) => {
   const { slug } = req.params;
 
   const product = await Product.aggregate(productDetails(slug));
-  console.log(product);
+  if (!product.length) {
+    return res.redirect('/products');
+  }
 
   const categoriesList = await Category.find();
   const clubsList = await Club.find();
 
   res.render('user/product_details', {
     layout: userMain,
+    js_file: 'cart',
     categories: categoriesList,
     clubs: clubsList,
     product: product[0],
