@@ -1,17 +1,27 @@
-// Size Selection
+import { showToast } from '../toast.js';
+
 const btnSize = document.getElementById('btn-size');
 const quantityInput = document.getElementById('quantity');
 const btnAddCart = document.getElementById('addToCart');
-
 let maxStock = 0;
+
+// Event Handlers
 btnSize.addEventListener('click', selectSize);
+btnAddCart.addEventListener('click', addToCart);
+
+/////////////////////////////////////////////////////////////
+///Funtionalities
+
+// Size Selection
 function selectSize(e) {
   if (!e.target.classList.contains('size-option')) return;
-  btnAddCart.classList.remove('cursor-not-allowed', 'disabled');
 
+  btnAddCart.classList.add('cursor-not-allowed', 'opacity-80');
+  btnAddCart.setAttribute('disabled', 'true');
   maxStock = e.target.dataset.quantity;
   if (maxStock) {
-    btnAddCart.classList.remove('cursor-not-allowed', 'disabled');
+    btnAddCart.classList.remove('cursor-not-allowed', 'opacity-80');
+    btnAddCart.removeAttribute('disabled');
   }
   // Remove selected class from all size options
   const sizeOptions = document.getElementsByClassName('size-option');
@@ -48,8 +58,10 @@ function decrementQuantity() {
   }
 }
 
-async function addToCart() {
+async function addToCart(e) {
   const productId = this.dataset.productId;
+  console.log(productId);
+
   const quantity = document.getElementById('quantity').value;
   const size = document
     .querySelector('.size-option.selected')
@@ -66,8 +78,8 @@ async function addToCart() {
 
   const data = await response.json();
   if (data.success) {
-    alert('Added to cart!');
+    showToast(data.message, 'success');
   } else {
-    alert('Error adding to cart.');
+    showToast(data.message || 'something went wrong');
   }
 }
