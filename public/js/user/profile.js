@@ -58,7 +58,7 @@ if (isProfile) {
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////ADDRESS FUNCTIONALITY
-function AddressFunctionality() {
+export const AddressFunctionality = function () {
   const allAddresses = JSON.parse(
     document.getElementById('allAddresses').value
   );
@@ -293,7 +293,7 @@ function AddressFunctionality() {
       }
     });
   });
-}
+};
 const isAddress = document.querySelector('#address');
 if (isAddress) {
   AddressFunctionality();

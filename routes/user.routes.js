@@ -23,6 +23,7 @@ import {
   getCart,
   removecartItem,
 } from '../controllers/user_controllers/cart.controller.js';
+import { getCheckout } from '../controllers/user_controllers/order.controller.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -66,5 +67,8 @@ router.delete('/profile/address/:id', isUserAuthenticated, deleteAddress);
 router.get('/cart', isUserAuthenticated, fetchCartLength, getCart);
 router.post('/cart/add', isUserAuthenticated, addToCart);
 router.delete('/cart/remove-item', isUserAuthenticated, removecartItem);
+
+// order
+router.get('/checkout', isUserAuthenticated, fetchCartLength, getCheckout);
 
 export default router;

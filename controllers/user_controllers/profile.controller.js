@@ -183,6 +183,7 @@ export const addAddress = asyncHandler(async (req, res) => {
 
 export const editAddress = asyncHandler(async (req, res) => {
   console.log(req.body);
+  console.log(req.originalUrl);
 
   const { id, fullName, mobile, address, district, state, country, pincode } =
     req.body;
