@@ -24,6 +24,7 @@ import {
   removecartItem,
 } from '../controllers/user_controllers/cart.controller.js';
 import { getCheckout } from '../controllers/user_controllers/order.controller.js';
+import { validateCartForCheckout } from '../middlewares/validatecart.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -69,6 +70,12 @@ router.post('/cart/add', isUserAuthenticated, addToCart);
 router.delete('/cart/remove-item', isUserAuthenticated, removecartItem);
 
 // order
-router.get('/checkout', isUserAuthenticated, fetchCartLength, getCheckout);
+router.get(
+  '/checkout',
+  isUserAuthenticated,
+  fetchCartLength,
+  validateCartForCheckout,
+  getCheckout
+);
 
 export default router;
