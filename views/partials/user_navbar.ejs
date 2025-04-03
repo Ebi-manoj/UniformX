@@ -110,14 +110,13 @@
           </svg>
         
           <!-- Badge (Cart Item Count) -->
-          <% if (cartLength > 0) { %>
             <span
               id="cartText"
-              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full"
+              class="absolute <%= cartLength?'block':'hidden' %> -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full"
             >
               <%= cartLength %>
             </span>
-          <% } %>
+         
         </a>
         
          <!-- profile -->

@@ -21,6 +21,7 @@ import { profileUpload } from '../config/cloudinary.js';
 import {
   addToCart,
   getCart,
+  removecartItem,
 } from '../controllers/user_controllers/cart.controller.js';
 
 const router = express.Router();
@@ -64,5 +65,6 @@ router.delete('/profile/address/:id', isUserAuthenticated, deleteAddress);
 // Cart
 router.get('/cart', isUserAuthenticated, fetchCartLength, getCart);
 router.post('/cart/add', isUserAuthenticated, addToCart);
+router.delete('/cart/remove-item', isUserAuthenticated, removecartItem);
 
 export default router;

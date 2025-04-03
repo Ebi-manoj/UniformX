@@ -18,6 +18,7 @@ const cartSchema = new mongoose.Schema({
     },
   ],
   totalPrice: Number,
+  discountPrice: Number,
 });
 
 export const Cart = mongoose.model('cart', cartSchema);

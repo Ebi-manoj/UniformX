@@ -5,6 +5,23 @@ import { Wishlist } from '../../model/wishlist.js';
 import { validateId } from '../../utilities/validateId.js';
 
 const userMain = './layouts/user_main';
+const TAX_RATE = 0.05;
+const calculateCartTotal = function (cart) {
+  // Recalculate cart total
+  cart.totalPrice = cart.products.reduce(
+    (total, item) => total + item.productId.price * item.quantity,
+    0
+  );
+  cart.discountPrice = cart.products.reduce(
+    (total, item) =>
+      total +
+      (item.productId.price *
+        item.quantity *
+        (item.productId.discountPercentage || 0)) /
+        100,
+    0
+  );
+};
 ////////////////
 //Get cart
 
@@ -12,7 +29,16 @@ export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   const cart = await Cart.find({ userId }).populate('products.productId');
   console.log(cart);
-  res.render('user/cart', { layout: userMain, cart: cart[0] });
+
+  const taxAmount = (cart[0].totalPrice - cart[0].discountPrice) * TAX_RATE;
+  const finalPrice = cart[0].totalPrice - cart[0].discountPrice + taxAmount;
+  res.render('user/cart', {
+    layout: userMain,
+    js_file: 'cart',
+    cart: cart[0],
+    finalPrice,
+    taxAmount,
+  });
 });
 
 //////////////////
@@ -40,7 +66,6 @@ export const addToCart = asyncHandler(async (req, res) => {
   const selectedSize = product.sizes.find(
     s => s.size.toLowerCase() === size.toLowerCase()
   );
-  console.log(selectedSize);
 
   // Check if product is in stock
   if (selectedSize.stock_quantity <= 0) {
@@ -97,19 +122,52 @@ export const addToCart = asyncHandler(async (req, res) => {
   await Wishlist.updateOne({ userId }, { $pull: { products: productId } });
   cart = await cart.populate('products.productId');
 
-  // Recalculate cart total
-  cart.totalPrice = cart.products.reduce(
-    (total, item) => total + item.productId.price * item.quantity,
-    0
-  );
-  console.log(cart);
-  console.log(cart.totalPrice);
+  calculateCartTotal(cart);
 
   // Save cart
   const savedCart = await cart.save();
+
   res.status(200).json({
     success: true,
     message: 'Product added to Cart',
     cartLength: savedCart.products.length,
   });
+});
+
+/////////////////////////////////////////
+/////Remove from Cart
+export const removecartItem = asyncHandler(async (req, res) => {
+  const { productId, size } = req.body;
+  const userId = req.user?._id;
+  if (!validateId(userId)) {
+    req.flash('Error', 'Session expired');
+    return res.redirect('/cart');
+  }
+  const cart = await Cart.findOne({ userId }).populate('products.productId');
+
+  if (!cart) {
+    req.flash('Error', 'Session expired');
+    return res.redirect('/cart');
+  }
+
+  const itemIndex = cart.products.findIndex(
+    item =>
+      item.productId._id.toString() === productId.toString() &&
+      item.size.toLowerCase() === size.toLowerCase()
+  );
+  console.log(itemIndex);
+
+  if (itemIndex === -1) {
+    req.flash('Error', 'Item not Found');
+    return res.redirect('/cart');
+  }
+
+  // Remove item
+  cart.products.splice(itemIndex, 1);
+  calculateCartTotal(cart);
+
+  await cart.save();
+
+  req.flash('warning', 'Removed item');
+  res.redirect('/cart');
 });
