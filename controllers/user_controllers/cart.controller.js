@@ -168,6 +168,6 @@ export const removecartItem = asyncHandler(async (req, res) => {
 
   await cart.save();
 
-  req.flash('warning', 'Removed item');
+  req.flash('success', 'Removed item');
   res.redirect('/cart');
 });
