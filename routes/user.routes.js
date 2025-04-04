@@ -26,6 +26,7 @@ import {
 import {
   getAllOrders,
   getCheckout,
+  getOrder,
   getOrderSucces,
   placeOrder,
 } from '../controllers/user_controllers/order.controller.js';
@@ -96,5 +97,6 @@ router.get(
   getOrderSucces
 );
 router.get('/orders', isUserAuthenticated, fetchCartLength, getAllOrders);
+router.get('/order/:id', isUserAuthenticated, fetchCartLength, getOrder);
 
 export default router;

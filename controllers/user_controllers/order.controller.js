@@ -179,8 +179,43 @@ export const getOrderSucces = asyncHandler(async (req, res) => {
 
 ///////////////////////////////////////////
 //Get All Orders
-
 export const getAllOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find().populate('user', 'name email');
-  res.render('user/orders', { layout: userMain, orders });
+  const orders = await Order.find()
+    .sort({ createdAt: -1 })
+    .populate('user', 'full_name email');
+  res.render('user/orders', { layout: userMain, orders, js_file: 'order' });
 });
+
+///////////////////////////////////////////////
+///Get Single Order
+export const getOrder = asyncHandler(async (req, res) => {
+  const orderId = req.params.id;
+  if (!validateId(orderId)) {
+    req.flash('error', 'Invalid Order');
+    return res.status(404).json({ success: false });
+    return res.redirect('/orders');
+  }
+  const order = await Order.findOne({ _id: orderId }).populate(
+    'user',
+    'full_name'
+  );
+  const steps = [
+    'PROCESSING',
+    'PACKED',
+    'SHIPPED',
+    'DELIVERED',
+    'CANCELLED',
+    'RETURNED',
+  ];
+  const currentStepIndex = steps.indexOf(order.status);
+  const progressPercentage =
+    currentStepIndex >= 0 ? ((currentStepIndex + 1) / steps.length) * 100 : 0;
+  res.render('user/order_detail', {
+    layout: userMain,
+    order,
+    progressPercentage,
+  });
+});
+
+///////////////////////////////////////////////////////////////
+/////

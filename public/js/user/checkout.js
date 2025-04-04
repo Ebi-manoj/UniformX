@@ -25,8 +25,8 @@ btnPlaceOrder.addEventListener('click', async function () {
     .forEach(input => input.setAttribute('disabled', true));
 
   const shippingAddress = {
-    address: formData.get('address'),
-    fullName: formData.get('fullName'),
+    street_address: formData.get('address'),
+    name: formData.get('fullName'),
     district: formData.get('district'),
     state: formData.get('state'),
     mobile: formData.get('mobile'),
