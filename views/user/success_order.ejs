@@ -1,0 +1,91 @@
+<div class="bg-green-50 min-h-screen">
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Success Content -->
+    <div class="flex flex-col items-center justify-center py-12">
+      <!-- Package Icon with Checkmark -->
+      <div class="mb-8">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="80"
+          height="80"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="text-gray-800"
+        >
+          <!-- Box -->
+          <path d="M21 8V21H3V8"></path>
+          <path d="M3 4h18v4H3z"></path>
+          <path d="M12 4v17"></path>
+          <!-- Bookmark -->
+          <path d="M8 4v4h4V4"></path>
+          <!-- Checkmark Circle -->
+          <circle
+            cx="17"
+            cy="15"
+            r="4"
+            stroke="currentColor"
+            fill="white"
+          ></circle>
+          <path
+            d="M15 15l1.5 1.5 2.5-2.5"
+            stroke="currentColor"
+            stroke-width="1.5"
+          ></path>
+        </svg>
+      </div>
+
+      <!-- Success Message -->
+      <h2 class="text-2xl font-bold text-gray-900 mb-3 text-center">
+        Thank you for shopping
+      </h2>
+      <p class="text-gray-600 text-center mb-8 max-w-md">
+        Your order has been successfully placed and is now being processed
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+        <a
+          href="/products"
+          class="bg-white border border-gray-300 text-gray-800 py-3 px-6 rounded text-center font-medium hover:bg-gray-50 transition flex-1"
+        >
+          Continue Shopping
+        </a>
+        <a
+          href="/order-details"
+          class="bg-gray-900 text-white py-3 px-6 rounded text-center font-medium hover:bg-gray-800 transition flex-1"
+        >
+          View Order Details
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Information (Optional) -->
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <h3 class="text-lg font-semibold mb-4">Order Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="text-sm text-gray-500">Order Number</p>
+                <p class="font-medium"><%= details.orderNumber %></p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Date</p>
+                <p class="font-medium"><%= details.orderDate %></p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="font-medium"><%= details.customerEmail %></p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Total</p>
+                <p class="font-medium">₹<%= details.totalAmount %></p>
+            </div>
+        </div>
+    </div>
+</div>
+  </div>

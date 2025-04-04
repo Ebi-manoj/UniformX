@@ -24,7 +24,9 @@ import {
   removecartItem,
 } from '../controllers/user_controllers/cart.controller.js';
 import {
+  getAllOrders,
   getCheckout,
+  getOrderSucces,
   placeOrder,
 } from '../controllers/user_controllers/order.controller.js';
 import { validateCartForCheckout } from '../middlewares/validatecart.js';
@@ -87,5 +89,12 @@ router.post(
   validateCartForCheckout,
   placeOrder
 );
+router.get(
+  '/order-success/:id',
+  isUserAuthenticated,
+  fetchCartLength,
+  getOrderSucces
+);
+router.get('/orders', isUserAuthenticated, fetchCartLength, getAllOrders);
 
 export default router;

@@ -47,8 +47,10 @@ btnPlaceOrder.addEventListener('click', async function () {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'Order failed');
-    alert('Order placed successfully!');
+    console.log('The order succefull');
+    window.location.href = `${data.redirectUrl}/${data.orderId}`;
   } catch (error) {
+    showToast('Something Went Wrong!');
     console.log(error.message);
   }
 });

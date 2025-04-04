@@ -4,7 +4,7 @@ const OrderSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'user',
       required: true,
     },
     items: [
@@ -91,8 +91,24 @@ const OrderSchema = new mongoose.Schema(
       requestedAt: Date,
       resolvedAt: Date,
     },
+    orderNumber: {
+      type: String,
+      unique: true,
+    },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
+
+// Generate order number before saving
+OrderSchema.pre('save', async function (next) {
+  if (!this.orderNumber) {
+    const count = await mongoose.model('Order').countDocuments();
+    this.orderNumber = `ORD-${new Date()
+      .toISOString()
+      .slice(0, 10)
+      .replace(/-/g, '')}-${(count + 1).toString().padStart(3, '0')}`;
+  }
+  next();
+});
 
 export const Order = mongoose.model('Order', OrderSchema);

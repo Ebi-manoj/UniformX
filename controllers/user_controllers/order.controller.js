@@ -105,14 +105,20 @@ export const placeOrder = asyncHandler(async (req, res) => {
     // Save the order
     await order.save({ session });
 
-    // Update product stock quantities
-    for (const item of cart.products) {
-      const selectedSize = item.productId.size;
-      await Product.updateOne(
-        { _id: item.productId._id },
-        { $inc: { [`sizes.${selectedSize}.stock_quantity`]: -item.quantity } },
-        { session }
-      );
+    const updateResults = await Promise.all(
+      cart.products.map(async item => {
+        return Product.updateOne(
+          { _id: item.productId._id, 'sizes.size': item.size },
+          { $inc: { 'sizes.$.stock_quantity': -item.quantity } },
+          { session }
+        );
+      })
+    );
+
+    const failedUpdates = updateResults.filter(res => res.modifiedCount === 0);
+
+    if (failedUpdates.length > 0) {
+      throw new Error('Stock update failed for some products');
     }
 
     // Clear the cart
@@ -127,10 +133,12 @@ export const placeOrder = asyncHandler(async (req, res) => {
 
     // Commit the transaction
     await session.commitTransaction();
-
-    res
-      .status(200)
-      .json({ success: true, message: 'Order Placed Succesfully' });
+    res.status(200).json({
+      success: true,
+      message: 'Order Placed Succesfully',
+      redirectUrl: '/order-success',
+      orderId: order.orderNumber,
+    });
   } catch (error) {
     // Abort the transaction on error
     await session.abortTransaction();
@@ -139,4 +147,37 @@ export const placeOrder = asyncHandler(async (req, res) => {
     // End the session
     session.endSession();
   }
+});
+
+/////////////////////////////////////////////
+////Get order Success Page
+
+export const getOrderSucces = asyncHandler(async (req, res) => {
+  const orderNumber = req.params.id;
+  console.log(orderNumber);
+
+  const order = await Order.findOne({ orderNumber }).populate('user', 'email');
+  if (!order) {
+    req.flash('error', 'Something went wrong');
+    return res.redirect('/cart');
+  }
+  console.log(order);
+  const details = {
+    orderNumber: order.orderNumber,
+    orderDate: order.createdAt.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+    customerEmail: order.user.email,
+    totalAmount: order.totalAmount,
+  };
+  res.render('user/success_order', { layout: userMain, details });
+});
+
+///////////////////////////////////////////
+//Get All Orders
+
+export const getAllOrders = asyncHandler(async (req, res) => {
+  res.render('user/orders', { layout: userMain });
 });
