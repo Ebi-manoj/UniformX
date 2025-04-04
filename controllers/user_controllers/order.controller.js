@@ -40,13 +40,13 @@ export const getCheckout = asyncHandler(async (req, res) => {
 //Place an Order
 export const placeOrder = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-  // console.log(userId);
-  // console.log(req.body);
   const { shippingAddress, paymentMethod } = req.body;
+
   if (!validateId(userId)) {
-    req.flash('error', 'session expired');
+    req.flash('error', 'Session expired');
     return res.redirect('/checkout');
   }
+
   // Start a transaction
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -60,32 +60,34 @@ export const placeOrder = asyncHandler(async (req, res) => {
       })
       .session(session);
 
+    if (!cart || !cart.products.length) {
+      throw new Error('Cart is empty or not found');
+    }
+
     // Calculate order amounts
     const subtotal = cart.totalPrice;
-    const discount = cart.discountPrice;
+    const discount = cart.discountPrice || 0; // Ensure discount exists
     const taxAmount = subtotal * TAX_RATE;
     const totalAmount = subtotal + taxAmount - discount;
-    console.log(cart);
 
-    // Create order items
+    // Create order items with individual status
     const orderItems = cart.products.map(item => {
-      console.log('...............................');
-
-      console.log(item.productId);
-      console.log('...............................');
-
+      if (!item.productId) {
+        throw new Error(`Product not found for cart item: ${item}`);
+      }
       return {
         product: item.productId._id,
         title: item.productId.title,
         price: item.productId.price,
+        size: item.size, // Assuming size comes from cart
         quantity: item.quantity,
         image:
           item.productId.image_url && item.productId.image_url.length > 0
             ? item.productId.image_url[0]
             : null,
+        status: 'PROCESSING', // Initialize each item's status
       };
     });
-    console.log(orderItems);
 
     // Create new order
     const order = new Order({
@@ -98,7 +100,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
       taxAmount,
       discount,
       totalAmount,
-      status: 'PROCESSING',
+      status: 'PROCESSING', // Order-level status (optional, can derive from items)
       statusHistory: [
         {
           status: 'PROCESSING',
@@ -111,6 +113,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
     // Save the order
     await order.save({ session });
 
+    // Update product stock
     const updateResults = await Promise.all(
       cart.products.map(async item => {
         return Product.updateOne(
@@ -122,29 +125,30 @@ export const placeOrder = asyncHandler(async (req, res) => {
     );
 
     const failedUpdates = updateResults.filter(res => res.modifiedCount === 0);
-
     if (failedUpdates.length > 0) {
       throw new Error('Stock update failed for some products');
     }
 
     // Clear the cart
-    console.log(cart._id);
-
     await Cart.deleteOne({ _id: cart._id }, { session });
-    await order.save({ session });
 
     // Commit the transaction
     await session.commitTransaction();
+
     res.status(200).json({
       success: true,
-      message: 'Order Placed Succesfully',
+      message: 'Order placed successfully',
       redirectUrl: '/order-success',
       orderId: order.orderNumber,
     });
   } catch (error) {
     // Abort the transaction on error
     await session.abortTransaction();
-    throw error;
+    console.error('Order placement error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to place order',
+    });
   } finally {
     // End the session
     session.endSession();

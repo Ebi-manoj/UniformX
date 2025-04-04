@@ -19,6 +19,28 @@ const OrderSchema = new mongoose.Schema(
         size: String,
         quantity: Number,
         image: String,
+        status: {
+          type: String,
+          enum: [
+            'PROCESSING',
+            'PACKED',
+            'SHIPPED',
+            'DELIVERED',
+            'CANCELLED',
+            'RETURNED',
+          ],
+          default: 'PROCESSING',
+        },
+        statusHistory: [
+          {
+            status: String,
+            timestamp: {
+              type: Date,
+              default: Date.now,
+            },
+            note: String,
+          },
+        ],
       },
     ],
     shippingAddress: {
@@ -49,28 +71,6 @@ const OrderSchema = new mongoose.Schema(
     shippingCost: Number,
     discount: Number,
     totalAmount: Number,
-    status: {
-      type: String,
-      enum: [
-        'PROCESSING',
-        'PACKED',
-        'SHIPPED',
-        'DELIVERED',
-        'CANCELLED',
-        'RETURNED',
-      ],
-      default: 'PROCESSING',
-    },
-    statusHistory: [
-      {
-        status: String,
-        timestamp: {
-          type: Date,
-          default: Date.now,
-        },
-        note: String,
-      },
-    ],
     invoiceUrl: String,
     returnRequest: {
       status: {

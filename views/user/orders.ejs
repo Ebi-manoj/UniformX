@@ -112,29 +112,30 @@
                     <!-- Right Column -->
                     <div class="mt-4 md:mt-0 flex flex-col md:items-end justify-between">
                       <div class="flex items-center space-x-3 mb-3">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= order.status === 'PROCESSING' ? 'bg-yellow-100 text-yellow-800' : order.status === 'DELIVERED' || order.status === 'COMPLETED' ? 'bg-green-100 text-green-800' : order.status === 'SHIPPED' ? 'bg-blue-100 text-blue-800' : order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800' %>">
-                          <%= order.status.charAt(0).toUpperCase() + order.status.slice(1).toLowerCase() %>
+                        <% 
+                          // Determine representative status (e.g., first item's status)
+                          const representativeStatus = order.items[0].status;
+                          const allSameStatus = order.items.every(item => item.status === representativeStatus);
+                        %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= representativeStatus === 'PROCESSING' ? 'bg-yellow-100 text-yellow-800' : representativeStatus === 'DELIVERED' ? 'bg-green-100 text-green-800' : representativeStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-800' : representativeStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800' %>">
+                          <%= representativeStatus.charAt(0).toUpperCase() + representativeStatus.slice(1).toLowerCase() %> <%= !allSameStatus ? '(Mixed)' : '' %>
                         </span>
-                        <% if (order.status === 'PROCESSING') { %>
+                        <% if (order.items.some(item => item.status === 'PROCESSING')) { %>
                           <button class="text-sm text-black hover:text-gray-600 font-medium cancel-order" data-order-id="<%= order._id %>">
                             Cancel
                           </button>
-                        <% } else if (order.status === 'DELIVERED') { %>
+                        <% } else if (order.items.every(item => item.status === 'DELIVERED')) { %>
                           <button class="text-sm text-black hover:text-gray-600 font-medium return-order" data-order-id="<%= order._id %>">
                             Return
                           </button>
-                        <% } else if (order.status === 'SHIPPED') { %>
+                        <% } else if (order.items.some(item => item.status === 'SHIPPED')) { %>
                           <button class="text-sm text-black hover:text-gray-600 font-medium track-order" data-order-id="<%= order._id %>">
                             Track
                           </button>
-                        <% } else if (order.status === 'COMPLETED') { %>
-                          <button class="text-sm text-black hover:text-gray-600 font-medium review-order" data-order-id="<%= order._id %>">
-                            Review
-                          </button>
                         <% } %>
                       </div>
-                      <button  data-order-id="<%= order._id %>" class="btn btn-view-order bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition view-order" data-order-id="<%= order._id %>">
-                        View Item
+                      <button class="btn btn-view-order bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition view-order" data-order-id="<%= order._id %>">
+                        View Order
                       </button>
                     </div>
                   </div>
