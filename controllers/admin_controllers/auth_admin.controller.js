@@ -49,7 +49,7 @@ export const getDashboard = asyncHandler(async (req, res) => {
 });
 
 export const logout = asyncHandler(async (req, res) => {
-  res.clearCookie('token', {
+  res.clearCookie('adminToken', {
     httpOnly: true,
     sameSite: 'strict',
   });

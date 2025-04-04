@@ -501,3 +501,11 @@ export const googleCallback = asyncHandler(async (req, res, next) => {
     res.redirect('/');
   })(req, res, next);
 });
+
+export const userLogout = asyncHandler(async (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'strict',
+  });
+  res.redirect('/');
+});

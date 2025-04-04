@@ -56,7 +56,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
     const [cart] = await Cart.find({ userId })
       .populate({
         path: 'products.productId',
-        select: 'name price image_url sizes status category_id',
+        select: 'title price image_url sizes status category_id',
       })
       .session(session);
 
@@ -69,10 +69,15 @@ export const placeOrder = asyncHandler(async (req, res) => {
 
     // Create order items
     const orderItems = cart.products.map(item => {
+      console.log('...............................');
+
+      console.log(item.productId);
+      console.log('...............................');
+
       return {
         product: item.productId._id,
-        name: item.productId.title,
-        price: item.price,
+        title: item.productId.title,
+        price: item.productId.price,
         quantity: item.quantity,
         image:
           item.productId.image_url && item.productId.image_url.length > 0
@@ -80,6 +85,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
             : null,
       };
     });
+    console.log(orderItems);
 
     // Create new order
     const order = new Order({
@@ -125,10 +131,6 @@ export const placeOrder = asyncHandler(async (req, res) => {
     console.log(cart._id);
 
     await Cart.deleteOne({ _id: cart._id }, { session });
-
-    // // Generate invoice (can be implemented later)
-    // const invoiceUrl = await generateInvoice(order);
-    // order.invoiceUrl = invoiceUrl;
     await order.save({ session });
 
     // Commit the transaction
@@ -179,5 +181,6 @@ export const getOrderSucces = asyncHandler(async (req, res) => {
 //Get All Orders
 
 export const getAllOrders = asyncHandler(async (req, res) => {
-  res.render('user/orders', { layout: userMain });
+  const orders = await Order.find().populate('user', 'name email');
+  res.render('user/orders', { layout: userMain, orders });
 });
