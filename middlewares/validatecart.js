@@ -18,6 +18,7 @@ export const validateCartForCheckout = async function (req, res, next) {
 
   if (!cart || cart.products.length === 0) {
     req.flash('error', 'Cart is empty');
+    return res.redirect('/cart');
   }
 
   let invalidItems = true;

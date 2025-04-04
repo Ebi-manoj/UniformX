@@ -6,7 +6,7 @@
       <div class="flex-1">
         <h2 class="text-lg font-medium mb-6">Your cart</h2>
         <div id="item-box" class="space-y-6">
-          <% if (cart.products.length === 0) { %>
+          <% if (!cart || cart.products.length === 0) { %>
             <!-- Modern Empty Cart Message -->
             <div class="flex flex-col items-center justify-center text-center p-10 bg-gray-100 rounded-lg">
               <img src="/images/empty-cart.svg" alt="Empty Cart" class="w-32 h-32 mb-4 opacity-70" />
@@ -79,19 +79,19 @@
       </div>
 
       <!-- Order Summary -->
-      <div class="w-full lg:w-80 <%= cart.products.length === 0?'hidden':'block' %>">
+      <div class="w-full lg:w-80 <%= !cart|| cart.products.length === 0?'hidden':'block' %>">
         <h2 class="text-lg font-medium mb-6">Order Summary</h2>
 
         <div class="bg-white rounded-lg shadow-sm p-6">
           <div class="space-y-4">
             <div class="flex justify-between">
               <span class="text-gray-600">Subtotal</span>
-              <span class="font-medium">₹ <%= cart.totalPrice %></span>
+              <span class="font-medium">₹ <%= cart?.totalPrice %></span>
             </div>
 
             <div class="flex justify-between">
               <span class="text-gray-600">Total discount</span>
-              <span class="font-medium text-green-600">-₹<%= cart.discountPrice %></span>
+              <span class="font-medium text-green-600">-₹<%= cart?.discountPrice %></span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Shipping</span>

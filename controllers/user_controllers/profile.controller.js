@@ -67,8 +67,6 @@ export const editProfile = asyncHandler(async (req, res) => {
 
 export const uploadProfilePic = asyncHandler(async (req, res, next) => {
   try {
-    console.log(req.file);
-
     if (!req.file) {
       req.flash('error', 'No image found!');
       return res.redirect('/profile');
@@ -143,7 +141,6 @@ export const fetchAddress = asyncHandler(async (req, res) => {
 //////////////////////////////////
 /// addAddress
 export const addAddress = asyncHandler(async (req, res) => {
-  console.log(req.body);
   const { fullName, mobile, address, district, state, country, pincode } =
     req.body;
   if (
@@ -182,9 +179,6 @@ export const addAddress = asyncHandler(async (req, res) => {
 //Edit Address
 
 export const editAddress = asyncHandler(async (req, res) => {
-  console.log(req.body);
-  console.log(req.originalUrl);
-
   const { id, fullName, mobile, address, district, state, country, pincode } =
     req.body;
 

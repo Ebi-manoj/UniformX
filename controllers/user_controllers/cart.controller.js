@@ -27,15 +27,14 @@ const calculateCartTotal = function (cart) {
 
 export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-  const cart = await Cart.find({ userId }).populate('products.productId');
-  console.log(cart);
+  const [cart] = await Cart.find({ userId }).populate('products.productId');
 
-  const taxAmount = (cart[0].totalPrice - cart[0].discountPrice) * TAX_RATE;
-  const finalPrice = cart[0].totalPrice - cart[0].discountPrice + taxAmount;
+  const taxAmount = (cart?.totalPrice - cart?.discountPrice) * TAX_RATE;
+  const finalPrice = cart?.totalPrice - cart?.discountPrice + taxAmount;
   res.render('user/cart', {
     layout: userMain,
     js_file: 'cart',
-    cart: cart[0],
+    cart,
     finalPrice,
     taxAmount,
   });
@@ -98,7 +97,6 @@ export const addToCart = asyncHandler(async (req, res) => {
 
     // Validate against stock and max quantity per order
     if (newQuantity > selectedSize.stock_quantity) {
-      console.log('hai');
       return res
         .status(404)
         .json({ success: false, message: 'Not enough stock available' });
@@ -155,7 +153,6 @@ export const removecartItem = asyncHandler(async (req, res) => {
       item.productId._id.toString() === productId.toString() &&
       item.size.toLowerCase() === size.toLowerCase()
   );
-  console.log(itemIndex);
 
   if (itemIndex === -1) {
     req.flash('Error', 'Item not Found');

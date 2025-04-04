@@ -23,7 +23,10 @@ import {
   getCart,
   removecartItem,
 } from '../controllers/user_controllers/cart.controller.js';
-import { getCheckout } from '../controllers/user_controllers/order.controller.js';
+import {
+  getCheckout,
+  placeOrder,
+} from '../controllers/user_controllers/order.controller.js';
 import { validateCartForCheckout } from '../middlewares/validatecart.js';
 
 const router = express.Router();
@@ -76,6 +79,13 @@ router.get(
   fetchCartLength,
   validateCartForCheckout,
   getCheckout
+);
+router.post(
+  '/place-order',
+  isUserAuthenticated,
+  fetchCartLength,
+  validateCartForCheckout,
+  placeOrder
 );
 
 export default router;
