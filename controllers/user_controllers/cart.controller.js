@@ -46,7 +46,6 @@ export const addToCart = asyncHandler(async (req, res) => {
   const { productId, size } = req.body;
   const quantity = parseInt(req.body.quantity);
 
-  // Validate product availability
   const product = await Product.findById(productId)
     .populate('club_id')
     .populate('category_id');
