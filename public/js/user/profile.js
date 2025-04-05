@@ -22,22 +22,41 @@ function ProfileFunctionality() {
   //////////////////////////////////////
   //Dynamic Address
   const addressSelect = document.getElementById('addressSelect');
-  const addressSPan = document.getElementById('addressSpan');
+  const addressSpan = document.getElementById('addressSpan');
   const addressId = document.getElementById('addressId');
   const allAddresses = JSON.parse(
     document.getElementById('allAddresses').value
   );
+
+  // On address selection change
   addressSelect.addEventListener('change', function (e) {
     const index = e.target.value;
-    addressSPan.textContent = allAddresses[index].street_address;
-    addressId.value = allAddresses[index]._id;
+
+    if (index === 'add_new') {
+      addressSpan.textContent = 'New address will be added...';
+      addressId.value = '';
+      return;
+    }
+
+    const selectedAddress = allAddresses[index];
+    if (selectedAddress) {
+      addressSpan.textContent = selectedAddress.street_address;
+      addressId.value = selectedAddress._id;
+    } else {
+      addressSpan.textContent = 'Invalid address selected';
+      addressId.value = '';
+    }
   });
+
+  // On modal open: set default address
   if (allAddresses.length > 0) {
-    const address = allAddresses.find(addr => addr.is_default === true);
-    addressSPan.textContent = address.street_address;
+    const address =
+      allAddresses.find(addr => addr.is_default === true) || allAddresses[0];
+    addressSpan.textContent = address.street_address;
     addressId.value = address._id;
     addressSelect.value = allAddresses.indexOf(address);
   }
+
   //////////////////////////////
   //Upload img
   const uploadImgBtn = document.getElementById('upload-img-btn');
@@ -50,6 +69,45 @@ function ProfileFunctionality() {
 
     if (!this.files.length) return;
     document.getElementById('uploadProfilePicForm').submit();
+  });
+  ////////////////////////////////////////////////////////////
+  //Edit Profile Validation
+  const form = document.querySelector('#editProfileModal form');
+
+  form.addEventListener('submit', function (e) {
+    const fullName = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('mobile').value.trim();
+    const addressId = document.getElementById('addressId').value;
+    console.log(addressId);
+
+    // Full Name Validation
+    if (fullName === '') {
+      e.preventDefault();
+      showToast('Full Name is required!', 'error');
+      return;
+    }
+
+    // Email Validation
+    if (!email.match(/^\S+@\S+\.\S+$/)) {
+      e.preventDefault();
+      showToast('Please enter a valid email!', 'error');
+      return;
+    }
+
+    // Phone Validation (10 digit number)
+    if (!phone.match(/^\d{10}$/)) {
+      e.preventDefault();
+      showToast('Phone number must be 10 digits!', 'error');
+      return;
+    }
+
+    // Address Validation (optional)
+    if (!addressId) {
+      e.preventDefault();
+      showToast('Please select or add an address!', 'error');
+      return;
+    }
   });
 }
 const isProfile = document.getElementById('profile');

@@ -30,6 +30,8 @@ export const editProfile = asyncHandler(async (req, res) => {
     req.flash('error', 'All fields are required!');
     return res.redirect('/profile');
   }
+  console.log(addressId);
+
   const userId = req.user?._id;
   if (!validateId(userId)) {
     req.flash('error', 'Session expired!');
@@ -48,15 +50,17 @@ export const editProfile = asyncHandler(async (req, res) => {
       return res.redirect('/profile');
     }
     const address = await Address.findOne({ _id: addressId, userId });
+    console.log(address);
 
     if (!address) {
       req.flash('error', 'Address not found!');
       return res.redirect('/profile');
     }
     await Address.updateMany({ userId }, { $set: { is_default: false } });
-
-    address.is_default = true;
-    await address.save();
+    await Address.updateOne(
+      { _id: addressId, userId },
+      { $set: { is_default: true } }
+    );
   }
   req.flash('success', 'Profile updated successfully');
   res.redirect('/profile');
@@ -64,7 +68,6 @@ export const editProfile = asyncHandler(async (req, res) => {
 
 /////////////////////////////////////////
 //Upload Profile Pic
-
 export const uploadProfilePic = asyncHandler(async (req, res, next) => {
   try {
     if (!req.file) {

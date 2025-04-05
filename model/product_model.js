@@ -42,6 +42,10 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    maxQuantity: {
+      type: Number,
+      default: 5,
+    },
   },
   {
     timestamps: true,

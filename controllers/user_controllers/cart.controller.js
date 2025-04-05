@@ -71,6 +71,11 @@ export const addToCart = asyncHandler(async (req, res) => {
       .status(404)
       .json({ success: false, message: 'Product out of stock' });
   }
+  if (product.maxQuantity < size) {
+    return res
+      .status(404)
+      .json({ success: false, message: 'You cant order this much quantity' });
+  }
 
   const userId = req.user?._id;
   if (!validateId(userId)) {

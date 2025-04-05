@@ -39,7 +39,7 @@ app.use(
     },
   })
 );
-// app.use(morgan('dev'));
+app.use(morgan('dev'));
 // passport config
 app.use(passport.initialize());
 app.use(passport.session());

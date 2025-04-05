@@ -58,10 +58,10 @@
                 <div class="flex items-center">
                   <span class="mr-6 font-medium">₹<%= product.productId.price.toFixed(2) %></span>
         
-                  <div class="flex items-center border rounded-md">
-                    <button class="px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity" data-product-id="<%= product.productId %>" data-action="decrease">−</button>
-                    <span class="px-2 py-1"><%= product.quantity %></span>
-                    <button class="px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity" data-product-id="<%= product.productId %>" data-action="increase">+</button>
+                  <div class="flex items-center border rounded-md quantity">
+                    <button class="btn-decrement px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity"  data-product-id="<%= product.productId %>" data-action="decrease">−</button>
+                    <span  class=" px-2 py-1"><%= product.quantity %></span>
+                    <button class="btn-increment px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity" data-quantity="<%= stockQuantity %>" data-max-quantity="<%= product.productId.maxQuantity %>" data-product-id="<%= product.productId %>" data-action="increase">+</button>
                   </div>
         
                   <!-- Remove Button -->

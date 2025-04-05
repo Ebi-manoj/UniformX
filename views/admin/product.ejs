@@ -251,11 +251,11 @@
               <div class="text-base font-bold text-gray-900">
               <% if (product.discountPercentage) { %>
               <% const discountedPrice = product.price * (1 - product.discountPercentage / 100); %>
-              <span class="text-red-500">$<%= discountedPrice.toFixed(2) %></span>
-              <span class="line-through text-gray-500 ml-2">$<%= product.price.toFixed(2) %></span>
+              <span class="text-red-500">₹<%= discountedPrice.toFixed(2) %></span>
+              <span class="line-through text-gray-500 ml-2">₹<%= product.price.toFixed(2) %></span>
               <span class="text-green-500 text-sm ml-2">(<%= product.discountPercentage %>% off)</span>
               <% } else { %>
-              $<%= product.price.toFixed(2) %>
+              ₹<%= product.price.toFixed(2) %>
               <% } %>
               </div>
               </td>

@@ -165,6 +165,7 @@ export const getProductDetails = asyncHandler(async (req, res) => {
 
   const categoriesList = await Category.find();
   const clubsList = await Club.find();
+  console.log(product[0]);
 
   res.render('user/product_details', {
     layout: userMain,

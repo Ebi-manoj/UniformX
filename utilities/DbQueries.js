@@ -196,6 +196,7 @@ export function productDetails(slug) {
         stockStatus: 1,
         discountPercentage: 1,
         relatedProducts: 1, // Include all related products
+        maxQuantity: 1,
       },
     },
   ];
