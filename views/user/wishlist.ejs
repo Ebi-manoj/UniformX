@@ -1,0 +1,244 @@
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 50;
+    }
+    
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 25px;
+        border-radius: 10px;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .size-option:checked + label {
+        border-color: #000;
+        background-color: #f3f4f6;
+        font-weight: 600;
+    }
+    
+    .remove-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+    
+    .remove-btn:hover {
+        background-color: #f3f4f6;
+        color: #000;
+    }
+    
+    .wishlist-item {
+        transition: all 0.3s ease;
+    }
+    
+    .wishlist-item:hover {
+        background-color: #f9fafb;
+    }
+</style>
+
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <h1 class="text-3xl font-bold mb-8">Your Wishlist</h1>
+    
+    <div class="space-y-6">
+        <% if (!wishlist || wishlist.items.length === 0) { %>
+            <div class="text-center py-12">
+                <h2 class="text-xl font-semibold text-gray-700">Your wishlist is empty</h2>
+                <p class="text-gray-500 mt-2">Add some products to see them here!</p>
+            </div>
+        <% } else { %>
+            <% wishlist.items.forEach(item => { %>
+                <div class="flex items-center border-b p-2 pb-6 wishlist-item" 
+                     data-product-id="<%= item.productId._id %>" 
+                     data-product-name="<%= item.productId.name %>">
+                    <div class="w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
+                        <img src="<%= item.productId.image_url?.[0] || '/placeholder.svg?height=80&width=80' %>" 
+                             alt="<%= item.productId.title %>" 
+                             class="w-full h-full object-contain p-2">
+                    </div>
+                    
+                    <div class="ml-6 flex-grow">
+                        <h3 class="font-semibold text-lg"><%= item.productId.title %></h3>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Added On: <%= new Date(item.addedAt).toLocaleDateString() %>
+                        </p>
+                        <button class="remove-btn text-sm text-gray-500 mt-2 remove-item">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            Remove
+                        </button>
+                    </div>
+                    
+                    <div class="text-right">
+                        <div class="mb-3">
+                            <% if (item.productId.discountPercentage) { %>
+                                <span class="text-xs text-red-500 line-through mr-2">
+                                    ₹<%= item.productId.price %>
+                                </span>
+                                <span class="text-sm font-bold text-gray-900 mr-2">
+                                    ₹<%= (item.productId.price - (item.productId.price * item.productId.discountPercentage / 100)).toFixed(2) %>
+                                </span>
+                                <span class="text-sm font-semibold text-green-600">
+                                    (-<%= item.productId.discountPercentage %>%)
+                                </span>
+                            <% } else { %>
+                                <span class="text-sm font-bold text-gray-900">
+                                    ₹<%= item.productId.price %>
+                                </span>
+                            <% } %>
+                        </div>
+                        <button class="border border-gray-300 rounded-md px-4 py-2 text-sm hover:bg-gray-900 hover:text-white transition-colors add-to-cart-btn">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+    </div>
+</div>
+
+<!-- Size Selection Modal -->
+<div id="sizeModal" class="modal">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-semibold" id="modalProductName">Select Size</h3>
+            <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <div class="mb-6">
+            <p class="text-sm text-gray-600 mb-3">Please select your size:</p>
+            <div class="grid grid-cols-4 gap-3" id="sizeOptions">
+                <!-- Sizes will be dynamically populated -->
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3">
+            <button id="cancelBtn" class="border border-gray-300 rounded-md px-5 py-2 text-sm hover:bg-gray-50 transition-colors">Cancel</button>
+            <button id="addToCartBtn" class="bg-black text-white rounded-md px-5 py-2 text-sm hover:bg-gray-800 transition-colors">Add to Cart</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const modal = document.getElementById('sizeModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const modalProductName = document.getElementById('modalProductName');
+    const sizeOptions = document.getElementById('sizeOptions');
+    
+    let currentProduct = null;
+    
+    document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const productElement = this.closest('[data-product-id]');
+            const productId = productElement.dataset.productId;
+            const productName = productElement.dataset.productName;
+            
+            currentProduct = { id: productId, name: productName };
+            modalProductName.textContent = `Select Size - ${productName}`;
+            
+            // Clear previous size options
+            sizeOptions.innerHTML = '';
+            
+            // Example sizes - in real scenario, fetch from product data
+            const sizes = ['XS', 'S', 'M', 'L', 'XL', '2XL'];
+            sizes.forEach(size => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <input type="radio" name="size" id="size-${size.toLowerCase()}" value="${size}" class="size-option hidden">
+                    <label for="size-${size.toLowerCase()}" class="border rounded-md py-2 px-3 flex items-center justify-center text-sm cursor-pointer hover:bg-gray-50 transition-colors">${size}</label>
+                `;
+                sizeOptions.appendChild(div);
+            });
+            
+            modal.style.display = 'block';
+        });
+    });
+    
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    cancelBtn.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (event) => {
+        if (event.target === modal) modal.style.display = 'none';
+    });
+    
+    addToCartBtn.addEventListener('click', async function() {
+        const selectedSize = document.querySelector('input[name="size"]:checked');
+        
+        if (selectedSize) {
+            try {
+                const response = await fetch('/cart/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        productId: currentProduct.id,
+                        quantity: 1,
+                        size: selectedSize.value
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert(`Added ${currentProduct.name} (Size: ${selectedSize.value}) to cart`);
+                    modal.style.display = 'none';
+                } else {
+                    alert(data.message || 'Failed to add to cart');
+                }
+            } catch (error) {
+                alert('Error adding to cart');
+                console.error(error);
+            }
+        } else {
+            alert('Please select a size');
+        }
+    });
+    
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', async function() {
+            const item = this.closest('[data-product-id]');
+            const productId = item.dataset.productId;
+            const productName = item.dataset.productName;
+            
+            if (confirm(`Remove ${productName} from your wishlist?`)) {
+                try {
+                    const response = await fetch('/wishlist/remove', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ productId })
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        item.style.opacity = '0';
+                        item.style.transition = 'opacity 0.3s ease';
+                        setTimeout(() => item.remove(), 300);
+                    } else {
+                        alert(data.message || 'Failed to remove item');
+                    }
+                } catch (error) {
+                    alert('Error removing item');
+                    console.error(error);
+                }
+            }
+        });
+    });
+</script>

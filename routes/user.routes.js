@@ -32,6 +32,10 @@ import {
   placeOrder,
 } from '../controllers/user_controllers/order.controller.js';
 import { validateCartForCheckout } from '../middlewares/validatecart.js';
+import {
+  addToWhishlist,
+  fetchWishlist,
+} from '../controllers/user_controllers/wishlist.controller.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -77,6 +81,14 @@ router.post('/cart/add', isUserAuthenticated, addToCart);
 router.post('/cart/update', isUserAuthenticated, updateCartQunatity);
 router.delete('/cart/remove-item', isUserAuthenticated, removecartItem);
 
+// Whihslist
+router.get('/wishlist', isUserAuthenticated, fetchCartLength, fetchWishlist);
+router.post(
+  '/add-wishlist',
+  isUserAuthenticated,
+  fetchCartLength,
+  addToWhishlist
+);
 // order
 router.get(
   '/checkout',

@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { Category } from '../../model/category_model.js';
 import { Club } from '../../model/club_model.js';
 import { productDetails } from '../../utilities/DbQueries.js';
+import { Wishlist } from '../../model/wishlist.js';
 const userMain = './layouts/user_main';
 
 export const listProducts = asyncHandler(async (req, res) => {
@@ -157,20 +158,27 @@ export const listProducts = asyncHandler(async (req, res) => {
 // Get Product Details
 export const getProductDetails = asyncHandler(async (req, res) => {
   const { slug } = req.params;
+  const userId = req.user._id;
 
   const product = await Product.aggregate(productDetails(slug));
   if (!product.length) {
     return res.redirect('/products');
   }
+  //checking wishlisted true
+  const wishlist = await Wishlist.findOne({ userId });
+  const isWishlisted = wishlist.items.some(
+    item => item.productId.toString() === product[0]._id.toString()
+  );
 
   const categoriesList = await Category.find();
   const clubsList = await Club.find();
-  console.log(product[0]);
+  console.log(isWishlisted);
 
   res.render('user/product_details', {
     layout: userMain,
     js_file: 'cart',
     categories: categoriesList,
+    isWishlisted,
     clubs: clubsList,
     product: product[0],
     alternativeProduct: product[0]?.alternativeProduct || null,

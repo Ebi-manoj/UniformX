@@ -273,9 +273,10 @@
                     <button id="addToCart" data-product-id="<%= product._id %>" class="flex-1 bg-gray-900 text-white py-3 px-6 rounded hover:bg-gray-800 transition-colors cursor-not-allowed opacity-80"disabled>
                         ADD TO CART
                     </button>
-                    <button class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors">
-                        <i class="far fa-heart"></i>
-                    </button>
+                    <button id="addToWishlist" data-product-id="<%= product._id %>" 
+                        class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors">
+                        <i id="wishlist-icon" class="<%= isWishlisted ? 'fas' : 'far' %> fa-heart text-red-500 text-[1.2rem]"></i>
+                      </button>
                 </div>
                 
                 <div class="text-sm text-gray-600 mb-8">

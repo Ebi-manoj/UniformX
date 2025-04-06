@@ -10,9 +10,11 @@ if (productDetail) {
   console.log('Product Detail');
   const btnSize = document.getElementById('btn-size');
   const btnAddCart = document.getElementById('addToCart');
+  const btnWishlist = document.getElementById('addToWishlist');
 
   btnSize.addEventListener('click', selectSize);
   btnAddCart.addEventListener('click', addToCart);
+  btnWishlist.addEventListener('click', addToWishlist);
 
   const btnDecrement = document.getElementById('btn-decrement');
   const btnIncrement = document.getElementById('btn-increment');
@@ -40,7 +42,27 @@ if (productDetail) {
     e.target.classList.add('selected');
     quantityInput.value = 1;
   }
-
+  ////////////////////////////////////////////////////////////
+  //Whishlit
+  async function addToWishlist(e) {
+    const icon = document.getElementById('wishlist-icon');
+    const productId = this.dataset.productId;
+    try {
+      const response = await fetch('/add-wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast(data.message, 'success');
+        icon.classList.toggle('far');
+        icon.classList.toggle('fas');
+      }
+    } catch (error) {
+      showToast('something went wrong');
+    }
+  }
   async function addToCart(e) {
     const productId = this.dataset.productId;
     const quantity = document.getElementById('quantity').value;
