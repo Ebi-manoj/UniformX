@@ -66,7 +66,6 @@ if (productDetail) {
     }
   }
 }
-
 if (cartSection) {
   const deleteModal = document.getElementById('deleteModal');
   const cancelDelete = document.getElementById('cancelDelete');
@@ -76,7 +75,7 @@ if (cartSection) {
     deleteModal.classList.add('hidden');
   });
 
-  removeBtn.addEventListener('click', function (e) {
+  removeBtn.addEventListener('click', async function (e) {
     const removeButton = e.target.closest('.remove-item');
     if (removeButton) {
       const id = removeButton.dataset.productId;
@@ -85,21 +84,20 @@ if (cartSection) {
       return;
     }
 
-    const incrementBtn = e.target.closest('.btn-increment');
-    const decrementBtn = e.target.closest('.btn-decrement');
-
-    if (incrementBtn) {
-      const quantityBox = incrementBtn.closest('.quantity');
+    const updateBtn = e.target.closest('.update-quantity');
+    if (updateBtn) {
+      const quantityBox = updateBtn.closest('.quantity');
       const span = quantityBox.querySelector('span');
-      maxStock = parseInt(incrementBtn.dataset.quantity);
-      maxQuantity = parseInt(incrementBtn.dataset.maxQuantity);
-      incrementQuantity('textContent', span);
-    }
+      const productId = updateBtn.dataset.productId;
+      const action = updateBtn.dataset.action;
+      maxStock = parseInt(updateBtn.dataset.quantity || 9999);
+      maxQuantity = parseInt(updateBtn.dataset.maxQuantity || 9999);
 
-    if (decrementBtn) {
-      const quantityBox = decrementBtn.closest('.quantity');
-      const span = quantityBox.querySelector('span');
-      decrementQuantity('textContent', span);
+      if (action === 'increase') {
+        await updateCartQuantity(productId, span, 'increase');
+      } else if (action === 'decrease') {
+        await updateCartQuantity(productId, span, 'decrease');
+      }
     }
   });
 
@@ -108,10 +106,57 @@ if (cartSection) {
     document.getElementById('input-size').value = size;
     deleteModal.classList.remove('hidden');
   }
+
+  async function updateCartQuantity(productId, span, action) {
+    console.log(productId, action);
+
+    const currentQuantity = parseInt(span.textContent);
+    const newQuantity =
+      action === 'increase' ? currentQuantity + 1 : currentQuantity - 1;
+
+    if (
+      newQuantity < 1 ||
+      newQuantity > maxStock ||
+      newQuantity > maxQuantity
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/cart/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId,
+          quantity: newQuantity,
+          size: span.dataset.size,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        span.textContent = newQuantity;
+        // Update order summary
+        document.querySelector('.subTotal').textContent = `₹ ${data.subtotal}`;
+        document.querySelector(
+          '.discountPrice'
+        ).textContent = `-₹${data.discount}`;
+        document.querySelector('.tax').textContent = `₹ ${data.tax}`;
+        document.querySelector('.total').textContent = `₹ ${data.total}`;
+        showToast('Cart updated successfully', 'success');
+      } else {
+        showToast(data.message || 'Failed to update cart');
+      }
+    } catch (error) {
+      showToast('Error updating cart');
+      console.error(error);
+    }
+  }
 }
 
-////////////////////////////////////////////////////////////////
-/////////////////////////  Utility Functions
+// Updated Utility Functions
 function incrementQuantity(property = 'value', element = quantityInput) {
   let currentQuantity = parseInt(element[property]);
   if (currentQuantity < maxStock && currentQuantity < maxQuantity) {

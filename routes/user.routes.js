@@ -22,6 +22,7 @@ import {
   addToCart,
   getCart,
   removecartItem,
+  updateCartQunatity,
 } from '../controllers/user_controllers/cart.controller.js';
 import {
   getAllOrders,
@@ -73,6 +74,7 @@ router.delete('/profile/address/:id', isUserAuthenticated, deleteAddress);
 // Cart
 router.get('/cart', isUserAuthenticated, fetchCartLength, getCart);
 router.post('/cart/add', isUserAuthenticated, addToCart);
+router.post('/cart/update', isUserAuthenticated, updateCartQunatity);
 router.delete('/cart/remove-item', isUserAuthenticated, removecartItem);
 
 // order

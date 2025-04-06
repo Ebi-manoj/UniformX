@@ -60,7 +60,7 @@
         
                   <div class="flex items-center border rounded-md quantity">
                     <button class="btn-decrement px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity"  data-product-id="<%= product.productId %>" data-action="decrease">−</button>
-                    <span  class=" px-2 py-1"><%= product.quantity %></span>
+                    <span data-size="<%= product.size %>"  class=" px-2 py-1"><%= product.quantity %></span>
                     <button class="btn-increment px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity" data-quantity="<%= stockQuantity %>" data-max-quantity="<%= product.productId.maxQuantity %>" data-product-id="<%= product.productId %>" data-action="increase">+</button>
                   </div>
         
@@ -86,12 +86,12 @@
           <div class="space-y-4">
             <div class="flex justify-between">
               <span class="text-gray-600">Subtotal</span>
-              <span class="font-medium">₹ <%= cart?.totalPrice %></span>
+              <span class="font-medium subTotal">₹ <%= cart?.totalPrice %></span>
             </div>
 
             <div class="flex justify-between">
               <span class="text-gray-600">Total discount</span>
-              <span class="font-medium text-green-600">-₹<%= cart?.discountPrice %></span>
+              <span class="font-medium text-green-600 discountPrice">-₹<%= cart?.discountPrice %></span>
             </div>
             <div class="flex justify-between">
               <span class="text-gray-600">Shipping</span>
@@ -100,12 +100,12 @@
 
             <div class="flex justify-between">
               <span class="text-gray-600">Tax</span>
-              <span class="font-medium">₹ <%= taxAmount.toFixed(2) %></span>
+              <span class="font-medium tax">₹ <%= taxAmount.toFixed(2) %></span>
             </div>
 
             <div class="border-t pt-4 flex justify-between">
               <span class="font-medium">Total</span>
-              <span class="font-medium">₹ <%= finalPrice %></span>
+              <span class="font-medium total">₹ <%= finalPrice %></span>
             </div>
           </div>
           <a href="/checkout">

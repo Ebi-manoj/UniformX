@@ -135,7 +135,62 @@ export const addToCart = asyncHandler(async (req, res) => {
     cartLength: savedCart.products.length,
   });
 });
+//////////////////////////////////////////
+/////////Update Cart quantity
+export const updateCartQunatity = asyncHandler(async (req, res) => {
+  const { productId, quantity, size } = req.body;
+  const userId = req.user._id;
+  console.log(productId, quantity, size);
 
+  // Find the cart
+  let cart = await Cart.findOne({ userId }).populate('products.productId');
+
+  if (!cart) {
+    return res.status(404).json({ success: false, message: 'Cart not found' });
+  }
+
+  // Find the product in cart
+  const productIndex = cart.products.findIndex(
+    p => p.productId.toString() === productId && p.size === size
+  );
+  console.log(productIndex);
+
+  if (productIndex === -1) {
+    return res
+      .status(404)
+      .json({ success: false, message: 'Product not found in cart' });
+  }
+
+  // Get stock quantity from product's size data
+  const sizeData = cart.products[productIndex].productId.sizes.find(
+    s => s.size.toLowerCase() === size.toLowerCase()
+  );
+
+  if (quantity > sizeData.stock_quantity) {
+    return res.status(400).json({
+      success: false,
+      message: 'Quantity exceeds available stock',
+    });
+  }
+
+  // Update quantity
+  cart.products[productIndex].quantity = quantity;
+
+  calculateCartTotal(cart);
+  const tax = (cart?.totalPrice - cart?.discountPrice) * TAX_RATE;
+  const total = cart?.totalPrice - cart?.discountPrice + tax;
+
+  await cart.save();
+
+  res.json({
+    success: true,
+    subtotal: cart.totalPrice,
+    discount: cart.discountPrice,
+    tax: tax.toFixed(2),
+    total: total.toFixed(2),
+    message: 'Cart updated successfully',
+  });
+});
 /////////////////////////////////////////
 /////Remove from Cart
 export const removecartItem = asyncHandler(async (req, res) => {
