@@ -45,6 +45,7 @@ export const getCart = asyncHandler(async (req, res) => {
 export const addToCart = asyncHandler(async (req, res) => {
   const { productId, size } = req.body;
   const quantity = parseInt(req.body.quantity);
+  console.log(productId, size, quantity);
 
   const product = await Product.findById(productId)
     .populate('club_id')
@@ -121,7 +122,10 @@ export const addToCart = asyncHandler(async (req, res) => {
   }
 
   // Remove from wishlist if present
-  await Wishlist.updateOne({ userId }, { $pull: { products: productId } });
+  await Wishlist.updateOne(
+    { userId },
+    { $pull: { items: { productId: productId } } }
+  );
   cart = await cart.populate('products.productId');
 
   calculateCartTotal(cart);

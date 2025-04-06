@@ -42,52 +42,9 @@ if (productDetail) {
     e.target.classList.add('selected');
     quantityInput.value = 1;
   }
-  ////////////////////////////////////////////////////////////
-  //Whishlit
-  async function addToWishlist(e) {
-    const icon = document.getElementById('wishlist-icon');
-    const productId = this.dataset.productId;
-    try {
-      const response = await fetch('/add-wishlist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        showToast(data.message, 'success');
-        icon.classList.toggle('far');
-        icon.classList.toggle('fas');
-      }
-    } catch (error) {
-      showToast('something went wrong');
-    }
-  }
-  async function addToCart(e) {
-    const productId = this.dataset.productId;
-    const quantity = document.getElementById('quantity').value;
-    const size = document
-      .querySelector('.size-option.selected')
-      ?.textContent.trim();
-
-    const response = await fetch('/cart/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ productId, quantity, size }),
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      showToast(data.message, 'success');
-      document.getElementById('cartText').textContent = data?.cartLength;
-      document.getElementById('cartText').classList.remove('hidden');
-    } else {
-      showToast(data.message || 'something went wrong');
-    }
-  }
 }
+/////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////
 if (cartSection) {
   const deleteModal = document.getElementById('deleteModal');
   const cancelDelete = document.getElementById('cancelDelete');
@@ -122,63 +79,16 @@ if (cartSection) {
       }
     }
   });
-
   function confirmDelete(id, size) {
     document.getElementById('input-productId').value = id;
     document.getElementById('input-size').value = size;
     deleteModal.classList.remove('hidden');
   }
-
-  async function updateCartQuantity(productId, span, action) {
-    console.log(productId, action);
-
-    const currentQuantity = parseInt(span.textContent);
-    const newQuantity =
-      action === 'increase' ? currentQuantity + 1 : currentQuantity - 1;
-
-    if (
-      newQuantity < 1 ||
-      newQuantity > maxStock ||
-      newQuantity > maxQuantity
-    ) {
-      return;
-    }
-
-    try {
-      const response = await fetch('/cart/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          productId,
-          quantity: newQuantity,
-          size: span.dataset.size,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        span.textContent = newQuantity;
-        // Update order summary
-        document.querySelector('.subTotal').textContent = `₹ ${data.subtotal}`;
-        document.querySelector(
-          '.discountPrice'
-        ).textContent = `-₹${data.discount}`;
-        document.querySelector('.tax').textContent = `₹ ${data.tax}`;
-        document.querySelector('.total').textContent = `₹ ${data.total}`;
-        showToast('Cart updated successfully', 'success');
-      } else {
-        showToast(data.message || 'Failed to update cart');
-      }
-    } catch (error) {
-      showToast('Error updating cart');
-      console.error(error);
-    }
-  }
 }
 
-// Updated Utility Functions
+/////////////////////////////////////////////////////////////////////////
+/////Funtions
+
 function incrementQuantity(property = 'value', element = quantityInput) {
   let currentQuantity = parseInt(element[property]);
   if (currentQuantity < maxStock && currentQuantity < maxQuantity) {
@@ -190,5 +100,94 @@ function decrementQuantity(property = 'value', element = quantityInput) {
   let currentQuantity = parseInt(element[property]);
   if (currentQuantity > 1) {
     element[property] = currentQuantity - 1;
+  }
+}
+
+async function addToWishlist(e) {
+  const icon = document.getElementById('wishlist-icon');
+  const productId = this.dataset.productId;
+  try {
+    const response = await fetch('/add-wishlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId }),
+    });
+    const data = await response.json();
+    if (data.success) {
+      showToast(data.message, 'success');
+      icon.classList.toggle('far');
+      icon.classList.toggle('fas');
+    }
+  } catch (error) {
+    showToast('something went wrong');
+  }
+}
+
+export async function addToCart(e) {
+  const productId = this.dataset.productId;
+  const quantity = document.getElementById('quantity').value || 1;
+  const size = document
+    .querySelector('.size-option.selected')
+    ?.textContent.trim();
+
+  const response = await fetch('/cart/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ productId, quantity, size }),
+  });
+
+  const data = await response.json();
+  if (data.success) {
+    showToast(data.message, 'success');
+    document.getElementById('cartText').textContent = data?.cartLength;
+    document.getElementById('cartText').classList.remove('hidden');
+  } else {
+    showToast(data.message || 'something went wrong');
+  }
+}
+
+async function updateCartQuantity(productId, span, action) {
+  console.log(productId, action);
+
+  const currentQuantity = parseInt(span.textContent);
+  const newQuantity =
+    action === 'increase' ? currentQuantity + 1 : currentQuantity - 1;
+
+  if (newQuantity < 1 || newQuantity > maxStock || newQuantity > maxQuantity) {
+    return;
+  }
+
+  try {
+    const response = await fetch('/cart/update', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productId,
+        quantity: newQuantity,
+        size: span.dataset.size,
+      }),
+    });
+
+    const data = await response.json();
+    if (data.success) {
+      span.textContent = newQuantity;
+      // Update order summary
+      document.querySelector('.subTotal').textContent = `₹ ${data.subtotal}`;
+      document.querySelector(
+        '.discountPrice'
+      ).textContent = `-₹${data.discount}`;
+      document.querySelector('.tax').textContent = `₹ ${data.tax}`;
+      document.querySelector('.total').textContent = `₹ ${data.total}`;
+      showToast('Cart updated successfully', 'success');
+    } else {
+      showToast(data.message || 'Failed to update cart');
+    }
+  } catch (error) {
+    showToast('Error updating cart');
+    console.error(error);
   }
 }

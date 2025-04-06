@@ -15,7 +15,11 @@ export const fetchWishlist = asyncHandler(async (req, res) => {
   const wishlist = await Wishlist.findOne({ userId }).populate(
     'items.productId'
   );
-  res.render('user/wishlist', { layout: userMain, wishlist });
+  res.render('user/wishlist', {
+    layout: userMain,
+    js_file: 'wishlist',
+    wishlist,
+  });
 });
 
 export const addToWhishlist = asyncHandler(async (req, res) => {
