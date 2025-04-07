@@ -6,6 +6,9 @@ import mongoose from 'mongoose';
 import { Order } from '../../model/order_model.js';
 import { Product } from '../../model/product_model.js';
 import puppeteer from 'puppeteer';
+import { generateInvoiceHTML } from '../../utilities/invoiceHtml.js';
+import fs from 'fs';
+import { Buffer } from 'buffer';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
@@ -316,7 +319,7 @@ export const cancelOrder = asyncHandler(async (req, res) => {
 });
 
 ///////////////////////////////
-//Download invoice
+///download invoice
 export const downloadInvoice = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
 
@@ -330,30 +333,53 @@ export const downloadInvoice = asyncHandler(async (req, res) => {
     }
 
     const htmlContent = generateInvoiceHTML(order);
+    console.log('Generated HTML Content:', htmlContent);
 
-    const browser = await puppeteer.launch({ headless: 'new' });
+    // Launch Puppeteer
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath:
+        process.env.NODE_ENV === 'production'
+          ? '/usr/bin/chromium-browser'
+          : undefined,
+    });
     const page = await browser.newPage();
 
+    // Set content and wait for rendering
     await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
+    // Generate PDF
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
+      preferCSSPageSize: true,
+      margin: { top: '20mm', right: '20mm', bottom: '20mm', left: '20mm' },
     });
 
     await browser.close();
 
+    // Debug: Save PDF locally to verify
+    fs.writeFileSync('debug-invoice.pdf', pdfBuffer);
+    console.log('PDF saved as debug-invoice.pdf for debugging');
+
+    // Ensure no compression or encoding interferes
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=invoice-${order.orderNumber}.pdf`
     );
+    res.setHeader('Content-Length', pdfBuffer.length);
+    res.setHeader('Content-Transfer-Encoding', 'binary'); // Explicitly set binary encoding
 
-    res.send(pdfBuffer);
+    // Send the PDF buffer as a stream to avoid corruption
+    res.send(Buffer.from(pdfBuffer));
   } catch (err) {
-    console.error(err);
-    res
-      .status(500)
-      .json({ success: false, message: 'Failed to generate invoice' });
+    console.error('Error generating invoice:', err);
+    if (!res.headersSent) {
+      return res
+        .status(500)
+        .json({ success: false, message: 'Failed to generate invoice' });
+    }
   }
 });

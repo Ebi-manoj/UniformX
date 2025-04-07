@@ -1,7 +1,11 @@
 export const generateInvoiceHTML = order => {
   return `
-     <html lang="en">
-    <style>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <title>Invoice</title>
+      <style>
         body {
           font-family: Arial, sans-serif;
           padding: 20px;
@@ -18,39 +22,32 @@ export const generateInvoiceHTML = order => {
           border-collapse: collapse;
           margin-top: 20px;
         }
-        table,
-        th,
-        td {
+        table, th, td {
           border: 1px solid black;
         }
-        th,
-        td {
+        th, td {
           padding: 8px;
           text-align: left;
         }
         .right {
           text-align: right;
         }
-        img{
+        .bottom-box {
+          display: flex;
+        }
+        .totals {
+          width: fit-content;
+          display: flex;
+          flex-direction: column;
+          margin: 1rem 0 0 auto;
+        }
+        .watermark {
+          position: absolute;
+          top: 50%;
+          left: 50%;
           width: 20%;
           opacity: 0.2;
-
-        }
-        .bottom-box{
-            display: flex;
-            
-        }
-        .totals{
-         width: fit-content;
-         display: flex;
-         flex-direction: column;
-         margin: 1rem 0 0 auto;
-        }
-        img{
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
+          transform: translate(-50%, -50%);
         }
       </style>
     </head>
@@ -60,20 +57,16 @@ export const generateInvoiceHTML = order => {
       <p><strong>Invoice Date:</strong> ${new Date().toLocaleDateString()}</p>
       <p><strong>Payment Status:</strong> ${order.paymentStatus}</p>
       <p><strong>Payment Method:</strong> ${order.paymentMethod}</p>
-  
+
       <h3>Shipping Address</h3>
       <p>
-        ${order.shippingAddress?.name}<br />
-        ${order.shippingAddress?.street_address}<br />
-        ${order.shippingAddress?.district}, ${
-    order.shippingAddress?.state
-  }<br />
-        ${order.shippingAddress?.pincode}, ${
-    order.shippingAddress?.country
-  }<br />
-        Mobile: ${order.shippingAddress?.mobile}
+        ${order.shippingAddress.name}<br />
+        ${order.shippingAddress.street_address}<br />
+        ${order.shippingAddress.district}, ${order.shippingAddress.state}<br />
+        ${order.shippingAddress.pincode}<br />
+        Mobile: ${order.shippingAddress.mobile}
       </p>
-  
+
       <h3>Items</h3>
       <table>
         <thead>
@@ -89,40 +82,37 @@ export const generateInvoiceHTML = order => {
           ${order.items
             .map(
               item => `
-          <tr>
-            <td>${item.title}</td>
-            <td>${item.size || '-'}</td>
-            <td>${item.quantity}</td>
-            <td>Rs ${item.price.toFixed(2)}</td>
-            <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
-          </tr>
-          `
+                <tr>
+                  <td>${item.title || 'Product'}</td>
+                  <td>${item.size || '-'}</td>
+                  <td>${item.quantity}</td>
+                  <td>Rs ${item.price.toFixed(2)}</td>
+                  <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
+                </tr>
+              `
             )
             .join('')}
         </tbody>
       </table>
+
+      <div class="totals">
+        <p><strong>Subtotal:</strong> Rs ${order.subtotal.toFixed(2)}</p>
+        <p><strong>Tax:</strong> Rs ${order.taxAmount.toFixed(2)}</p>
+        <p><strong>Shipping:</strong> Rs ${order.shippingCost.toFixed(2)}</p>
+        ${
+          order.discount > 0
+            ? `<p><strong>Discount:</strong> -Rs ${order.discount.toFixed(
+                2
+              )}</p>`
+            : ''
+        }
+        <p><strong>Total Amount:</strong> Rs ${order.totalAmount.toFixed(2)}</p>
+      </div>
      
-        
+          <img class="watermark" src="/images/logo.png" alt="Logo" />
+          
     
-        <div class="totals">
-          <p><strong>Subtotal:</strong> Rs ${order.subtotal.toFixed(2)}</p>
-          <p><strong>Tax:</strong> Rs ${order.taxAmount.toFixed(2)}</p>
-          <p><strong>Shipping:</strong> Rs ${order.shippingCost.toFixed(2)}</p>
-          ${
-            order.discount > 0
-              ? `
-          <p><strong>Discount:</strong> -Rs ${order.discount.toFixed(2)}</p>
-          `
-              : ''
-          }
-          <p><strong>Total Amount:</strong> Rs ${order.totalAmount.toFixed(
-            2
-          )}</p>
-        </div>
-        <img src="/images/uniformX.png" alt="">
-
     </body>
-</html>
-
-    `;
+    </html>
+  `;
 };
