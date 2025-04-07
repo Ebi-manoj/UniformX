@@ -120,19 +120,7 @@
                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= representativeStatus === 'PROCESSING' ? 'bg-yellow-100 text-yellow-800' : representativeStatus === 'DELIVERED' ? 'bg-green-100 text-green-800' : representativeStatus === 'SHIPPED' ? 'bg-blue-100 text-blue-800' : representativeStatus === 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800' %>">
                           <%= representativeStatus.charAt(0).toUpperCase() + representativeStatus.slice(1).toLowerCase() %> <%= !allSameStatus ? '(Mixed)' : '' %>
                         </span>
-                        <% if (order.items.some(item => item.status === 'PROCESSING')) { %>
-                          <button class="text-sm text-black hover:text-gray-600 font-medium cancel-order" data-order-id="<%= order._id %>">
-                            Cancel
-                          </button>
-                        <% } else if (order.items.every(item => item.status === 'DELIVERED')) { %>
-                          <button class="text-sm text-black hover:text-gray-600 font-medium return-order" data-order-id="<%= order._id %>">
-                            Return
-                          </button>
-                        <% } else if (order.items.some(item => item.status === 'SHIPPED')) { %>
-                          <button class="text-sm text-black hover:text-gray-600 font-medium track-order" data-order-id="<%= order._id %>">
-                            Track
-                          </button>
-                        <% } %>
+                       
                       </div>
                       <button class="btn btn-view-order bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition view-order" data-order-id="<%= order._id %>">
                         View Order

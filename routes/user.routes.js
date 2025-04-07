@@ -25,6 +25,7 @@ import {
   updateCartQunatity,
 } from '../controllers/user_controllers/cart.controller.js';
 import {
+  cancelOrder,
   getAllOrders,
   getCheckout,
   getOrder,
@@ -112,5 +113,11 @@ router.get(
 );
 router.get('/orders', isUserAuthenticated, fetchCartLength, getAllOrders);
 router.get('/order/:id', isUserAuthenticated, fetchCartLength, getOrder);
+router.post(
+  '/cancel-order/:orderId',
+  isUserAuthenticated,
+  fetchCartLength,
+  cancelOrder
+);
 
 export default router;

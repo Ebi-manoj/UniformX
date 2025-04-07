@@ -86,6 +86,13 @@ export const placeOrder = asyncHandler(async (req, res) => {
             ? item.productId.image_url[0]
             : null,
         status: 'PROCESSING', // Initialize each item's status
+        statusHistory: [
+          {
+            status: 'PROCESSING',
+            timestamp: new Date(),
+            note: 'Order received',
+          },
+        ],
       };
     });
 
@@ -100,14 +107,6 @@ export const placeOrder = asyncHandler(async (req, res) => {
       taxAmount,
       discount,
       totalAmount,
-      status: 'PROCESSING', // Order-level status (optional, can derive from items)
-      statusHistory: [
-        {
-          status: 'PROCESSING',
-          timestamp: new Date(),
-          note: 'Order received',
-        },
-      ],
     });
 
     // Save the order
@@ -196,30 +195,121 @@ export const getOrder = asyncHandler(async (req, res) => {
   const orderId = req.params.id;
   if (!validateId(orderId)) {
     req.flash('error', 'Invalid Order');
-    return res.status(404).json({ success: false });
     return res.redirect('/orders');
   }
   const order = await Order.findOne({ _id: orderId }).populate(
     'user',
     'full_name'
   );
-  const steps = [
-    'PROCESSING',
-    'PACKED',
-    'SHIPPED',
-    'DELIVERED',
-    'CANCELLED',
-    'RETURNED',
-  ];
-  const currentStepIndex = steps.indexOf(order.status);
-  const progressPercentage =
-    currentStepIndex >= 0 ? ((currentStepIndex + 1) / steps.length) * 100 : 0;
+
   res.render('user/order_detail', {
     layout: userMain,
+    js_file: 'order',
     order,
-    progressPercentage,
   });
 });
 
 ///////////////////////////////////////////////////////////////
-/////
+// Cancel a specific item in an order
+export const cancelOrder = asyncHandler(async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const { itemId, reason } = req.body;
+    const userId = req.user._id;
+
+    // Find the order
+    const order = await Order.findOne({ _id: orderId, user: userId });
+
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found or you don't have permission",
+      });
+    }
+
+    // Find the item in the order
+    const itemIndex = order.items.findIndex(
+      item => item._id.toString() === itemId
+    );
+
+    if (itemIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Item not found in order',
+      });
+    }
+
+    const item = order.items[itemIndex];
+
+    // Check if item can be cancelled
+    if (['SHIPPED', 'DELIVERED', 'CANCELLED'].includes(item.status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Item cannot be cancelled - current status: ${item.status}`,
+      });
+    }
+
+    // Update item status and add to history
+    item.status = 'CANCELLED';
+    item.statusHistory.push({
+      status: 'CANCELLED',
+      timestamp: new Date(),
+      note: reason || 'Customer cancelled item',
+    });
+
+    // Restore stock
+    const product = await Product.findById(item.product);
+    const sizeData = product.sizes.find(
+      s => s.size.toLowerCase() === item.size.toLowerCase()
+    );
+
+    if (sizeData) {
+      sizeData.stock_quantity += item.quantity;
+      await product.save();
+    }
+
+    // Recalculate order totals
+    const activeItems = order.items.filter(i => i.status !== 'CANCELLED');
+    if (activeItems.length > 0) {
+      order.subtotal = activeItems.reduce(
+        (sum, i) => sum + i.price * i.quantity,
+        0
+      );
+      order.taxAmount = order.subtotal * TAX_RATE;
+      order.totalAmount =
+        order.subtotal +
+        order.taxAmount +
+        (order.shippingCost || 0) -
+        (order.discount || 0);
+    } else {
+      // If all items are cancelled, mark payment status as refunded if applicable
+      if (order.paymentStatus === 'COMPLETED') {
+        order.paymentStatus = 'REFUNDED';
+      }
+      order.totalAmount = 0;
+    }
+
+    await order.save();
+
+    res.json({
+      success: true,
+      message: 'Item cancelled successfully',
+      order: {
+        id: order._id,
+        item: {
+          id: item._id,
+          status: item.status,
+          statusHistory: item.statusHistory,
+        },
+        totalAmount: order.totalAmount,
+        paymentStatus: order.paymentStatus,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while cancelling item',
+    });
+  }
+});

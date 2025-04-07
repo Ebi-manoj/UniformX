@@ -31,6 +31,7 @@ const OrderSchema = new mongoose.Schema(
           ],
           default: 'PROCESSING',
         },
+
         statusHistory: [
           {
             status: String,
@@ -41,6 +42,14 @@ const OrderSchema = new mongoose.Schema(
             note: String,
           },
         ],
+        expectedDelivery: {
+          type: Date,
+          default: () => {
+            const date = new Date();
+            date.setDate(date.getDate() + 7);
+            return date;
+          },
+        },
       },
     ],
     shippingAddress: {
@@ -82,16 +91,7 @@ const OrderSchema = new mongoose.Schema(
       requestedAt: Date,
       resolvedAt: Date,
     },
-    cancelRequest: {
-      status: {
-        type: String,
-        enum: ['NONE', 'REQUESTED', 'APPROVED', 'REJECTED'],
-        default: 'NONE',
-      },
-      reason: String,
-      requestedAt: Date,
-      resolvedAt: Date,
-    },
+
     orderNumber: {
       type: String,
       unique: true,
