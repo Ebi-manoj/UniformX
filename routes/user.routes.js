@@ -26,6 +26,7 @@ import {
 } from '../controllers/user_controllers/cart.controller.js';
 import {
   cancelOrder,
+  downloadInvoice,
   getAllOrders,
   getCheckout,
   getOrder,
@@ -118,6 +119,12 @@ router.post(
   isUserAuthenticated,
   fetchCartLength,
   cancelOrder
+);
+router.get(
+  '/order/:orderId/invoice',
+  isUserAuthenticated,
+  fetchCartLength,
+  downloadInvoice
 );
 
 export default router;

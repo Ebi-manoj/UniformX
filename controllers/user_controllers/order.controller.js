@@ -5,6 +5,7 @@ import { Cart } from '../../model/cart_model.js';
 import mongoose from 'mongoose';
 import { Order } from '../../model/order_model.js';
 import { Product } from '../../model/product_model.js';
+import puppeteer from 'puppeteer';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
@@ -311,5 +312,48 @@ export const cancelOrder = asyncHandler(async (req, res) => {
       success: false,
       message: 'Server error while cancelling item',
     });
+  }
+});
+
+///////////////////////////////
+//Download invoice
+export const downloadInvoice = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId).populate('user', 'name email');
+
+    if (!order) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Order not found' });
+    }
+
+    const htmlContent = generateInvoiceHTML(order);
+
+    const browser = await puppeteer.launch({ headless: 'new' });
+    const page = await browser.newPage();
+
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+    });
+
+    await browser.close();
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=invoice-${order.orderNumber}.pdf`
+    );
+
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ success: false, message: 'Failed to generate invoice' });
   }
 });

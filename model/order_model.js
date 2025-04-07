@@ -77,7 +77,10 @@ const OrderSchema = new mongoose.Schema(
     },
     subtotal: Number,
     taxAmount: Number,
-    shippingCost: Number,
+    shippingCost: {
+      type: Number,
+      default: 0,
+    },
     discount: Number,
     totalAmount: Number,
     invoiceUrl: String,
