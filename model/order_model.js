@@ -26,6 +26,7 @@ const OrderSchema = new mongoose.Schema(
             'PACKED',
             'SHIPPED',
             'DELIVERED',
+            'RETURN REQUESTED',
             'CANCELLED',
             'RETURNED',
           ],
@@ -105,17 +106,6 @@ const OrderSchema = new mongoose.Schema(
     discount: Number,
     totalAmount: Number,
     invoiceUrl: String,
-    returnRequest: {
-      // Optional: Keep order-level return request for full order returns
-      status: {
-        type: String,
-        enum: ['NONE', 'REQUESTED', 'APPROVED', 'REJECTED', 'COMPLETED'],
-        default: 'NONE',
-      },
-      reason: String,
-      requestedAt: Date,
-      resolvedAt: Date,
-    },
     orderNumber: {
       type: String,
       unique: true,

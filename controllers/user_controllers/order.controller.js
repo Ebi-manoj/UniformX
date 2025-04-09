@@ -79,17 +79,21 @@ export const placeOrder = asyncHandler(async (req, res) => {
       if (!item.productId) {
         throw new Error(`Product not found for cart item: ${item}`);
       }
+
+      const originalPrice = item.productId.price;
+      const discount = item.productId.discount || 0;
+      const discountedPrice = originalPrice - (originalPrice * discount) / 100;
       return {
         product: item.productId._id,
         title: item.productId.title,
-        price: item.productId.price,
-        size: item.size, // Assuming size comes from cart
+        price: discountedPrice,
+        size: item.size,
         quantity: item.quantity,
         image:
           item.productId.image_url && item.productId.image_url.length > 0
             ? item.productId.image_url[0]
             : null,
-        status: 'PROCESSING', // Initialize each item's status
+        status: 'PROCESSING',
         statusHistory: [
           {
             status: 'PROCESSING',
@@ -376,4 +380,45 @@ export const downloadInvoice = asyncHandler(async (req, res) => {
         .json({ success: false, message: 'Failed to generate invoice' });
     }
   }
+});
+
+// return order
+
+export const returnOrder = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  const { itemId, reason } = req.body;
+
+  if (!validateId(orderId)) {
+    return res.status(404).json({
+      success: false,
+      message: 'Invalid Order or you dont have Permission',
+    });
+  }
+  if (!itemId || !reason) {
+    return res.status(404).json({ success: false, messge: 'Field are empty' });
+  }
+
+  const order = await Order.findById(orderId);
+  if (!order)
+    return res.status(404).json({ success: false, messgae: 'Order not Found' });
+
+  const item = order.items.id(itemId);
+  if (!item)
+    return res.status(404).json({ success: false, message: 'Item not found' });
+
+  item.status = 'RETURN REQUESTED';
+  item.returnRequest = {
+    status: 'REQUESTED',
+    reason,
+    requestedAt: new Date(),
+    resolvedAt: new Date(),
+    refundAmount: item.price * item.quantity,
+  };
+  item.statusHistory.push({ status: 'RETURN REQUESTED', note: reason });
+
+  await order.save();
+  res.json({
+    success: true,
+    message: 'Return requested..Wait For the approval',
+  });
 });

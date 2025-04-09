@@ -95,3 +95,32 @@ updateStatusBtn.forEach(btn =>
     }
   })
 );
+
+//Approve return request
+document.querySelectorAll('.approve-return-btn').forEach(button => {
+  button.addEventListener('click', async () => {
+    const orderId = button.getAttribute('data-order-id');
+    const itemId = button.getAttribute('data-item-id');
+
+    try {
+      const response = await fetch(
+        `/admin/orders/${orderId}/approve-return/${itemId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      const data = await response.json();
+      if (data.success) {
+        showToast('Return approved successfully!', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        showToast('Failed to approve return: ' + data.message);
+      }
+    } catch (error) {
+      showToast('An error occurred: ' + error.message);
+    }
+  });
+});

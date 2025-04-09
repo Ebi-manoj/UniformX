@@ -2,6 +2,8 @@ import asyncHandler from 'express-async-handler';
 import { Order } from '../../model/order_model.js';
 import mongoose from 'mongoose';
 
+const TAX_RATE = 0.05;
+
 export const fetchAllOrders = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = 5;
@@ -145,4 +147,45 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     message: 'Order item status updated successfully',
     order,
   });
+});
+
+// Approve Return Request
+export const approveReturn = asyncHandler(async (req, res) => {
+  console.log('reached');
+
+  const { orderId, itemId } = req.params;
+
+  const order = await Order.findById(orderId);
+  if (!order)
+    return res.status(404).json({ success: false, message: 'Order not found' });
+
+  const item = order.items.id(itemId);
+  if (!item)
+    return res.status(404).json({ success: false, message: 'Item not found' });
+
+  if (
+    item.status !== 'RETURN REQUESTED' ||
+    item.returnRequest.status !== 'REQUESTED'
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: 'Item is not in a return requested state',
+    });
+  }
+
+  item.status = 'RETURNED';
+  item.paymentStatus = 'REFUNDED';
+  item.returnRequest.status = 'COMPLETED';
+  item.returnRequest.resolvedAt = new Date();
+  const baseAmount = item.price * item.quantity;
+  const taxAmount = baseAmount * TAX_RATE;
+  item.returnRequest.refundAmount = baseAmount + taxAmount;
+  item.statusHistory.push({
+    status: 'RETURNED',
+    note: 'Return approved and processed',
+  });
+
+  await order.save();
+
+  res.json({ success: true, message: 'Return approved and processed', order });
 });

@@ -32,6 +32,7 @@ import {
   getOrder,
   getOrderSucces,
   placeOrder,
+  returnOrder,
 } from '../controllers/user_controllers/order.controller.js';
 import { validateCartForCheckout } from '../middlewares/validatecart.js';
 import {
@@ -114,12 +115,8 @@ router.get(
 );
 router.get('/orders', isUserAuthenticated, fetchCartLength, getAllOrders);
 router.get('/order/:id', isUserAuthenticated, fetchCartLength, getOrder);
-router.post(
-  '/cancel-order/:orderId',
-  isUserAuthenticated,
-  fetchCartLength,
-  cancelOrder
-);
+router.post('/cancel-order/:orderId', isUserAuthenticated, cancelOrder);
+router.put('/return-order/:orderId', isUserAuthenticated, returnOrder);
 router.get(
   '/order/:orderId/invoice',
   isUserAuthenticated,

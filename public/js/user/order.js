@@ -67,3 +67,66 @@ if (cancelModal) {
     }
   });
 }
+
+// Return request Handling
+
+function returnOrder() {
+  const returnModal = document.getElementById('returnModal');
+  const btnReturn = document.querySelectorAll('.btn-return');
+  let orderId = null;
+  let itemId = null;
+
+  // Handling button clicks
+  btnReturn.forEach(btn =>
+    btn.addEventListener('click', function () {
+      orderId = this.dataset.orderId;
+      itemId = this.dataset.itemId;
+
+      console.log(orderId, itemId);
+
+      returnModal.classList.remove('hidden');
+    })
+  );
+
+  // Handling Closing the modal
+  const btnCloseReturn = document.getElementById('btnCloseReturn');
+  if (btnCloseReturn) {
+    btnCloseReturn.addEventListener('click', function () {
+      closeReturnModal();
+    });
+  }
+
+  function closeReturnModal() {
+    returnModal.classList.add('hidden');
+  }
+
+  // SUbmit the Response
+  const btnSubmitReturn = document.getElementById('btnSubmitReturn');
+  if (btnSubmitReturn) {
+    btnSubmitReturn.addEventListener('click', async function () {
+      const returnNote = document.getElementById('returnNote').value;
+
+      if (!returnNote) return showToast('Give a Valid reason');
+
+      // fetch return order request
+      try {
+        const response = await fetch(`/return-order/${orderId}`, {
+          method: 'PUT',
+          headers: { 'content-Type': 'application/json' },
+          body: JSON.stringify({ itemId, reason: returnNote }),
+        });
+        const data = await response.json();
+        if (data.success) {
+          showToast(data.message || 'Return Requested', 'success');
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        }
+      } catch (error) {
+        showToast('Something went wrong');
+      }
+    });
+  }
+}
+
+returnOrder();
