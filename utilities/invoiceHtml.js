@@ -1,4 +1,16 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 export const generateInvoiceHTML = order => {
+  const logo = fs.readFileSync(
+    path.join(__dirname, '../public/images/logo.png'),
+    'base64'
+  );
+  const imageTag = `<img src="data:image/png;base64,${logo}" class="watermark" alt="Logo" />`;
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -109,7 +121,7 @@ export const generateInvoiceHTML = order => {
         <p><strong>Total Amount:</strong> Rs ${order.totalAmount.toFixed(2)}</p>
       </div>
      
-          <img class="watermark" src="/images/logo.png" alt="Logo" />
+         ${imageTag} 
           
     
     </body>

@@ -36,6 +36,10 @@ import {
   toggleProduct,
   updateProduct,
 } from '../controllers/admin_controllers/product_admin.controller.js';
+import {
+  fetchAllOrders,
+  updateOrderStatus,
+} from '../controllers/admin_controllers/order.controller.js';
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -90,4 +94,8 @@ router.post(
   updateProduct
 );
 router.patch('/toggle-product/:id', isProtected, toggleProduct);
+
+// Order routes
+router.get('/orders', isProtected, fetchAllOrders);
+router.post('/order/update/:orderId', isProtected, updateOrderStatus);
 export default router;

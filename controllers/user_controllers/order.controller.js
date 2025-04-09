@@ -333,7 +333,6 @@ export const downloadInvoice = asyncHandler(async (req, res) => {
     }
 
     const htmlContent = generateInvoiceHTML(order);
-    console.log('Generated HTML Content:', htmlContent);
 
     // Launch Puppeteer
     const browser = await puppeteer.launch({
@@ -359,18 +358,13 @@ export const downloadInvoice = asyncHandler(async (req, res) => {
 
     await browser.close();
 
-    // Debug: Save PDF locally to verify
-    fs.writeFileSync('debug-invoice.pdf', pdfBuffer);
-    console.log('PDF saved as debug-invoice.pdf for debugging');
-
-    // Ensure no compression or encoding interferes
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
       `attachment; filename=invoice-${order.orderNumber}.pdf`
     );
     res.setHeader('Content-Length', pdfBuffer.length);
-    res.setHeader('Content-Transfer-Encoding', 'binary'); // Explicitly set binary encoding
+    res.setHeader('Content-Transfer-Encoding', 'binary');
 
     // Send the PDF buffer as a stream to avoid corruption
     res.send(Buffer.from(pdfBuffer));
