@@ -93,7 +93,8 @@ export const fetchAllOrders = asyncHandler(async (req, res) => {
 
 export const updateOrderStatus = asyncHandler(async (req, res) => {
   const { orderId } = req.params;
-  const { itemId, status, note } = req.body;
+  const { itemId, note } = req.body;
+  const status = req.body?.status.toUpperCase();
 
   const order = await Order.findById(orderId);
   if (!order) {
@@ -130,9 +131,9 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   if (
     status === 'DELIVERED' &&
     order.paymentMethod === 'COD' &&
-    order.paymentStatus === 'PENDING'
+    item.paymentStatus === 'PENDING'
   ) {
-    order.paymentStatus = 'COMPLETED';
+    item.paymentStatus = 'COMPLETED';
     order.paymentDetails = {
       ...order.paymentDetails,
       paidAt: Date.now(),

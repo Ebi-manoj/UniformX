@@ -31,7 +31,11 @@ const OrderSchema = new mongoose.Schema(
           ],
           default: 'PROCESSING',
         },
-
+        paymentStatus: {
+          type: String,
+          enum: ['PENDING', 'COMPLETED', 'FAILED', 'REFUNDED'],
+          default: 'PENDING',
+        },
         statusHistory: [
           {
             status: String,
@@ -49,6 +53,17 @@ const OrderSchema = new mongoose.Schema(
             date.setDate(date.getDate() + 7);
             return date;
           },
+        },
+        returnRequest: {
+          status: {
+            type: String,
+            enum: ['NONE', 'REQUESTED', 'APPROVED', 'REJECTED', 'COMPLETED'],
+            default: 'NONE',
+          },
+          reason: String,
+          requestedAt: Date,
+          resolvedAt: Date,
+          refundAmount: Number, // Amount refunded for this item
         },
       },
     ],
@@ -68,7 +83,13 @@ const OrderSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ['PENDING', 'COMPLETED', 'FAILED', 'REFUNDED'],
+      enum: [
+        'PENDING',
+        'PARTIALLY_COMPLETED',
+        'COMPLETED',
+        'FAILED',
+        'REFUNDED',
+      ],
       default: 'PENDING',
     },
     paymentDetails: {
@@ -85,6 +106,7 @@ const OrderSchema = new mongoose.Schema(
     totalAmount: Number,
     invoiceUrl: String,
     returnRequest: {
+      // Optional: Keep order-level return request for full order returns
       status: {
         type: String,
         enum: ['NONE', 'REQUESTED', 'APPROVED', 'REJECTED', 'COMPLETED'],
@@ -94,13 +116,16 @@ const OrderSchema = new mongoose.Schema(
       requestedAt: Date,
       resolvedAt: Date,
     },
-
     orderNumber: {
       type: String,
       unique: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 // Generate order number before saving
@@ -113,6 +138,43 @@ OrderSchema.pre('save', async function (next) {
       .replace(/-/g, '')}-${(count + 1).toString().padStart(3, '0')}`;
   }
   next();
+});
+
+// Method to update paymentStatus based on item statuses
+OrderSchema.methods.updatePaymentStatus = function () {
+  const paidItems = this.items.filter(
+    item => item.paymentStatus === 'COMPLETED'
+  ).length;
+  const totalItems = this.items.length;
+  const refundedItems = this.items.filter(
+    item => item.paymentStatus === 'REFUNDED'
+  ).length;
+  const allCompleted = this.items.every(
+    item => item.paymentStatus === 'COMPLETED'
+  );
+  const allRefunded = this.items.every(
+    item => item.paymentStatus === 'REFUNDED'
+  );
+
+  if (allCompleted) {
+    this.paymentStatus = 'COMPLETED';
+    this.paymentDetails = this.paymentDetails || {};
+    this.paymentDetails.paidAt = new Date();
+  } else if (refundedItems > 0 && refundedItems < totalItems) {
+    this.paymentStatus = 'PARTIALLY_COMPLETED';
+  } else if (allRefunded) {
+    this.paymentStatus = 'REFUNDED';
+  } else if (paidItems === 0 && this.paymentStatus !== 'FAILED') {
+    this.paymentStatus = 'PENDING';
+  }
+};
+
+// Pre-save middleware
+OrderSchema.pre('save', function (next) {
+  if (this.isModified('items')) {
+    this.updatePaymentStatus();
+    next();
+  }
 });
 
 export const Order = mongoose.model('Order', OrderSchema);

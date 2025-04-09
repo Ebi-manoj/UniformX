@@ -1,3 +1,5 @@
+import { showToast } from '../toast.js';
+
 // ToogleOrder Details
 const orderRow = document.querySelectorAll('.order-row');
 orderRow.forEach(btn => btn.addEventListener('click', toggleOrderDetails));
@@ -40,3 +42,56 @@ function applyFilters() {
 }
 
 applyFilters();
+
+//Show the clear buttton
+const clearBtn = document.getElementById('clearBtn');
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasFilters =
+    urlParams.get('search') ||
+    urlParams.get('status') ||
+    urlParams.get('payment') ||
+    urlParams.get('dateRange');
+
+  if (hasFilters) {
+    clearBtn.classList.remove('hidden');
+  }
+});
+
+// Remove filter when clicking the clear Button
+clearBtn.addEventListener('click', function () {
+  window.location.href = 'orders';
+});
+
+//Update Status of Particular Product
+const updateStatusBtn = document.querySelectorAll('.updateStatusBtn');
+
+updateStatusBtn.forEach(btn =>
+  btn.addEventListener('click', async function () {
+    const orderId = this.dataset.orderId;
+    const itemId = this.dataset.itemId;
+    const statusUpdateDiv = this.closest('.statusUpdate');
+    const status = statusUpdateDiv.querySelector('.selectStatus').value;
+
+    // fetch for Update Status
+    try {
+      const response = await fetch(`/admin/order/update/${orderId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId, status }),
+      });
+      const data = await response.json();
+
+      if (data.success) {
+        showToast(data.message || 'Status Updated', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        showToast('Something Went Wrong');
+      }
+    } catch (error) {
+      showToast('Internal Server issue');
+    }
+  })
+);

@@ -97,5 +97,5 @@ router.patch('/toggle-product/:id', isProtected, toggleProduct);
 
 // Order routes
 router.get('/orders', isProtected, fetchAllOrders);
-router.post('/order/update/:orderId', isProtected, updateOrderStatus);
+router.put('/order/update/:orderId', isProtected, updateOrderStatus);
 export default router;

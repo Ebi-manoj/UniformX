@@ -131,9 +131,11 @@
         </div>
         <div class="flex gap-2">
           <button
-            class="px-4 py-2 bg-black text-white rounded-md hover:bg-gray-800"
+            id="clearBtn"
+            class="hidden px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-800"
           >
-            <i class="fas fa-filter mr-2"></i> Filter
+          <i class="fa-solid fa-eraser"></i>   
+          clear     
           </button>
           <!-- <button
             class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
@@ -241,24 +243,32 @@
                                   <div class="text-sm text-gray-500">Qty: <%= item.quantity %></div>
                                 </div>
                               </div>
-                              <div class="mt-3">
-                                <div class="flex items-center">
-                                  <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div class="bg-black h-2.5 rounded-full" style="width: <%= item.status === 'DELIVERED' ? '100%' : item.status === 'SHIPPED' ? '75%' : '50%' %>"></div>
+                            <!-- Inside the item loop -->
+                                <div class="mt-3">
+                                  <div class="flex items-center">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                      <div class="bg-black h-2.5 rounded-full" style="width: <%= item.status === 'DELIVERED' ? '100%' : item.status === 'SHIPPED' ? '75%' : '50%' %>"></div>
+                                    </div>
+                                    <span class="ml-3 text-sm font-medium"><%= item.status %></span>
                                   </div>
-                                  <span class="ml-3 text-sm font-medium"><%= item.status %></span>
+                                  <div class="statusUpdate mt-2 flex gap-2">
+                                    <select class="selectStatus text-sm border border-gray-300 rounded px-2 py-1">
+                                      <option value="processing" <%= item.status === 'PROCESSING' ? 'selected' : '' %>>Processing</option>
+                                      <option value="packed" <%= item.status === 'PACKED' ? 'selected' : '' %>>Packed</option>
+                                      <option value="shipped" <%= item.status === 'SHIPPED' ? 'selected' : '' %>>Shipped</option>
+                                      <option value="delivered" <%= item.status === 'DELIVERED' ? 'selected' : '' %>>Delivered</option>
+                                      <option value="cancelled" <%= item.status === 'CANCELLED' ? 'selected' : '' %>>Cancelled</option>
+                                      <option value="returned" <%= item.status === 'RETURNED' ? 'selected' : '' %>>Returned</option>
+                                    </select>
+                                    <button data-order-id="<%= order._id %>" data-item-id="<%= item._id %>" class="updateStatusBtn text-sm px-3 py-1 bg-black text-white rounded hover:bg-gray-800">Update</button>
+                                  </div>
+                                  <div class="mt-1">
+                                    <span class="text-sm text-gray-600">Payment Status: </span>
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium status-<%= item.paymentStatus.toLowerCase().replace('_', '-') %>">
+                                      <%= item.paymentStatus %>
+                                    </span>
+                                  </div>
                                 </div>
-                                <div class="mt-2 flex gap-2">
-                                  <select class="text-sm border border-gray-300 rounded px-2 py-1">
-                                    <option value="processing" <%= item.status === 'PROCESSING' ? 'selected' : '' %>>Processing</option>
-                                    <option value="packed" <%= item.status === 'PACKED' ? 'selected' : '' %>>Packed</option>
-                                    <option value="shipped" <%= item.status === 'SHIPPED' ? 'selected' : '' %>>Shipped</option>
-                                    <option value="delivered" <%= item.status === 'DELIVERED' ? 'selected' : '' %>>Delivered</option>
-                                    <option value="cancelled" <%= item.status === 'CANCELLED' ? 'selected' : '' %>>Cancelled</option>
-                                  </select>
-                                  <button class="text-sm px-3 py-1 bg-black text-white rounded hover:bg-gray-800">Update</button>
-                                </div>
-                              </div>
                             </div>
                           </div>
                         </div>
