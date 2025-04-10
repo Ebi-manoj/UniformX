@@ -177,9 +177,14 @@ export const approveReturn = asyncHandler(async (req, res) => {
   item.paymentStatus = 'REFUNDED';
   item.returnRequest.status = 'COMPLETED';
   item.returnRequest.resolvedAt = new Date();
+
   const baseAmount = item.price * item.quantity;
-  const taxAmount = baseAmount * TAX_RATE;
-  item.returnRequest.refundAmount = baseAmount + taxAmount;
+  const totalSubtotal = order.subtotal;
+  const totalAmount = order.totalAmount;
+
+  const proportion = baseAmount / totalSubtotal;
+  item.returnRequest.refundAmount = +(proportion * totalAmount).toFixed(2);
+
   item.statusHistory.push({
     status: 'RETURNED',
     note: 'Return approved and processed',
