@@ -39,6 +39,7 @@ import {
 import {
   approveReturn,
   fetchAllOrders,
+  rejectReturn,
   updateOrderStatus,
 } from '../controllers/admin_controllers/order.controller.js';
 const router = express.Router();
@@ -104,4 +105,5 @@ router.put(
   isProtected,
   approveReturn
 );
+router.put('/orders/:orderId/reject-return/:itemId', isProtected, rejectReturn);
 export default router;

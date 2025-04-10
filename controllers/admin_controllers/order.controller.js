@@ -1,6 +1,7 @@
 import asyncHandler from 'express-async-handler';
 import { Order } from '../../model/order_model.js';
 import mongoose from 'mongoose';
+import { Product } from '../../model/product_model.js';
 
 const TAX_RATE = 0.05;
 
@@ -192,5 +193,49 @@ export const approveReturn = asyncHandler(async (req, res) => {
 
   await order.save();
 
-  res.json({ success: true, message: 'Return approved and processed', order });
+  const product = await Product.findById(item.product);
+  const selectedSize = product.sizes.find(s => s.size === item.size);
+  console.log(selectedSize);
+  selectedSize.stock_quantity += item.quantity;
+  await product.save();
+
+  res.json({
+    success: true,
+    message: 'Return approved and processed',
+    order,
+  });
+});
+
+export const rejectReturn = asyncHandler(async (req, res) => {
+  const { orderId, itemId } = req.params;
+
+  const order = await Order.findById(orderId);
+  if (!order)
+    return res.status(404).json({ success: false, message: 'Order not found' });
+
+  const item = order.items.id(itemId);
+  if (!item)
+    return res.status(404).json({ success: false, message: 'Item not found' });
+
+  if (
+    item.status !== 'RETURN REQUESTED' ||
+    item.returnRequest.status !== 'REQUESTED'
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: 'Item is not in a return requested state',
+    });
+  }
+
+  item.status = 'DELIVERED';
+  item.returnRequest.status = 'REJECTED';
+  item.returnRequest.resolvedAt = new Date();
+  item.statusHistory.push({
+    status: 'RETURN REJECTED',
+    note: 'Return request rejected',
+  });
+
+  await order.save();
+
+  res.json({ success: true, message: 'Return rejected', order });
 });

@@ -110,7 +110,7 @@
               <% const history = item.statusHistory ? item.statusHistory.find(h => h.status === step) : null; %>
               <div class="flex flex-col items-center">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center <%= item.status === step ? 'step-active' : history ? 'step-completed' : 'step-pending' %> mb-2">
-                  <i class="fas <%= step === 'PROCESSING' ? 'fa-clock' : step === 'PACKED' ? 'fa-check' : step === 'SHIPPED' ? 'fa-box' : step === 'DELIVERED' ? 'fa-truck' : step === 'RETURN REQUESTED' ? 'fa-hourglass-start' : step === 'RETURNED' ? 'fa-undo' : 'fa-times' %>"></i>
+                  <i class="fas <%= step === 'PROCESSING' ? 'fa-clock' : step === 'PACKED' ? 'fa-check' : step === 'SHIPPED' ? 'fa-box' : step === 'DELIVERED' ? 'fa-truck' : step === 'RETURNED REQUESTED' ? 'fa-hourglass-start' : step === 'RETURNED' ? 'fa-undo' : 'fa-times' %>"></i>
                 </div>
                 <span class="text-xs font-medium <%= item.status === step || history ? 'text-black' : 'text-gray-500' %>">
                   <%= step.replace('REQUESTED', '').charAt(0).toUpperCase() + step.replace('REQUESTED', '').slice(1).toLowerCase() %>
@@ -128,7 +128,7 @@
             <button class="btn btn-cancel cancel-item" data-order-id="<%= order._id %>" data-item-id="<%= item._id || index %>">Cancel Item</button>
           </div>
         <% } %>
-        <% if (item.status === 'DELIVERED') { %>
+        <% if (item.returnRequest.status!=='REJECTED' &&  item.status === 'DELIVERED') { %>
           <div class="mt-6 flex justify-end">
             <button class="px-2 py-2 bg-black text-white text-sm rounded-md hover:bg-gray-900 btn-return return-item" data-order-id="<%= order._id %>" data-item-id="<%= item._id || index %>">Return Item</button>
           </div>
@@ -136,6 +136,11 @@
         <% if (item.status === 'RETURN REQUESTED') { %>
           <div class="mt-6 flex justify-end">
             <span class="text-yellow-600 text-sm">Return Requested - Awaiting Approval</span>
+          </div>
+        <% } %> 
+        <% if (item.returnRequest.status === 'REJECTED') { %>
+          <div class="mt-6 flex justify-end">
+            <span class="text-red-600 text-sm">Return request- Rejected</span>
           </div>
         <% } %>
       </div>

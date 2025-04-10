@@ -124,3 +124,29 @@ document.querySelectorAll('.approve-return-btn').forEach(button => {
     }
   });
 });
+
+document.querySelectorAll('.reject-return-btn').forEach(button => {
+  button.addEventListener('click', async () => {
+    const orderId = button.getAttribute('data-order-id');
+    const itemId = button.getAttribute('data-item-id');
+
+    try {
+      const response = await fetch(
+        `/admin/orders/${orderId}/reject-return/${itemId}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      const result = await response.json();
+      if (result.success) {
+        alert('Return rejected successfully!');
+        location.reload();
+      } else {
+        alert('Failed to reject return: ' + result.message);
+      }
+    } catch (error) {
+      alert('An error occurred: ' + error.message);
+    }
+  });
+});
