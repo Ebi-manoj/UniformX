@@ -13,17 +13,16 @@ const userMain = './layouts/user_main';
 export const listProducts = asyncHandler(async (req, res) => {
   const {
     search,
-    categories, // Now supporting multiple categories
-    club, // Club filter
-    colors, // Colors filter
-    sizes, // Sizes filter
+    categories,
+    club,
+    colors,
+    sizes,
     minPrice,
     maxPrice,
     sort,
     page = 1,
     limit = 10,
   } = req.query;
-  console.log(req.query);
 
   // Build query object
   const query = { is_deleted: false };
@@ -87,17 +86,7 @@ export const listProducts = asyncHandler(async (req, res) => {
   const products = await Product.aggregate([
     { $match: query },
     {
-      $lookup: {
-        from: 'reviews',
-        localField: '_id',
-        foreignField: 'product_id',
-        as: 'reviews',
-      },
-    },
-    {
       $addFields: {
-        averageRating: { $avg: '$reviews.rating' },
-        reviewCount: { $size: '$reviews' },
         discountedPrice: {
           $subtract: [
             '$price',
@@ -122,16 +111,15 @@ export const listProducts = asyncHandler(async (req, res) => {
         club_id: 1,
         colors: 1,
         sizes: 1,
-        averageRating: 1,
-        reviewCount: 1,
         discountPercentage: 1,
+        averageRating: 1,
+        numReviews: 1,
       },
     },
   ]);
 
   // Fetch Unique Colors from Products
   const uniqueColors = await Product.distinct('color');
-  console.log(uniqueColors);
 
   // Fetch Categories & Clubs
   const categoriesList = await Category.find();
@@ -140,6 +128,7 @@ export const listProducts = asyncHandler(async (req, res) => {
   // Fetch Total Product Count for Pagination
   const totalProducts = await Product.countDocuments(query);
   const totalPages = Math.ceil(totalProducts / limitNumber);
+  console.log(products);
 
   // Render Page
   res.render('user/productlist', {
