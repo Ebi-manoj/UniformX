@@ -6,6 +6,8 @@ import { Category } from '../../model/category_model.js';
 import { Club } from '../../model/club_model.js';
 import { productDetails } from '../../utilities/DbQueries.js';
 import { Wishlist } from '../../model/wishlist.js';
+import { Order } from '../../model/order_model.js';
+import { validateId } from '../../utilities/validateId.js';
 const userMain = './layouts/user_main';
 
 export const listProducts = asyncHandler(async (req, res) => {
@@ -174,6 +176,58 @@ export const getProductDetails = asyncHandler(async (req, res) => {
   const clubsList = await Club.find();
   console.log(isWishlisted);
 
+  // Review
+  console.log(product[0]._id);
+
+  const reviews = await Review.find({ product: product[0]._id })
+    .populate('user', 'full_name')
+    .sort({ createdAt: -1 });
+  console.log(reviews);
+
+  // Calculate average rating
+  const averageRating = reviews.length
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    : 0;
+
+  const formattedReviews = reviews.map(r => ({
+    name: r.user.full_name,
+    initials: r.user.full_name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase(),
+    rating: r.rating,
+    comment: r.comment,
+    date: new Date(r.createdAt).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+    }),
+  }));
+
+  //checking the userCan write the review or not
+  let hasReviewed = false;
+  let hasPurchased = false;
+
+  const existed = await Review.findOne({
+    user: userId,
+    product: product[0]._id,
+  });
+
+  hasReviewed = !!existed;
+
+  const order = await Order.find({
+    user: userId,
+    items: {
+      $elemMatch: {
+        product: product[0]._id,
+        status: { $in: ['DELIVERED', 'RETURNED'] },
+      },
+    },
+  });
+
+  hasPurchased = !!order.length;
+  console.log(hasReviewed, hasPurchased);
+
   res.render('user/product_details', {
     layout: userMain,
     js_file: 'cart',
@@ -182,77 +236,53 @@ export const getProductDetails = asyncHandler(async (req, res) => {
     clubs: clubsList,
     product: product[0],
     alternativeProduct: product[0]?.alternativeProduct || null,
+    reviews: formattedReviews,
+    averageRating,
+    writeReview: hasPurchased && !hasReviewed,
   });
 });
 
-// Add Review
 export const addReview = asyncHandler(async (req, res) => {
-  const { product_id } = req.params;
-  const { rating, review_text } = req.body;
-  const user_id = req.user._id; // Assuming authentication middleware
+  const { productId } = req.params;
+  const { rating, comment } = req.body;
+  if (!rating || !comment) {
+    return res
+      .status(404)
+      .json({ success: false, message: 'Field cannot be empty' });
+  }
+  const userId = req.user._id;
+  if (!validateId(userId)) {
+    return res.status(401).json({ success: false, message: 'Session expired' });
+  }
+
+  if (!validateId(productId))
+    return res.status(404).json({ success: false, message: 'Invalid Product' });
+
+  const order = await Order.find({
+    user: userId,
+    items: {
+      $elemMatch: {
+        product: productId,
+        status: { $in: ['DELIVERED', 'RETURNED'] },
+      },
+    },
+  });
+
+  if (order.length === 0) {
+    return res
+      .status(401)
+      .json({ success: false, message: 'You dont have the permission' });
+  }
 
   const review = new Review({
-    product_id,
-    user_id,
+    user: userId,
+    product: productId,
+    comment,
     rating,
-    review_text,
-    verified_purchase: false, // You'd implement actual verification logic
   });
 
   await review.save();
-
-  res.status(201).json({ message: 'Review added successfully', review });
-});
-
-// Get Product Reviews
-export const getProductReviews = asyncHandler(async (req, res) => {
-  const { product_id } = req.params;
-  const { page = 1, limit = 10 } = req.query;
-
-  const reviews = await Review.aggregate([
-    {
-      $match: {
-        product_id: mongoose.Types.ObjectId(product_id),
-        is_active: true,
-      },
-    },
-    // Lookup user details
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'user_id',
-        foreignField: '_id',
-        as: 'user',
-      },
-    },
-    { $unwind: '$user' },
-    // Sort by most recent
-    { $sort: { createdAt: -1 } },
-    // Pagination
-    { $skip: (page - 1) * limit },
-    { $limit: Number(limit) },
-    // Project needed fields
-    {
-      $project: {
-        rating: 1,
-        review_text: 1,
-        images: 1,
-        createdAt: 1,
-        'user.full_name': 1,
-        'user.avatar': 1,
-      },
-    },
-  ]);
-
-  const totalReviews = await Review.countDocuments({
-    product_id: mongoose.Types.ObjectId(product_id),
-    is_active: true,
-  });
-
-  res.json({
-    reviews,
-    currentPage: page,
-    totalPages: Math.ceil(totalReviews / limit),
-    totalReviews,
-  });
+  res
+    .status(200)
+    .json({ success: true, message: 'Review posted successfully' });
 });

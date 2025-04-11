@@ -3,6 +3,7 @@ import { getHome } from '../controllers/user_controllers/auth_user.controller.js
 import { isUserAuthenticated } from '../middlewares/auth_middleware.js';
 import { fetchCartLength, fetchCategories } from '../middlewares/middleware.js';
 import {
+  addReview,
   getProductDetails,
   listProducts,
 } from '../controllers/user_controllers/product.controller.js';
@@ -84,7 +85,7 @@ router.post('/cart/add', isUserAuthenticated, addToCart);
 router.post('/cart/update', isUserAuthenticated, updateCartQunatity);
 router.delete('/cart/remove-item', isUserAuthenticated, removecartItem);
 
-// Whihslist
+// Wishlist
 router.get('/wishlist', isUserAuthenticated, fetchCartLength, fetchWishlist);
 router.post(
   '/add-wishlist',
@@ -124,4 +125,6 @@ router.get(
   downloadInvoice
 );
 
+// review
+router.post('/add-review/:productId', isUserAuthenticated, addReview);
 export default router;

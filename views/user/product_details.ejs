@@ -166,16 +166,16 @@
                 <div class="flex items-center mb-2">
                     <div class="star-rating flex mr-2">
                         <% for(let i = 0; i < 5; i++) { %>
-                            <% if (i < Math.floor(product.averageRating)) { %>
+                            <% if (i < Math.floor(averageRating)) { %>
                                 <i class="fas fa-star text-yellow-500"></i>
-                            <% } else if (i < product.averageRating) { %>
+                            <% } else if (i < averageRating) { %>
                                 <i class="fas fa-star-half-alt text-yellow-500"></i>
                             <% } else { %>
                                 <i class="far fa-star text-yellow-500"></i>
                             <% } %>
                         <% } %>
                     </div>
-                    <span class="text-sm text-gray-600">(<%= product.reviewCount %> Reviews)</span>
+                    <span class="text-sm text-gray-600">(<%= reviews.length %> Reviews)</span>
                 </div>
                 
                 
@@ -211,21 +211,21 @@
                 <div class="mb-6">
                     <h3 class="text-sm font-medium text-gray-900 mb-2">AVAILABLE TYPES</h3>
                     <div class="flex space-x-2">
-                      <% if (product.relatedProducts && product.relatedProducts.length > 0) { %>
+                    <% if (product.relatedProducts && product.relatedProducts.length > 0) { %>
                         <% product.relatedProducts.forEach(relatedProduct => { %>
-                          <a href="/product/<%= relatedProduct.slug %>">
+                        <a href="/product/<%= relatedProduct.slug %>">
                             <button class="px-4 py-2 border border-gray-300 rounded text-sm font-medium <%= relatedProduct.type === product.type ? 'bg-gray-900 text-white' : 'bg-gray-100' %>">
-                              <%= relatedProduct.type || 'Unknown Type' %>
+                            <%= relatedProduct.type || 'Unknown Type' %>
                             </button>
-                          </a>
+                        </a>
                         <% }); %>
-                      <% } else { %>
+                    <% } else { %>
                         <button class="px-4 py-2 border border-gray-300 rounded text-sm font-medium bg-gray-900 text-white">
-                          <%= product.type || 'Unknown Type' %>
+                        <%= product.type || 'Unknown Type' %>
                         </button>
-                      <% } %>
+                    <% } %>
                     </div>
-                  </div>
+                </div>
                 
                 <!-- Select Size -->
                 <div class="mb-6">
@@ -260,8 +260,8 @@
                         </button>
                     </div>
                 </div>
-                 <!-- Color -->
-                 <div class="mb-6">
+                <!-- Color -->
+                <div class="mb-6">
                     <h3 class="text-sm font-medium text-gray-900 mb-2">COLOR</h3>
                     <div class="flex space-x-2">
                         <div class="w-6 h-6 rounded-full border border-gray-300 cursor-pointer" style="background-color: <%= product.color %>;"></div>
@@ -276,14 +276,14 @@
                     <button id="addToWishlist" data-product-id="<%= product._id %>" 
                         class="w-12 h-12 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 transition-colors">
                         <i id="wishlist-icon" class="<%= isWishlisted ? 'fas' : 'far' %> fa-heart text-red-500 text-[1.2rem]"></i>
-                      </button>
+                    </button>
                 </div>
                 
                 <div class="text-sm text-gray-600 mb-8">
                     + FREE SHIPPING ON ORDERS $50+
                 </div>
                 
-               
+            
                 
             </div>
         </div>
@@ -321,100 +321,142 @@
             </div>
             
             
-            
+            <!-- review -->
             <div id="reviews" class="tab-content py-6">
-                <div class="mb-8">
-                    <div class="flex items-center mb-4">
-                        <div class="star-rating flex mr-3">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
-                        <span class="text-lg font-medium">4.5 out of 5</span>
+                <div class="max-w-3xl mx-auto px-4 py-8">
+            
+                <!-- Reviews Header -->
+                <div class="mb-6">
+                    <h2 class="text-xl font-medium mb-6">Reviews</h2>
+            
+                    <% if (reviews.length > 0) { %>
+                    <div class="flex items-center">
+                        <div class="text-3xl font-bold mr-2"><%= averageRating.toFixed(1) %></div>
+                        <div class="text-sm text-gray-500">— <%= reviews.length %> Reviews</div>
                     </div>
-                    <p class="text-gray-600">Based on 24 reviews</p>
+                    <% } else { %>
+                    <div class="text-gray-500 text-sm italic">No reviews yet</div>
+                    <% } %>
                 </div>
-                
-                <!-- Individual Reviews -->
-                <div class="space-y-6">
-                    <div class="border-b border-gray-200 pb-6">
-                        <div class="flex items-center mb-2">
-                            <div class="star-rating flex mr-2">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span class="font-medium">Great quality!</span>
+            
+                <!-- Write Review Button  -->
+                <div class="flex justify-between items-center mb-8">
+                    <% if (writeReview) { %>
+                        <button id="btnReview" class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                            Write a review
+                        </button>
+                    <% } %>
+            
+                </div>
+            
+                <!-- Divider -->
+                <div class="border-t border-gray-200 mb-6"></div>
+            
+                <!-- Reviews List -->
+                <% if (reviews.length > 0) { %>
+                    <div class="space-y-8">
+                    <% reviews.forEach((review) => { %>
+                        <div class="flex">
+                        <div class="mr-4">
+                            <div class="avatar w-10 h-10 rounded-full bg-slate-200 text-blue-400 flex items-center justify-center"><%= review.initials %></div>
                         </div>
-                        <p class="text-sm text-gray-600 mb-2">John D. - 2 weeks ago</p>
-                        <p class="text-gray-700">
-                            The jersey is exactly as described. The material feels premium and the fit is perfect. I've worn it to several games now and received many compliments. Highly recommend!
-                        </p>
-                    </div>
-                    
-                    <div class="border-b border-gray-200 pb-6">
-                        <div class="flex items-center mb-2">
-                            <div class="star-rating flex mr-2">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="far fa-star" class="star-empty"></i>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1">
+                            <h3 class="font-medium"><%= review.name %></h3>
+                            <div class="flex">
+                                <% for (let i = 1; i <= 5; i++) { %>
+                                <% if (i <= review.rating) { %>
+                                    <i class="star-filled fas fa-star"></i>
+                                <% } else { %>
+                                    <i class="star-empty far fa-star"></i>
+                                <% } %>
+                                <% } %>
                             </div>
-                            <span class="font-medium">Good but sizing runs small</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-2">Sarah M. - 1 month ago</p>
-                        <p class="text-gray-700">
-                            The jersey looks great and the quality is good, but I found the sizing to run a bit small. I usually wear a medium but had to exchange for a large. Other than that, I'm very happy with my purchase.
-                        </p>
-                    </div>
-                    
-                    <div class="pb-6">
-                        <div class="flex items-center mb-2">
-                            <div class="star-rating flex mr-2">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
                             </div>
-                            <span class="font-medium">Excellent jersey, fast shipping</span>
+                            <p class="text-xs text-gray-500 uppercase mb-2"><%= review.date %></p>
+                            <p class="text-gray-700"><%= review.comment %></p>
                         </div>
-                        <p class="text-sm text-gray-600 mb-2">Michael T. - 3 weeks ago</p>
-                        <p class="text-gray-700">
-                            I'm very impressed with both the quality of the jersey and the speed of delivery. The colors are vibrant and the material is comfortable even during hot weather. Will definitely buy from here again.
-                        </p>
+                        </div>
+                    <% }) %>
                     </div>
+            
+                    <!-- Load More Button -->
+                    <div class="mt-8 text-center">
+                    <button class="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                        Load more reviews
+                    </button>
+                    </div>
+                <% } %>
+            
                 </div>
             </div>
+            
         </div>
     </div>
 
+    <!-- Modal for review -->
+
+         <!-- Modal Background -->
+    <div
+    id="ratingModal"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-40"
+  >
+    <!-- Modal Box -->
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+      <!-- Close Button -->
+      <button
+        class="btnCloseReview absolute top-3 right-3 text-2xl text-gray-500 hover:text-black"
+      >
+        &times;
+      </button>
+
+      <!-- Modal Title -->
+      <h2 class="text-xl font-semibold mb-4">Leave a Review</h2>
+
+      <!-- Rating Stars -->
+      <div id="stars" class="flex mb-4">
+        <!-- Stars will be dynamically generated -->
+      </div>
+
+      <!-- Comment Field -->
+      <textarea
+        id="comment"
+        class="w-full border rounded p-2 mb-4"
+        rows="4"
+        placeholder="Write your comment..."
+      ></textarea>
+
+      <!-- Submit Button -->
+      <div class="text-right">
+        <button
+          data-product-id="<%= product._id %>"
+          class="btnSubmit bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
     <script>
-        // Image Slider
-      
-// Image Slider
-const imageArrayInput = document.getElementById("imageArray").value;
-const slides = imageArrayInput ? JSON.parse(imageArrayInput) : [];
+    // Image Slider
+    const imageArrayInput = document.getElementById("imageArray").value;
+    const slides = imageArrayInput ? JSON.parse(imageArrayInput) : [];
 
-let currentSlideIndex = 0;
+    let currentSlideIndex = 0;
 
-function changeSlide(n) {
+    function changeSlide(n) {
     goToSlide(currentSlideIndex + n);
-}
+    }
 
-function goToSlide(n) {
+    function goToSlide(n) {
     const navItems = document.querySelectorAll('.slider-nav-item');
-    
+
     // Remove active class from all nav items
     navItems.forEach(item => {
         item.classList.remove('active');
     });
-    
+
     // Calculate the new slide index
     if (n >= slides.length) {
         currentSlideIndex = 0;
@@ -423,37 +465,37 @@ function goToSlide(n) {
     } else {
         currentSlideIndex = n;
     }
-    
+
     // Update the current slide image
     document.getElementById('currentSlide').src = slides[currentSlideIndex];
-    
+
     // Add active class to current nav item
     navItems[currentSlideIndex].classList.add('active');
-    
-}
 
-// Image Zoom Functionality
-function initZoom() {
+    }
+
+    // Image Zoom Functionality
+    function initZoom() {
     const img = document.getElementById('currentSlide');
     const lens = document.getElementById('lens');
     const result = document.getElementById('zoomResult');
     const container = document.getElementById('imageContainer');
-    
+
     // Initial setup - hide lens and result
     lens.style.display = "none";
     result.style.display = "none";
-    
+
     // Add event listeners
     container.addEventListener("click", function() {
         showZoom();
     });
-    
+
     container.addEventListener("mouseleave", function() {
         hideZoom();
     });
-    
+
     container.addEventListener("mousemove", moveLens);
-    
+
     function moveLens(e) {
         // Prevent any other actions that may occur when moving over the image
         e.preventDefault();
@@ -490,7 +532,7 @@ function initZoom() {
         result.style.backgroundSize = (imgRect.width * cx) + "px " + (imgRect.height * cy) + "px";
         result.style.backgroundPosition = "-" + (x * cx) + "px -" + (y * cy) + "px";
     }
-    
+
     function getCursorPos(e) {
         // Get the x and y positions of the image
         const imgRect = img.getBoundingClientRect();
@@ -501,46 +543,46 @@ function initZoom() {
         
         return {x: x, y: y};
     }
-}
+    }
 
-function showZoom() {
+    function showZoom() {
     const lens = document.getElementById('lens');
     const result = document.getElementById('zoomResult');
-    
+
     lens.style.display = "block";
     result.style.display = "block";
-}
+    }
 
-function hideZoom() {
+    function hideZoom() {
     document.getElementById('lens').style.display = "none";
     document.getElementById('zoomResult').style.display = "none";
-}
+    }
 
-// Initialize zoom when the page loads
-document.addEventListener('DOMContentLoaded', function() {
+    // Initialize zoom when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
     initZoom();
-});
+    });
 
-// Tabs Functionality
-function openTab(evt, tabName) {
+    // Tabs Functionality
+    function openTab(evt, tabName) {
     // Hide all tab content
     const tabContents = document.getElementsByClassName('tab-content');
     for (let i = 0; i < tabContents.length; i++) {
         tabContents[i].classList.remove('active');
     }
-    
+
     // Remove active class from all tab buttons
     const tabButtons = document.getElementsByClassName('tab-button');
     for (let i = 0; i < tabButtons.length; i++) {
         tabButtons[i].classList.remove('border-gray-900', 'text-gray-900');
         tabButtons[i].classList.add('border-transparent', 'text-gray-500');
     }
-    
+
     // Show the selected tab content
     document.getElementById(tabName).classList.add('active');
-    
+
     // Add active class to the clicked button
     evt.currentTarget.classList.remove('border-transparent', 'text-gray-500');
     evt.currentTarget.classList.add('border-gray-900', 'text-gray-900');
-}
+    }
     </script>

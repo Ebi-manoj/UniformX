@@ -42,6 +42,84 @@ if (productDetail) {
     e.target.classList.add('selected');
     quantityInput.value = 1;
   }
+
+  // Adding review for the product
+
+  const btnReview = document.getElementById('btnReview');
+  if (btnReview) {
+    btnReview.addEventListener('click', toggleModal);
+  }
+  document
+    .querySelector('.btnCloseReview')
+    .addEventListener('click', toggleModal);
+  document.querySelector('.btnSubmit').addEventListener('click', submitReview);
+
+  const starsContainer = document.getElementById('stars');
+  let currentRating = 0;
+
+  // Create 5 stars
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('span');
+    star.classList = 'text-2xl cursor-pointer text-gray-300';
+    star.innerHTML = '★';
+    star.dataset.value = i;
+
+    // Hover & Click effects
+    star.addEventListener('click', () => {
+      currentRating = i;
+      updateStars(i);
+    });
+
+    star.addEventListener('mouseover', () => updateStars(i));
+    star.addEventListener('mouseout', () => updateStars(currentRating));
+
+    starsContainer.appendChild(star);
+  }
+
+  function updateStars(rating) {
+    const allStars = starsContainer.querySelectorAll('span');
+    allStars.forEach((star, idx) => {
+      star.classList =
+        idx < rating
+          ? 'text-yellow-400 text-2xl cursor-pointer'
+          : 'text-gray-300 text-2xl cursor-pointer';
+    });
+  }
+
+  function toggleModal() {
+    const modal = document.getElementById('ratingModal');
+    modal.classList.toggle('hidden');
+    modal.classList.toggle('flex');
+  }
+
+  async function submitReview() {
+    const productId = this.dataset.productId;
+    const comment = document.getElementById('comment').value;
+    if (!currentRating || !comment.trim()) {
+      showToast('Please provide a rating and comment.');
+      return;
+    }
+    try {
+      const response = await fetch(`/add-review/${productId}`, {
+        method: 'POST',
+        headers: { 'content-Type': 'application/json' },
+        body: JSON.stringify({ rating: currentRating, comment }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast('Review Posted Successfully', 'success');
+        toggleModal();
+        currentRating = 0;
+        updateStars(0);
+        document.getElementById('comment').value = '';
+      } else {
+        showToast(data.message || 'Something went wrong');
+      }
+    } catch (error) {
+      console.log(error);
+      showToast('Something went wrong');
+    }
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////

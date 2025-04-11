@@ -2,14 +2,14 @@ import mongoose from 'mongoose';
 
 const reviewSchema = new mongoose.Schema(
   {
-    product_id: {
+    product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'product',
       required: true,
     },
-    user_id: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: 'user',
       required: true,
     },
     rating: {
@@ -18,17 +18,9 @@ const reviewSchema = new mongoose.Schema(
       min: 1,
       max: 5,
     },
-    review_text: {
+    comment: {
       type: String,
       trim: true,
-    },
-    verified_purchase: {
-      type: Boolean,
-      default: false,
-    },
-    is_active: {
-      type: Boolean,
-      default: true,
     },
   },
   {
@@ -37,6 +29,6 @@ const reviewSchema = new mongoose.Schema(
 );
 
 // Compound index to prevent duplicate reviews by same user for same product
-reviewSchema.index({ product_id: 1, user_id: 1 }, { unique: true });
+reviewSchema.index({ product: 1, user: 1 }, { unique: true });
 
 export const Review = mongoose.model('review', reviewSchema);
