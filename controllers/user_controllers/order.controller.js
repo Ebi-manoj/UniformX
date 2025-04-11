@@ -191,7 +191,9 @@ export const getOrderSucces = asyncHandler(async (req, res) => {
 ///////////////////////////////////////////
 //Get All Orders
 export const getAllOrders = asyncHandler(async (req, res) => {
-  const orders = await Order.find()
+  const userId = req.user._id;
+
+  const orders = await Order.find({ user: userId })
     .sort({ createdAt: -1 })
     .populate('user', 'full_name email');
   res.render('user/orders', { layout: userMain, orders, js_file: 'order' });

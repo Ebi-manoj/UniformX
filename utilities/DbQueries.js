@@ -83,83 +83,10 @@ export function productDetails(slug) {
         as: 'relatedProducts',
       },
     },
-    // Lookup reviews
-    {
-      $lookup: {
-        from: 'reviews',
-        localField: '_id',
-        foreignField: 'product_id',
-        as: 'reviews',
-      },
-    },
-
-    // Filter active reviews and populate user_id
-    {
-      $addFields: {
-        reviews: {
-          $filter: {
-            input: '$reviews',
-            as: 'review',
-            cond: { $eq: ['$$review.is_active', true] },
-          },
-        },
-      },
-    },
-
-    // Lookup user details for each review
-    {
-      $lookup: {
-        from: 'users',
-        localField: 'reviews.user_id',
-        foreignField: '_id',
-        as: 'reviewUsers',
-      },
-    },
-
-    // Map reviews with user names
-    {
-      $addFields: {
-        reviews: {
-          $map: {
-            input: '$reviews',
-            as: 'review',
-            in: {
-              $mergeObjects: [
-                '$$review',
-                {
-                  user: {
-                    $arrayElemAt: [
-                      '$reviewUsers',
-                      {
-                        $indexOfArray: ['$reviewUsers._id', '$$review.user_id'],
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        },
-      },
-    },
-
-    // Sort reviews by date (newest first)
-    {
-      $addFields: {
-        reviews: {
-          $sortArray: {
-            input: '$reviews',
-            sortBy: { createdAt: -1 },
-          },
-        },
-      },
-    },
 
     // Add calculated fields
     {
       $addFields: {
-        averageRating: { $avg: '$reviews.rating' },
-        reviewCount: { $size: '$reviews' },
         totalStock: { $sum: '$sizes.stock_quantity' },
         stockStatus: {
           $cond: {
@@ -186,17 +113,12 @@ export function productDetails(slug) {
         color: 1,
         averageRating: 1,
         reviewCount: 1,
-        reviews: {
-          rating: 1,
-          review_text: 1,
-          verified_purchase: 1,
-          createdAt: 1,
-          'user.name': 1,
-        },
         stockStatus: 1,
         discountPercentage: 1,
         relatedProducts: 1, // Include all related products
         maxQuantity: 1,
+        averageRating: 1,
+        numReviews: 1,
       },
     },
   ];

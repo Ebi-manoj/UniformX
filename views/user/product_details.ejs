@@ -166,16 +166,16 @@
                 <div class="flex items-center mb-2">
                     <div class="star-rating flex mr-2">
                         <% for(let i = 0; i < 5; i++) { %>
-                            <% if (i < Math.floor(averageRating)) { %>
+                            <% if (i < Math.floor(product.averageRating)) { %>
                                 <i class="fas fa-star text-yellow-500"></i>
-                            <% } else if (i < averageRating) { %>
+                            <% } else if (i < product.averageRating) { %>
                                 <i class="fas fa-star-half-alt text-yellow-500"></i>
                             <% } else { %>
                                 <i class="far fa-star text-yellow-500"></i>
                             <% } %>
                         <% } %>
                     </div>
-                    <span class="text-sm text-gray-600">(<%= reviews.length %> Reviews)</span>
+                    <span class="text-sm text-gray-600">(<%= product.numReviews %> Reviews)</span>
                 </div>
                 
                 
@@ -331,8 +331,8 @@
             
                     <% if (reviews.length > 0) { %>
                     <div class="flex items-center">
-                        <div class="text-3xl font-bold mr-2"><%= averageRating.toFixed(1) %></div>
-                        <div class="text-sm text-gray-500">— <%= reviews.length %> Reviews</div>
+                        <div class="text-3xl font-bold mr-2"><%=product.averageRating %></div>
+                        <div class="text-sm text-gray-500">— <%= product.numReviews %> Reviews</div>
                     </div>
                     <% } else { %>
                     <div class="text-gray-500 text-sm italic">No reviews yet</div>

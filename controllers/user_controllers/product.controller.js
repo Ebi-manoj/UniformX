@@ -168,9 +168,12 @@ export const getProductDetails = asyncHandler(async (req, res) => {
   }
   //checking wishlisted true
   const wishlist = await Wishlist.findOne({ userId });
-  const isWishlisted = wishlist.items.some(
-    item => item.productId.toString() === product[0]._id.toString()
-  );
+  let isWishlisted;
+  if (wishlist) {
+    isWishlisted = wishlist.items.some(
+      item => item.productId.toString() === product[0]._id.toString()
+    );
+  }
 
   const categoriesList = await Category.find();
   const clubsList = await Club.find();
@@ -183,11 +186,6 @@ export const getProductDetails = asyncHandler(async (req, res) => {
     .populate('user', 'full_name')
     .sort({ createdAt: -1 });
   console.log(reviews);
-
-  // Calculate average rating
-  const averageRating = reviews.length
-    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-    : 0;
 
   const formattedReviews = reviews.map(r => ({
     name: r.user.full_name,
@@ -226,7 +224,7 @@ export const getProductDetails = asyncHandler(async (req, res) => {
   });
 
   hasPurchased = !!order.length;
-  console.log(hasReviewed, hasPurchased);
+  console.log(product[0]);
 
   res.render('user/product_details', {
     layout: userMain,
@@ -237,7 +235,6 @@ export const getProductDetails = asyncHandler(async (req, res) => {
     product: product[0],
     alternativeProduct: product[0]?.alternativeProduct || null,
     reviews: formattedReviews,
-    averageRating,
     writeReview: hasPurchased && !hasReviewed,
   });
 });
@@ -282,6 +279,18 @@ export const addReview = asyncHandler(async (req, res) => {
   });
 
   await review.save();
+  const allReviews = await Review.find({ product: productId });
+  const averageRating = allReviews.length
+    ? (
+        allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
+      ).toFixed(1)
+    : 0;
+
+  const product = await Product.findById(productId);
+  product.averageRating = parseFloat(averageRating) ?? product.averageRating;
+  product.numReviews = allReviews.length ?? product.numReviews;
+  await product.save();
+
   res
     .status(200)
     .json({ success: true, message: 'Review posted successfully' });
