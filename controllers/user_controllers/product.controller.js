@@ -85,6 +85,34 @@ export const listProducts = asyncHandler(async (req, res) => {
   // Fetch Products with filters, sorting, and pagination
   const products = await Product.aggregate([
     { $match: query },
+    // lookup for category
+    {
+      $lookup: {
+        from: 'categories',
+        localField: 'category_id',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    { $unwind: '$category' },
+    //lookup for club
+    {
+      $lookup: {
+        from: 'clubs',
+        localField: 'club_id',
+        foreignField: '_id',
+        as: 'club',
+      },
+    },
+    { $unwind: '$club' },
+    // listing only club and catgeories active
+    {
+      $match: {
+        'category.isActive': true,
+        'club.isActive': true,
+      },
+    },
+    // discount price
     {
       $addFields: {
         discountedPrice: {

@@ -278,6 +278,10 @@
                             <span class="font-medium">₹<%= order.subtotal.toFixed(2) %></span>
                           </div>
                           <div class="flex justify-between gap-8 mb-1">
+                            <span class="text-gray-600">Discount:</span>
+                            <span class="font-medium text-red-600">-₹<%= order.discount.toFixed(2) %></span>
+                          </div>
+                          <div class="flex justify-between gap-8 mb-1">
                             <span class="text-gray-600">Shipping:</span>
                             <span class="font-medium">₹<%= order.shippingCost.toFixed(2) %></span>
                           </div>

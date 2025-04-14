@@ -152,33 +152,36 @@ export const AddressFunctionality = function () {
   }
 
   // Update fields when dropdown changes
-  addressSelect.addEventListener('change', e => {
-    updateAddressFields(e.target.value);
-  });
+  if (addressSelect) {
+    addressSelect.addEventListener('change', e => {
+      updateAddressFields(e.target.value);
+    });
+  }
 
   // Edit Button and Validation for addressForm
   const toggleEditBtn = document.getElementById('toggleEditBtn');
   const addressForm = document.getElementById('addressForm');
-  const inputs = addressForm.querySelectorAll('input');
   let isEditMode = false;
-
-  toggleEditBtn.addEventListener('click', function () {
-    if (isEditMode) {
-      if (validateAddress(addressForm)) {
-        addressForm.submit();
+  if (addressForm) {
+    const inputs = addressForm.querySelectorAll('input');
+    toggleEditBtn.addEventListener('click', function () {
+      if (isEditMode) {
+        if (validateAddress(addressForm)) {
+          addressForm.submit();
+        }
+      } else {
+        // Enter edit mode
+        isEditMode = true;
+        toggleEditBtn.innerHTML = `<span>Save Changes</span>`;
+        inputs.forEach(input => {
+          input.disabled = false;
+          input.classList.remove('input-disabled');
+          input.classList.add('bg-white');
+        });
+        inputs[1].focus();
       }
-    } else {
-      // Enter edit mode
-      isEditMode = true;
-      toggleEditBtn.innerHTML = `<span>Save Changes</span>`;
-      inputs.forEach(input => {
-        input.disabled = false;
-        input.classList.remove('input-disabled');
-        input.classList.add('bg-white');
-      });
-      inputs[1].focus();
-    }
-  });
+    });
+  }
 
   // Exit edit mode after successful save
   function exitEditMode() {
@@ -318,39 +321,40 @@ export const AddressFunctionality = function () {
 
   ///////////////////////////////////////////
   ///Delete Address
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async function (e) {
+      const id = this.dataset.id;
 
-  deleteBtn.addEventListener('click', async function (e) {
-    const id = this.dataset.id;
+      Swal.fire({
+        title: 'Are you sure?',
+        text: `Do you want to delete this address?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, do it!',
+        cancelButtonText: 'Cancel',
+      }).then(async result => {
+        if (!result.isConfirmed) {
+          console.log('hai');
 
-    Swal.fire({
-      title: 'Are you sure?',
-      text: `Do you want to delete this address?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, do it!',
-      cancelButtonText: 'Cancel',
-    }).then(async result => {
-      if (!result.isConfirmed) {
-        console.log('hai');
-
-        return;
-      }
-      try {
-        const response = await fetch(`/profile/address/${id}`, {
-          method: 'DELETE',
-        });
-        const data = await response.json();
-        if (data.success) {
-          showToast(data.message, 'success');
-          setTimeout(() => {
-            location.reload();
-          }, 3000);
+          return;
         }
-      } catch (error) {
-        showToast('Something went wrong!');
-      }
+        try {
+          const response = await fetch(`/profile/address/${id}`, {
+            method: 'DELETE',
+          });
+          const data = await response.json();
+          if (data.success) {
+            showToast(data.message, 'success');
+            setTimeout(() => {
+              location.reload();
+            }, 3000);
+          }
+        } catch (error) {
+          showToast('Something went wrong!');
+        }
+      });
     });
-  });
+  }
 };
 const isAddress = document.querySelector('#address');
 if (isAddress) {

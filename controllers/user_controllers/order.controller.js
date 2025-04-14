@@ -7,7 +7,6 @@ import { Order } from '../../model/order_model.js';
 import { Product } from '../../model/product_model.js';
 import puppeteer from 'puppeteer';
 import { generateInvoiceHTML } from '../../utilities/invoiceHtml.js';
-import fs from 'fs';
 import { Buffer } from 'buffer';
 
 const userMain = './layouts/user_main';
@@ -70,7 +69,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
 
     // Calculate order amounts
     const subtotal = cart.totalPrice;
-    const discount = cart.discountPrice || 0; // Ensure discount exists
+    const discount = cart.discountPrice || 0;
     const taxAmount = subtotal * TAX_RATE;
     const totalAmount = subtotal + taxAmount - discount;
 

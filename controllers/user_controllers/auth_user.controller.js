@@ -42,7 +42,7 @@ export const getHome = asyncHandler(async (req, res) => {
       $lookup: {
         from: 'reviews',
         localField: '_id',
-        foreignField: 'product_id',
+        foreignField: 'product',
         as: 'reviews',
       },
     },

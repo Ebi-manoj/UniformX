@@ -78,6 +78,7 @@ export const fetchAllOrders = asyncHandler(async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit);
+  console.log(orders);
 
   res.render('admin/orders', {
     success: true,
