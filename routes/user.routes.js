@@ -40,6 +40,7 @@ import {
   addToWhishlist,
   fetchWishlist,
 } from '../controllers/user_controllers/wishlist.controller.js';
+import { getWallet } from '../controllers/user_controllers/wallet.controller.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -127,4 +128,7 @@ router.get(
 
 // review
 router.post('/add-review/:productId', isUserAuthenticated, addReview);
+
+// wallet
+router.get('/wallet', isUserAuthenticated, fetchCartLength, getWallet);
 export default router;

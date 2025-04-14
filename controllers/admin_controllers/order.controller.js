@@ -2,6 +2,8 @@ import asyncHandler from 'express-async-handler';
 import { Order } from '../../model/order_model.js';
 import mongoose from 'mongoose';
 import { Product } from '../../model/product_model.js';
+import { Wallet } from '../../model/wallet.js';
+import { Transaction } from '../../model/transaction.js';
 
 const TAX_RATE = 0.05;
 
@@ -153,58 +155,98 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
 // Approve Return Request
 export const approveReturn = asyncHandler(async (req, res) => {
-  console.log('reached');
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const { orderId, itemId } = req.params;
 
-  const { orderId, itemId } = req.params;
+    const order = await Order.findById(orderId).session(session);
+    if (!order)
+      return res
+        .status(404)
+        .json({ success: false, message: 'Order not found' });
 
-  const order = await Order.findById(orderId);
-  if (!order)
-    return res.status(404).json({ success: false, message: 'Order not found' });
+    const item = order.items.id(itemId);
+    if (!item)
+      return res
+        .status(404)
+        .json({ success: false, message: 'Item not found' });
 
-  const item = order.items.id(itemId);
-  if (!item)
-    return res.status(404).json({ success: false, message: 'Item not found' });
+    if (
+      item.status !== 'RETURN REQUESTED' ||
+      item.returnRequest.status !== 'REQUESTED'
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'Item is not in a return requested state',
+      });
+    }
 
-  if (
-    item.status !== 'RETURN REQUESTED' ||
-    item.returnRequest.status !== 'REQUESTED'
-  ) {
-    return res.status(400).json({
+    item.status = 'RETURNED';
+    item.paymentStatus = 'REFUNDED';
+    item.returnRequest.status = 'COMPLETED';
+    item.returnRequest.resolvedAt = new Date();
+
+    const baseAmount = item.price * item.quantity;
+    const totalSubtotal = order.subtotal;
+    const totalAmount = order.totalAmount;
+
+    const proportion = baseAmount / totalSubtotal;
+    item.returnRequest.refundAmount = +(proportion * totalAmount).toFixed(2);
+
+    const refundAmount = item.returnRequest.refundAmount;
+
+    item.statusHistory.push({
+      status: 'RETURNED',
+      note: 'Return approved and processed',
+    });
+
+    await order.save({ session });
+
+    const product = await Product.findById(item.product).session(session);
+    const selectedSize = product.sizes.find(s => s.size === item.size);
+    selectedSize.stock_quantity += item.quantity;
+    await product.save({ session });
+
+    const userId = order.user;
+
+    const transaction = new Transaction({
+      user: userId,
+      amount: refundAmount,
+      type: 'REFUND',
+      status: 'SUCCESS',
+    });
+    await transaction.save({ session });
+
+    let wallet = await Wallet.findOne({ user: userId }).session(session);
+    if (!wallet) {
+      wallet = new Wallet({
+        balance: 0,
+        user: userId,
+        transactionHistory: [],
+      });
+    }
+
+    wallet.balance += refundAmount;
+    wallet.transactionHistory.push(transaction._id);
+    await wallet.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.json({
+      success: true,
+      message: 'Return approved and processed',
+      order,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    res.status(500).json({
       success: false,
-      message: 'Item is not in a return requested state',
+      message: error.message || 'Something went wrong during return approval',
     });
   }
-
-  item.status = 'RETURNED';
-  item.paymentStatus = 'REFUNDED';
-  item.returnRequest.status = 'COMPLETED';
-  item.returnRequest.resolvedAt = new Date();
-
-  const baseAmount = item.price * item.quantity;
-  const totalSubtotal = order.subtotal;
-  const totalAmount = order.totalAmount;
-
-  const proportion = baseAmount / totalSubtotal;
-  item.returnRequest.refundAmount = +(proportion * totalAmount).toFixed(2);
-
-  item.statusHistory.push({
-    status: 'RETURNED',
-    note: 'Return approved and processed',
-  });
-
-  await order.save();
-
-  const product = await Product.findById(item.product);
-  const selectedSize = product.sizes.find(s => s.size === item.size);
-  console.log(selectedSize);
-  selectedSize.stock_quantity += item.quantity;
-  await product.save();
-
-  res.json({
-    success: true,
-    message: 'Return approved and processed',
-    order,
-  });
 });
 
 export const rejectReturn = asyncHandler(async (req, res) => {

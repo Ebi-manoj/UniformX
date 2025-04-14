@@ -1,0 +1,72 @@
+<div class="bg-gray-50 font-sans flex">
+    <%- include('../partials/profile_sidebar') %>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+      <div class="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+        
+        <!-- Wallet Header -->
+        <h1 class="text-2xl font-bold text-center mb-8">Wallet</h1>
+  
+        <!-- Wallet Balance Section -->
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold">Wallet Balance</h2>
+          <button class="bg-gray-900 text-white font-medium py-2 px-6 rounded-md">
+            Add Money
+          </button>
+        </div>
+  
+        <!-- Available Balance -->
+        <div class="bg-gray-100 rounded-md p-4 mb-8">
+          <p class="text-lg">Available wallet balance: ₹<%= wallet.balance %></p>
+        </div>
+  
+        <!-- Transaction History -->
+        <h2 class="text-xl font-bold mb-4">Wallet Transaction History</h2>
+  
+        <div class="overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr class="border-b border-gray-200">
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Transaction ID</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Date</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Amount</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Type</th>
+                <th class="text-left py-3 px-4 font-medium text-gray-600">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (transactions.length === 0) { %>
+                <tr>
+                  <td colspan="5" class="py-6 px-4 text-center text-gray-500">
+                    No transactions yet.
+                  </td>
+                </tr>
+              <% } else { %>
+                <% transactions.forEach(transaction => { %>
+                  <tr class="border-b border-gray-100">
+                    <td class="py-3 px-4"><%= transaction._id.toString().slice(-10).toUpperCase() %></td>
+                    <td class="py-3 px-4">
+                      <%= new Date(transaction.createdAt).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      }) %>
+                    </td>
+                    <td class="py-3 px-4 <%= transaction.type === 'DEBIT' ? 'text-red-600' : 'text-green-600' %>">
+                      <%= transaction.type === 'DEBIT' ? `-₹${transaction.amount}` : `₹${transaction.amount}` %>
+                    </td>
+                    <td class="py-3 px-4 capitalize"><%= transaction.type.toLowerCase() %></td>
+                    <td class="py-3 px-4">
+                      <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                        <%= transaction.status %>
+                      </span>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  
