@@ -20,11 +20,11 @@ export const addCoupons = asyncHandler(async (req, res) => {
     description,
     discountType,
     discountAmount,
+    isActive,
     minimumPurchase,
     startDate,
     endDate,
     usageLimit,
-    usageCount,
     applicableProducts,
     applicableCategories,
   } = req.body;
@@ -40,4 +40,27 @@ export const addCoupons = asyncHandler(async (req, res) => {
     req.flash('error', 'Please fill all required fields');
     return res.redirect('/admin/coupons/create');
   }
+
+  const existing = await Coupon.findOne({ code: code.toUpperCase() });
+  if (existing) {
+    req.flash('success', 'Already Existing Coupon');
+    return res.redirect('/admin/coupons/create');
+  }
+
+  const newCoupon = new Coupon({
+    code,
+    description,
+    isActive: isActive === 'on',
+    discountType,
+    discountAmount,
+    minimumPurchase: minimumPurchase || 0,
+    startDate,
+    endDate,
+    usageLimit: usageLimit || null,
+    applicableProducts: applicableProducts || [],
+    applicableCategories: applicableCategories || [],
+  });
+  await newCoupon.save();
+  req.flash('success', 'Coupon created successfully');
+  res.redirect('/admin/coupons/create');
 });
