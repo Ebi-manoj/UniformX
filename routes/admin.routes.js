@@ -42,6 +42,10 @@ import {
   rejectReturn,
   updateOrderStatus,
 } from '../controllers/admin_controllers/order.controller.js';
+import {
+  fetchAllCoupons,
+  getCreateCoupon,
+} from '../controllers/admin_controllers/coupon.controller.js';
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -106,4 +110,8 @@ router.put(
   approveReturn
 );
 router.put('/orders/:orderId/reject-return/:itemId', isProtected, rejectReturn);
+
+// coupon routes
+router.get('/coupons', isProtected, fetchAllCoupons);
+router.get('/coupons/create', isProtected, getCreateCoupon);
 export default router;
