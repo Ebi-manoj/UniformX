@@ -44,8 +44,11 @@ import {
 } from '../controllers/admin_controllers/order.controller.js';
 import {
   addCoupons,
+  deleteCoupon,
   fetchAllCoupons,
   getCreateCoupon,
+  getEditCoupon,
+  updateCoupon,
 } from '../controllers/admin_controllers/coupon.controller.js';
 const router = express.Router();
 
@@ -116,4 +119,7 @@ router.put('/orders/:orderId/reject-return/:itemId', isProtected, rejectReturn);
 router.get('/coupons', isProtected, fetchAllCoupons);
 router.get('/coupons/create', isProtected, getCreateCoupon);
 router.post('/coupons/create', isProtected, addCoupons);
+router.get('/coupons/edit/:id', isProtected, getEditCoupon);
+router.put('/coupons/update/:id', isProtected, updateCoupon);
+router.delete('/coupons/delete/:id', isProtected, deleteCoupon);
 export default router;
