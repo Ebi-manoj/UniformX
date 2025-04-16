@@ -29,8 +29,13 @@ export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   const [cart] = await Cart.find({ userId }).populate('products.productId');
 
-  const taxAmount = (cart?.totalPrice - cart?.discountPrice) * TAX_RATE;
-  const finalPrice = cart?.totalPrice - cart?.discountPrice + taxAmount;
+  const total = cart?.totalPrice ?? 0;
+  const discount = cart?.discountPrice ?? 0;
+  const couponDiscount = cart?.couponDiscount ?? 0;
+
+  const taxAmount = (total - discount) * TAX_RATE;
+  const finalPrice = total - discount - couponDiscount + taxAmount;
+
   res.render('user/cart', {
     layout: userMain,
     js_file: 'cart',

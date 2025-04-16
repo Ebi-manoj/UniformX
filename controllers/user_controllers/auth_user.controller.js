@@ -148,7 +148,6 @@ export const getVerifyOTP = asyncHandler(async (req, res) => {
 /////////////////////////////////////////////
 //signup Handler
 export const signUpHandler = asyncHandler(async (req, res, next) => {
-  console.log(req.body);
   const { name, email, password, mobile } = req.body;
 
   if (!name || !email || !password || !mobile) {
