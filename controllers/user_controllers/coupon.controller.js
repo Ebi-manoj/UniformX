@@ -24,7 +24,10 @@ export const applyCoupon = asyncHandler(async (req, res) => {
     req.flash('error', 'Cart not found');
     return res.redirect('/cart');
   }
-
+  if (cart.totalPrice < coupon.minimumPurchase) {
+    req.flash('error', 'Invalid Coupon');
+    return res.redirect('/cart');
+  }
   if (coupon.discountType === 'fixed') {
     cart.couponDiscount = coupon.discountAmount;
   } else {
