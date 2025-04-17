@@ -93,12 +93,7 @@
               <span class="text-gray-600">Total discount</span>
               <span class="font-medium text-green-600 discountPrice">-₹<%= cart?.discountPrice %></span>
             </div>
-            <% if (cart.couponDiscount) { %>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Coupon discount</span>
-                <span class="font-medium text-green-600 discountPrice">-₹<%= cart?.couponDiscount %></span>
-              </div>
-            <% } %>
+            
             <div class="flex justify-between">
               <span class="text-gray-600">Shipping</span>
               <span class="font-medium text-green-600">Free</span>
@@ -130,75 +125,6 @@
               >Continue Shopping</a
             >
           </div>
-
-          <% if (cart.couponDiscount) { %>
-            <div class="bg-white p-4 shadow-sm rounded-lg max-w-md mx-auto">
-              <div class="flex items-center justify-between">
-                <div class="text-xs text-black font-medium">COUPONS</div>
-              </div>
-              <div class="mt-2 flex items-center justify-between">
-                <div class="flex items-center space-x-2">
-                  <svg
-                    class="w-5 h-5 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                    ></path>
-                  </svg>
-                  <div>
-                    <p class="text-gray-900 text-sm font-medium">1 Coupon applied</p>
-                    <p class="text-green-600 text-[10px]">You saved additional ₹<%= cart.couponDiscount %></p>
-                  </div>
-                </div>
-                <form action="/coupon/remove" method="post">
-                  <input type="hidden" name="_method" value="PATCH">
-                  <button
-                  type="submit"
-                  class="px-2 py-1.5 bg-white border border-red-500 text-red-600 text-xs font-medium hover:bg-red-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
-                >
-                  Remove
-                </button>
-                </form>
-              </div>
-            </div>
-          <% } else { %>
-            <!-- Coupon Code -->
-            <div class="mt-6 pt-6 border-t">
-              <div class="flex justify-between">
-                <div class="text-xs text-gray-500 mb-2 italic">
-                  (If you have any Coupon)
-                </div>
-                <div class="view-coupon-btn text-sm mb-2 underline cursor-pointer text-gray-500 hover:text-gray-900 hover:underline">
-                  view coupons
-                </div>
-              </div>
-              <form action="/coupon/apply" method="post">
-                <div class="flex">
-                  <input
-                    type="text"
-                    placeholder="Enter Code"
-                    name="couponCode"
-                    class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <button
-                    type="submit"
-                    class="px-4 py-2 bg-gray-900 text-white font-medium rounded-r-md hover:bg-gray-800 transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </form>
-
-            </div>
-          <% } %>
-          
-          <!-- coupon -->
         </div>
       </div>
     </div>

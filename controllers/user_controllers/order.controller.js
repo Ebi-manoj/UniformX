@@ -8,6 +8,7 @@ import { Product } from '../../model/product_model.js';
 import puppeteer from 'puppeteer';
 import { generateInvoiceHTML } from '../../utilities/invoiceHtml.js';
 import { Buffer } from 'buffer';
+import { Coupon } from '../../model/coupon.js';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
@@ -22,10 +23,33 @@ export const getCheckout = asyncHandler(async (req, res) => {
   const addresses = await Address.find({ userId });
 
   // cart
-  const cart = await Cart.find({ userId }).populate('products.productId');
+  const cart = await Cart.findOne({ userId }).populate('products.productId');
 
-  const taxAmount = (cart[0].totalPrice - cart[0].discountPrice) * TAX_RATE;
-  const finalPrice = cart[0].totalPrice - cart[0].discountPrice + taxAmount;
+  // coupon calculation
+  const couponId = cart.coupon;
+  if (couponId) {
+    const coupon = await Coupon.findById(couponId);
+    if (coupon.discountType === 'fixed') {
+      cart.couponDiscount = coupon.discountAmount;
+    } else {
+      const finalPrice = cart.totalPrice - cart.discountPrice;
+      const maxRedeem = coupon.maxRedeem ?? 5000;
+      const couponDiscount = (finalPrice * coupon.discountAmount) / 100;
+      cart.couponDiscount =
+        couponDiscount > maxRedeem ? maxRedeem : couponDiscount;
+    }
+    if (coupon && cart.totalPrice < coupon.minimumPurchase) {
+      cart.coupon = null;
+      cart.couponDiscount = 0;
+    }
+    await cart.save();
+  }
+
+  const couponDiscount = cart.couponDiscount ?? 0;
+  const taxAmount = (cart.totalPrice - cart.discountPrice) * TAX_RATE;
+  const finalPrice =
+    cart.totalPrice - cart.discountPrice - couponDiscount + taxAmount;
+
   console.log(cart);
   console.log(taxAmount);
   console.log(finalPrice);
@@ -33,7 +57,7 @@ export const getCheckout = asyncHandler(async (req, res) => {
     js_file: 'checkout',
     layout: userMain,
     addresses,
-    cart: cart[0],
+    cart,
     taxAmount,
     finalPrice,
   });

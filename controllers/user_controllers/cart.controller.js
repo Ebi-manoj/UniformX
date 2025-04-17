@@ -3,10 +3,11 @@ import { Product } from '../../model/product_model.js';
 import { Cart } from '../../model/cart_model.js';
 import { Wishlist } from '../../model/wishlist.js';
 import { validateId } from '../../utilities/validateId.js';
+import { Coupon } from '../../model/coupon.js';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
-const calculateCartTotal = function (cart) {
+const calculateCartTotal = async function (cart) {
   // Recalculate cart total
   cart.totalPrice = cart.products.reduce(
     (total, item) => total + item.productId.price * item.quantity,
@@ -29,12 +30,23 @@ export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   const [cart] = await Cart.find({ userId }).populate('products.productId');
 
+  // const couponId = cart?.coupon;
+  // if (couponId) {
+  //   const coupon = await Coupon.findById(couponId);
+  //   const maxRedeem = coupon.maxRedeem || 5000;
+  //   cart.couponDiscount =
+  //     cart.couponDiscount > maxRedeem ? maxRedeem : cart.couponDiscount;
+  //   if (cart.totalPrice < coupon.minimumPurchase) {
+  //     cart.coupon = null;
+  //     cart.couponDiscount = 0;
+  //     await cart.save();
+  //   }
+  // }
+
   const total = cart?.totalPrice ?? 0;
   const discount = cart?.discountPrice ?? 0;
-  const couponDiscount = cart?.couponDiscount ?? 0;
-
   const taxAmount = (total - discount) * TAX_RATE;
-  const finalPrice = total - discount - couponDiscount + taxAmount;
+  const finalPrice = total - discount + taxAmount;
 
   res.render('user/cart', {
     layout: userMain,
@@ -149,7 +161,6 @@ export const addToCart = asyncHandler(async (req, res) => {
 export const updateCartQunatity = asyncHandler(async (req, res) => {
   const { productId, quantity, size } = req.body;
   const userId = req.user._id;
-  console.log(productId, quantity, size);
 
   // Find the cart
   let cart = await Cart.findOne({ userId }).populate('products.productId');
@@ -162,7 +173,6 @@ export const updateCartQunatity = asyncHandler(async (req, res) => {
   const productIndex = cart.products.findIndex(
     p => p.productId.toString() === productId && p.size === size
   );
-  console.log(productIndex);
 
   if (productIndex === -1) {
     return res
