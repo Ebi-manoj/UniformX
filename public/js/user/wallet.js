@@ -27,7 +27,7 @@ if (btnPay) {
     const amount = amountInput.value;
     if (!amount) return showToast('Please eneter a valid amount!');
 
-    const res = await fetch('/create-order', {
+    const res = await fetch('/wallet/create-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ amount }),

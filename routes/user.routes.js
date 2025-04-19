@@ -46,7 +46,8 @@ import {
   removeCoupon,
 } from '../controllers/user_controllers/coupon.controller.js';
 import {
-  createOrder,
+  createProductOrder,
+  createWalletOrder,
   verifyPayment,
 } from '../controllers/user_controllers/payment.controller.js';
 
@@ -145,6 +146,7 @@ router.post('/coupon/apply', isUserAuthenticated, applyCoupon);
 router.patch('/coupon/remove', isUserAuthenticated, removeCoupon);
 
 // payments
-router.post('/create-order', isUserAuthenticated, createOrder);
+router.post('/wallet/create-order', isUserAuthenticated, createWalletOrder);
+router.post('/order/create-order', isUserAuthenticated, createProductOrder);
 router.post('/verify-payment', isUserAuthenticated, verifyPayment);
 export default router;

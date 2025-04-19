@@ -187,7 +187,7 @@
           <div class="space-y-3">
             <!-- Debit Card / Credit Card -->
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="payment" value="card" class="radio-input" checked />
+              <input type="radio" name="payment" value="CARD" class="radio-input" checked />
              
               <div class="flex ml-auto space-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="12" viewBox="0 0 20 14" prefix=""><g fill="none" fill-rule="evenodd" transform="translate(1 1)"><rect width="18" height="12" stroke="#000" rx="1"></rect><path fill="#000" d="M0 3h18v2H0z"></path><rect width="7" height="1" x="2" y="8" fill="#000" rx=".5"></rect></g></svg>
@@ -197,7 +197,7 @@
         
             <!-- Net Banking -->
             <label class="flex items-center space-x-3 cursor-pointer">
-              <input type="radio" name="payment" value="bank" class="radio-input" />
+              <input type="radio" name="payment" value="BANK" class="radio-input" />
               <div class="flex ml-auto space-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="16" viewBox="0 0 18 16" prefix=""><g fill="none" fill-rule="evenodd"><path stroke="#000" stroke-width="1.125" d="M1.498 6.625h15.048a.112.112 0 0 0 .069-.201L9.605 1 1.437 6.419a.112.112 0 0 0 .062.206z"></path><path fill="#000" d="M3.375 7.188H4.5v6.187H3.375V7.75zM6.75 7.188h1.125v6.187H6.75zM10.125 7.188h1.125v6.187h-1.125zM13.5 7.188h1.125v6.187H13.5zM1.727 13.375h14.546c.376 0 .727.188.936.501l.558.837a.225.225 0 0 1-.187.35H.42a.225.225 0 0 1-.187-.35l.558-.837c.209-.313.56-.501.936-.501z"></path></g></svg>
               </div>
@@ -363,5 +363,5 @@
       </div>
     </div>
   </div>
-
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <%- include('../partials/address_modal') %>

@@ -9,7 +9,7 @@ import puppeteer from 'puppeteer';
 import { generateInvoiceHTML } from '../../utilities/invoiceHtml.js';
 import { Buffer } from 'buffer';
 import { Coupon } from '../../model/coupon.js';
-import { User } from '../../model/user_model.js';
+import { confirmOrder } from '../../services/confirm.order.js';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
@@ -74,121 +74,21 @@ export const placeOrder = asyncHandler(async (req, res) => {
     req.flash('error', 'Session expired');
     return res.redirect('/checkout');
   }
-
-  // Start a transaction
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
+  console.log(paymentMethod);
   try {
-    // Get the user's cart and validate it
-    const [cart] = await Cart.find({ userId })
-      .populate({
-        path: 'products.productId',
-        select: 'title price image_url sizes status category_id',
-      })
-      .session(session);
-
-    if (!cart || !cart.products.length) {
-      throw new Error('Cart is empty or not found');
-    }
-
-    if (cart.coupon) {
-      const user = await User.findById(userId);
-      user.couponApplied.push(cart.coupon);
-    }
-
-    // Calculate order amounts
-    const subtotal = cart.totalPrice;
-    const discount = cart.discountPrice || 0;
-    const couponDiscount = cart.couponDiscount ?? 0;
-    const taxAmount = (subtotal - discount) * TAX_RATE;
-    const totalAmount = subtotal + taxAmount - discount - couponDiscount;
-
-    // Create order items with individual status
-    const orderItems = cart.products.map(item => {
-      if (!item.productId) {
-        throw new Error(`Product not found for cart item: ${item}`);
-      }
-
-      const originalPrice = item.productId.price;
-      const discount = item.productId.discount || 0;
-      const discountedPrice = originalPrice - (originalPrice * discount) / 100;
-      return {
-        product: item.productId._id,
-        title: item.productId.title,
-        price: discountedPrice,
-        size: item.size,
-        quantity: item.quantity,
-        image:
-          item.productId.image_url && item.productId.image_url.length > 0
-            ? item.productId.image_url[0]
-            : null,
-        status: 'PROCESSING',
-        statusHistory: [
-          {
-            status: 'PROCESSING',
-            timestamp: new Date(),
-            note: 'Order received',
-          },
-        ],
-      };
-    });
-
-    // Create new order
-    const order = new Order({
-      user: userId,
-      items: orderItems,
-      shippingAddress,
-      paymentMethod,
-      paymentStatus: 'PENDING',
-      subtotal,
-      taxAmount,
-      discount,
-      totalAmount,
-    });
-
-    // Save the order
-    await order.save({ session });
-
-    // Update product stock
-    const updateResults = await Promise.all(
-      cart.products.map(async item => {
-        return Product.updateOne(
-          { _id: item.productId._id, 'sizes.size': item.size },
-          { $inc: { 'sizes.$.stock_quantity': -item.quantity } },
-          { session }
-        );
-      })
-    );
-
-    const failedUpdates = updateResults.filter(res => res.modifiedCount === 0);
-    if (failedUpdates.length > 0) {
-      throw new Error('Stock update failed for some products');
-    }
-
-    // Clear the cart
-    await Cart.deleteOne({ _id: cart._id }, { session });
-
-    // Commit the transaction
-    await session.commitTransaction();
-
+    const result = await confirmOrder(userId, shippingAddress, paymentMethod);
     res.status(200).json({
       success: true,
       message: 'Order placed successfully',
       redirectUrl: '/order-success',
-      orderId: order.orderNumber,
+      orderId: result.orderNumber,
     });
   } catch (error) {
-    // Abort the transaction on error
-    await session.abortTransaction();
-    console.error('Order placement error:', error);
+    console.error('Order error:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Failed to place order',
     });
-  } finally {
-    // End the session
-    session.endSession();
   }
 });
 
