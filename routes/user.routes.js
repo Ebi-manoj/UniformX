@@ -45,6 +45,10 @@ import {
   applyCoupon,
   removeCoupon,
 } from '../controllers/user_controllers/coupon.controller.js';
+import {
+  createOrder,
+  verifyPayment,
+} from '../controllers/user_controllers/payment.controller.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -139,4 +143,8 @@ router.get('/wallet', isUserAuthenticated, fetchCartLength, getWallet);
 // coupon
 router.post('/coupon/apply', isUserAuthenticated, applyCoupon);
 router.patch('/coupon/remove', isUserAuthenticated, removeCoupon);
+
+// payments
+router.post('/create-order', isUserAuthenticated, createOrder);
+router.post('/verify-payment', isUserAuthenticated, verifyPayment);
 export default router;

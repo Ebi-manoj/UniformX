@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 export const transactionSchema = new mongoose.Schema(
   {
@@ -19,6 +20,10 @@ export const transactionSchema = new mongoose.Schema(
       type: String,
       enum: ['SUCCESS', 'FAILED', 'PENDING'],
       default: 'PENDING',
+    },
+    razorpayOrderId: {
+      type: String,
+      default: null,
     },
   },
   { timestamps: true }

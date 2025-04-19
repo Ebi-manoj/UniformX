@@ -9,12 +9,14 @@ export const getWallet = asyncHandler(async (req, res) => {
     req.flash('success', 'Session expired!');
     return res.render('/profile');
   }
-  const wallet = await Wallet.findOne({ user: userId }).populate(
-    'transactionHistory'
-  );
+  const wallet = await Wallet.findOne({ user: userId }).populate({
+    path: 'transactionHistory',
+    options: { sort: { createdAt: -1 } },
+  });
   console.log(wallet);
 
   res.render('user/wallet', {
+    js_file: 'wallet',
     layout: userMain,
     wallet,
     transactions: wallet.transactionHistory,

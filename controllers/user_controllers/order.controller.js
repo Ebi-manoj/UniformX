@@ -9,6 +9,7 @@ import puppeteer from 'puppeteer';
 import { generateInvoiceHTML } from '../../utilities/invoiceHtml.js';
 import { Buffer } from 'buffer';
 import { Coupon } from '../../model/coupon.js';
+import { User } from '../../model/user_model.js';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
@@ -91,11 +92,17 @@ export const placeOrder = asyncHandler(async (req, res) => {
       throw new Error('Cart is empty or not found');
     }
 
+    if (cart.coupon) {
+      const user = await User.findById(userId);
+      user.couponApplied.push(cart.coupon);
+    }
+
     // Calculate order amounts
     const subtotal = cart.totalPrice;
     const discount = cart.discountPrice || 0;
-    const taxAmount = subtotal * TAX_RATE;
-    const totalAmount = subtotal + taxAmount - discount;
+    const couponDiscount = cart.couponDiscount ?? 0;
+    const taxAmount = (subtotal - discount) * TAX_RATE;
+    const totalAmount = subtotal + taxAmount - discount - couponDiscount;
 
     // Create order items with individual status
     const orderItems = cart.products.map(item => {
