@@ -5,8 +5,9 @@ const addOfferForm = document.getElementById('addOfferForm');
 const toggleType = document.querySelectorAll('.toggle-type');
 const editBtn = document.getElementById('edit-btn');
 const editModal = document.getElementById('editModal');
+const editOfferForm = document.getElementById('editOfferForm');
 
-if (addOfferForm || !editBtn.classList.contains('hidden')) {
+if (addOfferForm) {
   document.addEventListener('DOMContentLoaded', disablePastDates);
 }
 
@@ -22,11 +23,17 @@ if (toggleType) {
 if (addOfferForm) {
   addOfferForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    validateAndSubmit(addOfferForm);
+    validateAndSubmit(editOfferForm);
   });
 }
 
 if (editModal) {
+  editOfferForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    validateAndSubmit(editOfferForm);
+  });
+
+  // close functionalites
   document
     .getElementById('closeEditModal')
     .addEventListener('click', function () {
@@ -82,7 +89,7 @@ function fillEditForm(offer, products, categories) {
     const isChecked = offer.product?.includes(product._id);
     productContainer.innerHTML += `
         <label>
-          <input type="checkbox" name="products" value="${product._id}" ${
+          <input type="checkbox" name="products[]" value="${product._id}" ${
       isChecked ? 'checked' : ''
     }>
           ${product.title}
@@ -93,7 +100,7 @@ function fillEditForm(offer, products, categories) {
     const isChecked = offer.category?.includes(category._id);
     categoryContainer.innerHTML += `
         <label>
-          <input type="checkbox" name="categories" value="${category._id}" ${
+          <input type="checkbox" name="categories[]" value="${category._id}" ${
       isChecked ? 'checked' : ''
     }>
           ${category.name}
@@ -106,6 +113,15 @@ function fillEditForm(offer, products, categories) {
 
   validFrom.value = offer.validFrom.slice(0, 10);
   validTo.value = offer.validTo.slice(0, 10);
+  validFrom.min = offer.validFrom.slice(0, 10);
+  validFrom.addEventListener('change', function () {
+    if (validFrom.value) {
+      validTo.min = validFrom.value;
+      if (validTo.value < validFrom.value) {
+        validTo.value = validFrom.value;
+      }
+    }
+  });
 
   // toggler
   const isActiveBtn = document.getElementById('isActive');
@@ -161,6 +177,7 @@ function validateAndSubmit(form) {
   // Prepare form data
   const formData = new FormData(form);
   const data = Object.fromEntries(formData.entries());
+  console.log(data);
 
   // Safe parse using Zod
   const result = addOfferSchema.safeParse(data);

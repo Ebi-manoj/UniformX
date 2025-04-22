@@ -55,10 +55,55 @@ export const addOffer = asyncHandler(async (req, res) => {
     discountPercentage,
     validFrom: new Date(validFrom),
     validTo: new Date(validTo),
-    product: products || null,
-    category: categories || null,
   });
+  offer.product = type === 'product' ? products || null : null;
+  offer.category = type === 'category' ? categories || null : null;
+
   await offer.save();
   req.flash('success', 'Offer added successfully');
   res.redirect('/admin/offer-management');
+});
+
+export const editOffer = asyncHandler(async (req, res) => {
+  const {
+    offerId,
+    name,
+    type,
+    products,
+    categories,
+    discountPercentage,
+    validFrom,
+    validTo,
+    isActive,
+  } = req.body;
+  if (!validateId(offerId)) {
+    req.flash('error', 'Invalid Offer details');
+    return res.redirect('/admin/offer-management');
+  }
+  const offer = await Offer.findById(offerId);
+  if (!offer) {
+    req.flash('error', 'Invalid Offer details');
+    return res.redirect('/admin/offer-management');
+  }
+
+  offer.offerName = name || offer.offerName;
+  offer.type = type || offer.type;
+  offer.discountPercentage = discountPercentage || offer.discountPercentage;
+
+  if (validFrom && !isNaN(new Date(validFrom))) {
+    offer.validFrom = new Date(validFrom);
+  }
+  if (validTo && !isNaN(new Date(validTo))) {
+    offer.validTo = new Date(validTo);
+  }
+
+  offer.isActive = isActive === 'on' || offer.isActive;
+
+  offer.product = type === 'product' ? products || offer.product : null;
+  offer.category = type === 'category' ? categories || offer.category : null;
+
+  await offer.save();
+
+  req.flash('success', 'Offer updated successfully');
+  return res.redirect('/admin/offer-management');
 });

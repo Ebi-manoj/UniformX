@@ -52,6 +52,7 @@ import {
 } from '../controllers/admin_controllers/coupon.controller.js';
 import {
   addOffer,
+  editOffer,
   fetchAllOffers,
   fetchOffer,
   getAddOffer,
@@ -135,5 +136,6 @@ router.get('/offer-management', isProtected, fetchAllOffers);
 router.get('/offer/:id', isProtected, fetchOffer);
 router.get('/offers/add', isProtected, getAddOffer);
 router.post('/offers/add', isProtected, addOffer);
+router.put('/offers/edit', isProtected, editOffer);
 
 export default router;
