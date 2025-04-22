@@ -33,4 +33,13 @@ const offerSchema = new mongoose.Schema({
   validTo: Date,
 });
 
+offerSchema.methods.isValid = function () {
+  const now = new Date();
+  return (
+    this.isActive &&
+    (!this.validFrom || now >= this.validFrom) &&
+    (!this.validTo || now <= this.validTo)
+  );
+};
+
 export const Offer = mongoose.model('offer', offerSchema);

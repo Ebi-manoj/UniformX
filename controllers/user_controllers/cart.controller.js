@@ -3,26 +3,12 @@ import { Product } from '../../model/product_model.js';
 import { Cart } from '../../model/cart_model.js';
 import { Wishlist } from '../../model/wishlist.js';
 import { validateId } from '../../utilities/validateId.js';
-import { Coupon } from '../../model/coupon.js';
+import { Offer } from '../../model/offer.js';
+import { calculateCartTotal } from '../../services/order.js';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
-const calculateCartTotal = async function (cart) {
-  // Recalculate cart total
-  cart.totalPrice = cart.products.reduce(
-    (total, item) => total + item.productId.price * item.quantity,
-    0
-  );
-  cart.discountPrice = cart.products.reduce(
-    (total, item) =>
-      total +
-      (item.productId.price *
-        item.quantity *
-        (item.productId.discountPercentage || 0)) /
-        100,
-    0
-  );
-};
+
 ////////////////
 //Get cart
 
@@ -30,23 +16,11 @@ export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
   const [cart] = await Cart.find({ userId }).populate('products.productId');
 
-  // const couponId = cart?.coupon;
-  // if (couponId) {
-  //   const coupon = await Coupon.findById(couponId);
-  //   const maxRedeem = coupon.maxRedeem || 5000;
-  //   cart.couponDiscount =
-  //     cart.couponDiscount > maxRedeem ? maxRedeem : cart.couponDiscount;
-  //   if (cart.totalPrice < coupon.minimumPurchase) {
-  //     cart.coupon = null;
-  //     cart.couponDiscount = 0;
-  //     await cart.save();
-  //   }
-  // }
-
   const total = cart?.totalPrice ?? 0;
   const discount = cart?.discountPrice ?? 0;
+  const offerApplied = cart?.totalOfferDiscount ?? 0;
   const taxAmount = (total - discount) * TAX_RATE;
-  const finalPrice = total - discount + taxAmount;
+  const finalPrice = total - discount - offerApplied + taxAmount;
 
   res.render('user/cart', {
     layout: userMain,
@@ -131,10 +105,34 @@ export const addToCart = asyncHandler(async (req, res) => {
         .status(404)
         .json({ success: false, message: 'Not enough stock available' });
     }
+
+    // checking offer applied or not
+    const offers = await Offer.find({
+      isActive: true,
+      $or: [
+        { type: 'product', product: { $in: [productId] } },
+        { type: 'category', category: product.category_id },
+      ],
+    });
+
+    const offer = Math.max(
+      ...offers
+        .filter(offer => offer.isValid())
+        .map(offer => offer.discountPercentage)
+    );
+    console.log(offer);
+
+    let offerApplied = 0;
+    if (offer) {
+      offerApplied = (product.price * offer) / 100;
+      console.log(offerApplied);
+    }
+
     cart.products.push({
       productId,
       quantity,
       size,
+      offerApplied,
     });
   }
 
@@ -197,7 +195,8 @@ export const updateCartQunatity = asyncHandler(async (req, res) => {
 
   calculateCartTotal(cart);
   const tax = (cart?.totalPrice - cart?.discountPrice) * TAX_RATE;
-  const total = cart?.totalPrice - cart?.discountPrice + tax;
+  const total =
+    cart?.totalPrice - cart?.discountPrice - cart?.totalOfferDiscount + tax;
 
   await cart.save();
 
@@ -206,7 +205,7 @@ export const updateCartQunatity = asyncHandler(async (req, res) => {
     subtotal: cart.totalPrice,
     discount: cart.discountPrice,
     tax: tax.toFixed(2),
-    total: total.toFixed(2),
+    total: Math.floor(total),
     message: 'Cart updated successfully',
   });
 });

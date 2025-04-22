@@ -2,14 +2,13 @@ import asyncHandler from 'express-async-handler';
 import { validateId } from '../../utilities/validateId.js';
 import Address from '../../model/address.js';
 import { Cart } from '../../model/cart_model.js';
-import mongoose from 'mongoose';
 import { Order } from '../../model/order_model.js';
 import { Product } from '../../model/product_model.js';
 import puppeteer from 'puppeteer';
 import { generateInvoiceHTML } from '../../utilities/invoiceHtml.js';
 import { Buffer } from 'buffer';
 import { Coupon } from '../../model/coupon.js';
-import { confirmOrder } from '../../services/confirm.order.js';
+import { confirmOrder } from '../../services/order.js';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
@@ -47,9 +46,14 @@ export const getCheckout = asyncHandler(async (req, res) => {
   }
 
   const couponDiscount = cart.couponDiscount ?? 0;
+  const offerApplied = cart?.totalOfferDiscount ?? 0;
   const taxAmount = (cart.totalPrice - cart.discountPrice) * TAX_RATE;
   const finalPrice =
-    cart.totalPrice - cart.discountPrice - couponDiscount + taxAmount;
+    cart.totalPrice -
+    cart.discountPrice -
+    couponDiscount -
+    offerApplied +
+    taxAmount;
 
   console.log(cart);
   console.log(taxAmount);

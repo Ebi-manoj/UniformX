@@ -23,7 +23,7 @@ if (toggleType) {
 if (addOfferForm) {
   addOfferForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    validateAndSubmit(editOfferForm);
+    validateAndSubmit(addOfferForm);
   });
 }
 

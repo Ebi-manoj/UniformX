@@ -93,6 +93,13 @@
               <span class="text-gray-600">Total discount</span>
               <span class="font-medium text-green-600 discountPrice">-₹<%= cart?.discountPrice %></span>
             </div>
+            <% if (cart.totalOfferDiscount) { %>
+              <div class="flex justify-between">
+                <span class="text-gray-600">Offer applied</span>
+                <span class="font-medium text-green-600 discountPrice">-₹<%= cart?.totalOfferDiscount %></span>
+              </div>
+             
+            <% } %>
             
             <div class="flex justify-between">
               <span class="text-gray-600">Shipping</span>

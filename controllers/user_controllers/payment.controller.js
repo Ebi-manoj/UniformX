@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { Transaction } from '../../model/transaction.js';
 import { Wallet } from '../../model/wallet.js';
 import { Cart } from '../../model/cart_model.js';
-import { confirmOrder } from '../../services/confirm.order.js';
+import { confirmOrder } from '../../services/order.js';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,

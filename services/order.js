@@ -5,7 +5,26 @@ import { Order } from '../model/order_model.js';
 import { Product } from '../model/product_model.js';
 
 const TAX_RATE = 0.05;
-
+export const calculateCartTotal = async function (cart) {
+  // Recalculate cart total
+  cart.totalPrice = cart.products.reduce(
+    (total, item) => total + item.productId.price * item.quantity,
+    0
+  );
+  cart.discountPrice = cart.products.reduce(
+    (total, item) =>
+      total +
+      (item.productId.price *
+        item.quantity *
+        (item.productId.discountPercentage || 0)) /
+        100,
+    0
+  );
+  cart.totalOfferDiscount = cart.products.reduce(
+    (total, item) => total + (item.offerApplied || 0) * item.quantity,
+    0
+  );
+};
 // prettier-ignore
 export const confirmOrder = async function ( userId, shippingAddress, paymentMethod,paymentStatus='PENDING' ) {
     const session = await mongoose.startSession();
