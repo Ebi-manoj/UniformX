@@ -149,7 +149,12 @@ export const verifyPayment = asyncHandler(async (req, res) => {
       if (!shippingAddress || !paymentMethod) {
         throw new Error('Details are missing ...');
       }
-      const result = await confirmOrder(userId, shippingAddress, paymentMethod);
+      const result = await confirmOrder(
+        userId,
+        shippingAddress,
+        paymentMethod,
+        'COMPLETED'
+      );
       console.log(result.orderNumber);
 
       res.status(200).json({

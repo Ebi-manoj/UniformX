@@ -34,3 +34,24 @@ export const couponSchema = z.object({
       message: 'Usage limit must be at least 1 or empty',
     }),
 });
+
+export const addOfferSchema = z.object({
+  name: z.string().min(3, 'Offer name must be at least 3 characters').max(50),
+  type: z.enum(['product', 'category'], { message: 'Offer type is required' }),
+
+  products: z.array(z.string()).optional(),
+  categories: z.array(z.string()).optional(),
+
+  discountPercentage: z
+    .string()
+    .min(1, 'Discount percentage is required')
+    .refine(
+      val => !isNaN(val) && parseFloat(val) > 0 && parseFloat(val) <= 100,
+      {
+        message: 'Discount must be between 1 and 100',
+      }
+    ),
+
+  validFrom: z.string().min(1, 'Start date is required'),
+  validTo: z.string().min(1, 'End date is required'),
+});

@@ -50,6 +50,12 @@ import {
   getEditCoupon,
   updateCoupon,
 } from '../controllers/admin_controllers/coupon.controller.js';
+import {
+  addOffer,
+  fetchAllOffers,
+  fetchOffer,
+  getAddOffer,
+} from '../controllers/admin_controllers/offer.controller.js';
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -122,4 +128,12 @@ router.post('/coupons/create', isProtected, addCoupons);
 router.get('/coupons/edit/:id', isProtected, getEditCoupon);
 router.put('/coupons/update/:id', isProtected, updateCoupon);
 router.delete('/coupons/delete/:id', isProtected, deleteCoupon);
+
+// offer routes
+
+router.get('/offer-management', isProtected, fetchAllOffers);
+router.get('/offer/:id', isProtected, fetchOffer);
+router.get('/offers/add', isProtected, getAddOffer);
+router.post('/offers/add', isProtected, addOffer);
+
 export default router;

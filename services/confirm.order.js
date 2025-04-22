@@ -7,7 +7,7 @@ import { Product } from '../model/product_model.js';
 const TAX_RATE = 0.05;
 
 // prettier-ignore
-export const confirmOrder = async function ( userId, shippingAddress, paymentMethod ) {
+export const confirmOrder = async function ( userId, shippingAddress, paymentMethod,paymentStatus='PENDING' ) {
     const session = await mongoose.startSession();
     session.startTransaction();
   
@@ -48,6 +48,7 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
           quantity: item.quantity,
           image: item.productId.image_url?.[0] || null,
           status: 'PROCESSING',
+          paymentStatus:paymentStatus,
           statusHistory: [
             { status: 'PROCESSING', timestamp: new Date(), note: 'Order received' },
           ],
@@ -59,7 +60,7 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
         items: orderItems,
         shippingAddress,
         paymentMethod,
-        paymentStatus: 'PENDING',
+        paymentStatus: paymentStatus,
         subtotal,
         taxAmount,
         discount,

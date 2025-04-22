@@ -132,6 +132,8 @@ OrderSchema.pre('save', async function (next) {
 
 // Method to update paymentStatus based on item statuses
 OrderSchema.methods.updatePaymentStatus = function () {
+  if (this.paymentStatus && this.paymentStatus !== 'PENDING') return;
+
   const paidItems = this.items.filter(
     item => item.paymentStatus === 'COMPLETED'
   ).length;
