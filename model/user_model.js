@@ -34,6 +34,20 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
     couponApplied: [],
+    referalToken: {
+      type: String,
+      default: null,
+    },
+    referalTokenClaimed: {
+      type: Boolean,
+      default: false,
+    },
+    sharedReferals: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        default: null,
+      },
+    ],
   },
   { timestamps: true }
 );

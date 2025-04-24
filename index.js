@@ -16,6 +16,7 @@ import adminRoutes from './routes/admin.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import { User } from './model/user_model.js';
+import { generateReferralToken } from './utilities/generator.js';
 
 dotenv.config();
 connectDB();

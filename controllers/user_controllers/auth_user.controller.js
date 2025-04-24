@@ -5,6 +5,7 @@ import { Category } from '../../model/category_model.js';
 import {
   generateExpiry,
   generateOTP,
+  generateReferralToken,
   sendOTP,
 } from '../../utilities/generator.js';
 import { generateToken } from '../../config/jwt.js';
@@ -99,14 +100,17 @@ export const getHome = asyncHandler(async (req, res) => {
       },
     },
   ]);
+  console.log(req.user?.referalClaimed);
+
   res.render('user/home', {
     css_file: null,
-    js_file: null,
+    js_file: 'home',
     layout: userMain,
     categories,
     clubs,
     bestSelling,
     features,
+    referalClaimed: req.user?.referalTokenClaimed,
   });
 });
 ////////////////////////////////////////////////////
@@ -179,6 +183,7 @@ export const signUpHandler = asyncHandler(async (req, res, next) => {
 
     // Send OTP email
     await sendOTP(email, otp);
+    console.log(`Otp sent:${otp}`);
 
     // Redirect to OTP verification page
     res.redirect('/auth/verify-otp?purpose=signup');
@@ -234,12 +239,14 @@ export const verifyOTP = asyncHandler(async (req, res, next) => {
     // OTP Verified - Handle based on purpose
     if (purpose === 'signup') {
       const { name, password, mobile } = req.session.signupData;
+      const referalToken = await generateReferralToken();
 
       const user = new User({
         full_name: name,
         email,
         password,
         phone: mobile,
+        referalToken,
       });
 
       await user.save();
@@ -294,6 +301,7 @@ export const resendOTP = asyncHandler(async (req, res, next) => {
 
     // Send OTP email
     await sendOTP(email, otp);
+    console.log(`Resend Otp sent:${otp}`);
 
     req.flash('success', 'A new OTP has been sent to your email.');
     res.redirect('/auth/verify-otp');

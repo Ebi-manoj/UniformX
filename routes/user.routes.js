@@ -50,6 +50,10 @@ import {
   createWalletOrder,
   verifyPayment,
 } from '../controllers/user_controllers/payment.controller.js';
+import {
+  applyReferal,
+  getReferal,
+} from '../controllers/user_controllers/referal.controller.js';
 
 const router = express.Router();
 router.use(fetchCategories);
@@ -149,4 +153,8 @@ router.patch('/coupon/remove', isUserAuthenticated, removeCoupon);
 router.post('/wallet/create-order', isUserAuthenticated, createWalletOrder);
 router.post('/order/create-order', isUserAuthenticated, createProductOrder);
 router.post('/verify-payment', isUserAuthenticated, verifyPayment);
+
+// referals
+router.get('/referal', isUserAuthenticated, fetchCartLength, getReferal);
+router.put('/referal/apply/:referalToken', isUserAuthenticated, applyReferal);
 export default router;

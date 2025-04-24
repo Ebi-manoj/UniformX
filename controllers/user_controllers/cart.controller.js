@@ -115,11 +115,11 @@ export const addToCart = asyncHandler(async (req, res) => {
       ],
     });
 
-    const offer = Math.max(
-      ...offers
-        .filter(offer => offer.isValid())
-        .map(offer => offer.discountPercentage)
-    );
+    const validOffers = offers.filter(offer => offer.isValid());
+    const offer = validOffers.length
+      ? Math.max(...validOffers.map(offer => offer.discountPercentage))
+      : 0;
+
     console.log(offer);
 
     let offerApplied = 0;
