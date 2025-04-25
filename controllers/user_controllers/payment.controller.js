@@ -46,6 +46,10 @@ export const createWalletOrder = asyncHandler(async (req, res) => {
 export const createProductOrder = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id;
+    const { shippingAddress, paymentMethod } = req.body;
+    if (!shippingAddress || !paymentMethod) {
+      throw new Error('Please provide all details');
+    }
 
     const cart = await Cart.findOne({ userId });
 
@@ -67,13 +71,15 @@ export const createProductOrder = asyncHandler(async (req, res) => {
     };
     const order = await razorpay.orders.create(options);
 
-    // 4. Save temp transaction
+    // Save temp transaction
     const transaction = new Transaction({
       user: userId,
       amount: totalAmount,
       type: 'DEBIT',
       status: 'PENDING',
       razorpayOrderId: order.id,
+      shippingAddress,
+      paymentMethod,
     });
     await transaction.save();
 
@@ -87,6 +93,8 @@ export const createProductOrder = asyncHandler(async (req, res) => {
 });
 
 export const verifyPayment = asyncHandler(async (req, res) => {
+  console.log('verify payment reached');
+
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type } =
     req.body;
   console.log(req.body);
@@ -171,4 +179,27 @@ export const verifyPayment = asyncHandler(async (req, res) => {
       });
     }
   }
+});
+
+// retry payment
+export const retryPayment = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+
+  const transaction = await Transaction.findOne({ razorpayOrderId: orderId });
+  if (!transaction || transaction.status === 'SUCCESS') {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid or completed transaction' });
+  }
+  console.log(transaction);
+
+  res.status(200).json({
+    success: true,
+    order: {
+      id: transaction.razorpayOrderId,
+      amount: transaction.amount * 100,
+    },
+    shippingAddress: transaction.shippingAddress,
+    paymentMethod: transaction.paymentMethod,
+  });
 });

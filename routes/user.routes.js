@@ -31,6 +31,7 @@ import {
   getAllOrders,
   getCheckout,
   getOrder,
+  getOrderFailure,
   getOrderSucces,
   placeOrder,
   returnOrder,
@@ -48,6 +49,7 @@ import {
 import {
   createProductOrder,
   createWalletOrder,
+  retryPayment,
   verifyPayment,
 } from '../controllers/user_controllers/payment.controller.js';
 import {
@@ -128,6 +130,12 @@ router.get(
   fetchCartLength,
   getOrderSucces
 );
+router.get(
+  '/order-failure/:orderId',
+  isUserAuthenticated,
+  fetchCartLength,
+  getOrderFailure
+);
 router.get('/orders', isUserAuthenticated, fetchCartLength, getAllOrders);
 router.get('/order/:id', isUserAuthenticated, fetchCartLength, getOrder);
 router.post('/cancel-order/:orderId', isUserAuthenticated, cancelOrder);
@@ -153,6 +161,7 @@ router.patch('/coupon/remove', isUserAuthenticated, removeCoupon);
 router.post('/wallet/create-order', isUserAuthenticated, createWalletOrder);
 router.post('/order/create-order', isUserAuthenticated, createProductOrder);
 router.post('/verify-payment', isUserAuthenticated, verifyPayment);
+router.get('/retry-payment/:orderId', isUserAuthenticated, retryPayment);
 
 // referals
 router.get('/referal', isUserAuthenticated, fetchCartLength, getReferal);

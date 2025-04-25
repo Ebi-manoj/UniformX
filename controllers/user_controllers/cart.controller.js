@@ -22,6 +22,8 @@ export const getCart = asyncHandler(async (req, res) => {
   const taxAmount = (total - discount) * TAX_RATE;
   const finalPrice = total - discount - offerApplied + taxAmount;
 
+  console.log(cart);
+
   res.render('user/cart', {
     layout: userMain,
     js_file: 'cart',

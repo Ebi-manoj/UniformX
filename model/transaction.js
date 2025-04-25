@@ -24,6 +24,13 @@ export const transactionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    shippingAddress: {
+      type: Object,
+      default: {},
+    },
+    paymentMethod: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

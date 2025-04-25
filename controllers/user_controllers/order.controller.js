@@ -122,6 +122,23 @@ export const getOrderSucces = asyncHandler(async (req, res) => {
   res.render('user/success_order', { layout: userMain, details });
 });
 
+/////////////////////////////////////////////////
+// Get order failure
+export const getOrderFailure = asyncHandler(async (req, res) => {
+  const { orderId } = req.params;
+  const details = {
+    orderId,
+    date: new Date().toDateString(),
+  };
+  console.log(orderId, details);
+
+  res.render('user/order_failure', {
+    js_file: 'checkout',
+    layout: userMain,
+    details,
+  });
+});
+
 ///////////////////////////////////////////
 //Get All Orders
 export const getAllOrders = asyncHandler(async (req, res) => {

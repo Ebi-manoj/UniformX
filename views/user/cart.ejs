@@ -6,7 +6,7 @@
       <div class="flex-1">
         <h2 class="text-lg font-medium mb-6">Your cart</h2>
         <div id="item-box" class="space-y-6">
-          <% if (!cart || cart.products.length === 0) { %>
+          <% if (!cart || cart?.products?.length === 0) { %>
             <!-- Modern Empty Cart Message -->
             <div class="flex flex-col items-center justify-center text-center p-10 bg-gray-100 rounded-lg">
               <img src="/images/empty-cart.svg" alt="Empty Cart" class="w-32 h-32 mb-4 opacity-70" />
@@ -73,7 +73,7 @@
                 </div>
               </div>
             <% }); %>
-          <% } %>
+         
         </div>
         
       </div>
@@ -134,6 +134,7 @@
           </div>
         </div>
       </div>
+      <% } %>
     </div>
   </main>
 </div>
