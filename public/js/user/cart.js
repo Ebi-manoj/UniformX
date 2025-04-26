@@ -262,7 +262,7 @@ async function updateCartQuantity(productId, span, action) {
       document.querySelector('.tax').textContent = `₹ ${data.tax}`;
       document.querySelector('.total').textContent = `₹ ${data.total}`;
       if (offerApplied) {
-        offerApplied.textContent = `₹ ${data.offerApplied}`;
+        offerApplied.textContent = `-₹ ${data.offerApplied}`;
       }
 
       showToast('Cart updated successfully', 'success');

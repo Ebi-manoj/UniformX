@@ -9,6 +9,8 @@ import { generateInvoiceHTML } from '../../utilities/invoiceHtml.js';
 import { Buffer } from 'buffer';
 import { Coupon } from '../../model/coupon.js';
 import { confirmOrder } from '../../services/order.js';
+import { Transaction } from '../../model/transaction.js';
+import { Wallet } from '../../model/wallet.js';
 
 const userMain = './layouts/user_main';
 const TAX_RATE = 0.05;
@@ -210,6 +212,34 @@ export const cancelOrder = asyncHandler(async (req, res) => {
       });
     }
 
+    // Calculate refund amount (confirmed correct)
+    const refundAmount = (item.totalPrice + item.tax) * item.quantity;
+
+    // Handle refund for non-COD orders
+    if (order.paymentMethod !== 'COD' && item.paymentStatus === 'COMPLETED') {
+      const transaction = new Transaction({
+        user: userId,
+        amount: refundAmount,
+        type: 'REFUND',
+        status: 'SUCCESS',
+      });
+      await transaction.save();
+
+      let wallet = await Wallet.findOne({ user: userId });
+      if (!wallet) {
+        wallet = new Wallet({
+          user: userId,
+          transactionHistory: [],
+        });
+      }
+      wallet.balance += refundAmount; // Add refund to wallet balance
+      wallet.transactionHistory.push(transaction._id);
+      await wallet.save();
+
+      // Update refund status
+      item.paymentStatus = 'REFUNDED';
+    }
+
     // Update item status and add to history
     item.status = 'CANCELLED';
     item.statusHistory.push({
@@ -227,27 +257,39 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     if (sizeData) {
       sizeData.stock_quantity += item.quantity;
       await product.save();
+    } else {
+      throw new Error(`Size ${item.size} not found for product`);
     }
 
     // Recalculate order totals
-    const activeItems = order.items.filter(i => i.status !== 'CANCELLED');
-    if (activeItems.length > 0) {
-      order.subtotal = activeItems.reduce(
-        (sum, i) => sum + i.price * i.quantity,
-        0
-      );
-      order.taxAmount = order.subtotal * TAX_RATE;
-      order.totalAmount =
-        order.subtotal +
-        order.taxAmount +
-        (order.shippingCost || 0) -
-        (order.discount || 0);
-    } else {
-      // If all items are cancelled, mark payment status as refunded if applicable
-      if (order.paymentStatus === 'COMPLETED') {
-        order.paymentStatus = 'REFUNDED';
-      }
-      order.totalAmount = 0;
+    const originalPrice = item.price;
+    const discountedPrice =
+      originalPrice - (originalPrice * (product.discountPercentage || 0)) / 100;
+    const itemSubtotal = originalPrice * item.quantity;
+    const itemDiscount = (originalPrice - discountedPrice) * item.quantity;
+    const itemOfferApplied = item.offerApplied * item.quantity;
+
+    // Deduct item contributions
+    order.subtotal -= itemSubtotal;
+    order.discount -= itemDiscount;
+    order.totalOfferApplied -= itemOfferApplied;
+    order.taxAmount -= item.tax * item.quantity;
+    order.totalAmount =
+      order.subtotal +
+      order.taxAmount -
+      order.discount -
+      order.couponDiscount -
+      order.totalOfferApplied;
+
+    // Ensure non-negative values
+    order.subtotal = Math.max(order.subtotal, 0);
+    order.taxAmount = Math.max(order.taxAmount, 0);
+    order.totalAmount = Math.max(order.totalAmount, 0);
+
+    // If all items are cancelled, update order payment status
+    const allCancelled = order.items.every(i => i.status === 'CANCELLED');
+    if (allCancelled && order.paymentStatus === 'COMPLETED') {
+      order.paymentStatus = 'REFUNDED';
     }
 
     await order.save();

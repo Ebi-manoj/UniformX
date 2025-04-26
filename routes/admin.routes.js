@@ -57,6 +57,7 @@ import {
   fetchOffer,
   getAddOffer,
 } from '../controllers/admin_controllers/offer.controller.js';
+import { getSalesReport } from '../controllers/admin_controllers/salesReport.controller.js';
 const router = express.Router();
 
 router.get('/login', getLogin);
@@ -137,5 +138,8 @@ router.get('/offer/:id', isProtected, fetchOffer);
 router.get('/offers/add', isProtected, getAddOffer);
 router.post('/offers/add', isProtected, addOffer);
 router.put('/offers/edit', isProtected, editOffer);
+
+// sales reports
+router.get('/report', isProtected, getSalesReport);
 
 export default router;

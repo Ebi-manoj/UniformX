@@ -34,7 +34,7 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
       const [cart] = await Cart.find({ userId })
         .populate({
           path: 'products.productId',
-          select: 'title price image_url sizes status category_id discount',
+          select: 'title price image_url sizes status category_id discountPercentage',
         })
         .session(session);
   
@@ -50,23 +50,28 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
   
       const subtotal = cart.totalPrice;
       const discount = cart.discountPrice || 0;
+      const coupon=cart.coupon||null
       const couponDiscount = cart.couponDiscount ?? 0;
       const taxAmount = (subtotal - discount) * TAX_RATE;
+      const taxPerItem=taxAmount/cart.products.length
       const offerApplied=cart.totalOfferDiscount||0
       const totalAmount = subtotal + taxAmount - discount - couponDiscount - offerApplied;
-  
+     
         const orderItems = cart.products.map(item => { 
         const originalPrice = item.productId.price;
-        const discount = item.productId.discount || 0;
+        const discount = item.productId.discountPercentage || 0;
         const discountedPrice = originalPrice - (originalPrice * discount) / 100;
-  
+        const offerApplied=item.offerApplied??0
+        
         return {
           product: item.productId._id,
           title: item.productId.title,
-          price: discountedPrice,
+          price: originalPrice,
+          totalPrice:discountedPrice-offerApplied,
+          tax:taxPerItem,
           size: item.size,
           quantity: item.quantity,
-          offerApplied:item.offerApplied??0,
+          offerApplied:offerApplied,
           image: item.productId.image_url?.[0] || null,
           status: 'PROCESSING',
           paymentStatus:paymentStatus,
@@ -87,6 +92,7 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
         discount,
         totalAmount,
         couponDiscount,
+        coupon,
         totalOfferApplied:offerApplied
       });
   

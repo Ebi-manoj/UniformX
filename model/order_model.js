@@ -16,6 +16,9 @@ const OrderSchema = new mongoose.Schema(
         },
         title: String,
         price: Number,
+        totalPrice: Number,
+        tax: Number,
+        discount: Number,
         size: String,
         quantity: Number,
         offerApplied: Number,
@@ -80,7 +83,7 @@ const OrderSchema = new mongoose.Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ['COD', 'CARD', 'UPI', 'BANK'],
+      enum: ['COD', 'CARD', 'WALLET', 'BANK'],
       default: 'COD',
     },
     paymentStatus: {
@@ -109,6 +112,11 @@ const OrderSchema = new mongoose.Schema(
     couponDiscount: {
       type: Number,
       default: 0,
+    },
+    coupon: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Coupon',
+      default: null,
     },
     totalOfferApplied: {
       type: Number,
