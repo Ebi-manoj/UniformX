@@ -52,9 +52,10 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
       const discount = cart.discountPrice || 0;
       const couponDiscount = cart.couponDiscount ?? 0;
       const taxAmount = (subtotal - discount) * TAX_RATE;
-      const totalAmount = subtotal + taxAmount - discount - couponDiscount;
+      const offerApplied=cart.totalOfferDiscount||0
+      const totalAmount = subtotal + taxAmount - discount - couponDiscount - offerApplied;
   
-      const orderItems = cart.products.map(item => {
+        const orderItems = cart.products.map(item => { 
         const originalPrice = item.productId.price;
         const discount = item.productId.discount || 0;
         const discountedPrice = originalPrice - (originalPrice * discount) / 100;
@@ -65,6 +66,7 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
           price: discountedPrice,
           size: item.size,
           quantity: item.quantity,
+          offerApplied:item.offerApplied??0,
           image: item.productId.image_url?.[0] || null,
           status: 'PROCESSING',
           paymentStatus:paymentStatus,
@@ -84,6 +86,8 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
         taxAmount,
         discount,
         totalAmount,
+        couponDiscount,
+        totalOfferApplied:offerApplied
       });
   
       await order.save({ session });

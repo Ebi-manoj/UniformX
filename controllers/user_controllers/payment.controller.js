@@ -61,7 +61,9 @@ export const createProductOrder = asyncHandler(async (req, res) => {
     const discount = cart.discountPrice || 0;
     const couponDiscount = cart.couponDiscount ?? 0;
     const taxAmount = (subtotal - discount) * TAX_RATE;
-    const totalAmount = subtotal + taxAmount - discount - couponDiscount;
+    const offerApplied = cart.totalOfferDiscount || 0;
+    const totalAmount =
+      subtotal + taxAmount - discount - couponDiscount - offerApplied;
 
     //  Create Razorpay order
     const options = {

@@ -252,6 +252,7 @@ async function updateCartQuantity(productId, span, action) {
 
     const data = await response.json();
     if (data.success) {
+      const offerApplied = document.querySelector('.offerApplied');
       span.textContent = newQuantity;
       // Update order summary
       document.querySelector('.subTotal').textContent = `₹ ${data.subtotal}`;
@@ -260,6 +261,10 @@ async function updateCartQuantity(productId, span, action) {
       ).textContent = `-₹${data.discount}`;
       document.querySelector('.tax').textContent = `₹ ${data.tax}`;
       document.querySelector('.total').textContent = `₹ ${data.total}`;
+      if (offerApplied) {
+        offerApplied.textContent = `₹ ${data.offerApplied}`;
+      }
+
       showToast('Cart updated successfully', 'success');
     } else {
       showToast(data.message || 'Failed to update cart');

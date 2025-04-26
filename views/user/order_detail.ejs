@@ -177,6 +177,18 @@
           <span>Discount</span>
           <span>- ₹<%= order.discount ? order.discount.toFixed(2) : '0.00' %></span>
         </div>
+        <% if (order.totalOfferApplied) { %>
+          <div class="flex justify-between text-green-600">
+            <span>Offer applied</span>
+            <span>- ₹<%= order.totalOfferApplied ? order.totalOfferApplied.toFixed(2) : '0.00' %></span>
+          </div> 
+        <% } %>
+        <% if (order.couponDiscount) { %>
+          <div class="flex justify-between text-green-600">
+            <span>Coupon applied</span>
+            <span>- ₹<%= order.couponDiscount ? order.couponDiscount.toFixed(2) : '0.00' %></span>
+          </div> 
+        <% } %>
         <div class="flex justify-between">
           <span class="text-gray-600">Tax</span>
           <span class="font-medium">₹<%= order.taxAmount || 0 %></span>

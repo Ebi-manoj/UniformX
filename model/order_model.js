@@ -18,6 +18,7 @@ const OrderSchema = new mongoose.Schema(
         price: Number,
         size: String,
         quantity: Number,
+        offerApplied: Number,
         image: String,
         status: {
           type: String,
@@ -105,6 +106,14 @@ const OrderSchema = new mongoose.Schema(
     },
     discount: Number,
     totalAmount: Number,
+    couponDiscount: {
+      type: Number,
+      default: 0,
+    },
+    totalOfferApplied: {
+      type: Number,
+      default: 0,
+    },
     invoiceUrl: String,
     orderNumber: {
       type: String,

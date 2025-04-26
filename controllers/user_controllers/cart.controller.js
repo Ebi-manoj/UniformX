@@ -206,6 +206,7 @@ export const updateCartQunatity = asyncHandler(async (req, res) => {
     success: true,
     subtotal: cart.totalPrice,
     discount: cart.discountPrice,
+    offerApplied: cart?.totalOfferDiscount ?? 0,
     tax: tax.toFixed(2),
     total: Math.floor(total),
     message: 'Cart updated successfully',

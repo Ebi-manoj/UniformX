@@ -25,7 +25,10 @@ export const applyCoupon = asyncHandler(async (req, res) => {
     return res.redirect('/checkout');
   }
   if (cart.totalPrice < coupon.minimumPurchase) {
-    req.flash('error', 'Invalid Coupon');
+    req.flash(
+      'error',
+      `Invalid Coupon,Minimum purchase ${coupon.minimumPurchase}! `
+    );
     return res.redirect('/checkout');
   }
 
