@@ -140,6 +140,6 @@ router.post('/offers/add', isProtected, addOffer);
 router.put('/offers/edit', isProtected, editOffer);
 
 // sales reports
-router.get('/report', isProtected, getSalesReport);
+router.get('/salesreport', isProtected, getSalesReport);
 
 export default router;

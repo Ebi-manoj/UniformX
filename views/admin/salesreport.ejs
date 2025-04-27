@@ -1,563 +1,332 @@
-<link
-rel="stylesheet"
-href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
-/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 <script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-      },
-      animation: {
-        'fade-in': 'fadeIn 0.3s ease-in-out',
-      },
-      keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'sans-serif'],
+        },
+        animation: {
+          'fade-in': 'fadeIn 0.3s ease-in-out',
+        },
+        keyframes: {
+          fadeIn: {
+            '0%': { opacity: '0' },
+            '100%': { opacity: '1' },
+          },
         },
       },
     },
-  },
-};
+  };
 </script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-body {
-  font-family: 'Inter', sans-serif;
-}
-
-.card-hover {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
-    0 4px 6px -2px rgba(0, 0, 0, 0.03);
-}
-
-.flatpickr-calendar {
-  border-radius: 8px !important;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-    0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.flatpickr-day.selected {
-  background: #000 !important;
-  border-color: #000 !important;
-}
-
-.flatpickr-day.today {
-  border-color: #000 !important;
-}
-
-.flatpickr-day:hover {
-  background: #f3f4f6 !important;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+  .card-hover {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  }
+  .flatpickr-calendar {
+    border-radius: 8px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  }
+  .flatpickr-day.selected {
+    background: #000 !important;
+    border-color: #000 !important;
+  }
+  .flatpickr-day.today {
+    border-color: #000 !important;
+  }
+  .flatpickr-day:hover {
+    background: #f3f4f6 !important;
+  }
 </style>
-    
-    <div class="max-w-7xl mx-auto animate-fade-in py-5">
-      <!-- Header -->
-      <div
-        class="flex flex-col md:flex-row md:items-center justify-between mb-8"
-      >
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-1">Sales Report</h1>
-          <p class="text-sm text-gray-500">
-            Comprehensive overview of your sales performance
-          </p>
-        </div>
 
-        <!-- Export Option -->
-        <button
-          class="mt-4 md:mt-0 px-5 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center shadow-sm"
-        >
-          <i class="fas fa-file-pdf mr-2"></i> Export to PDF
-        </button>
+<div class="max-w-7xl mx-auto animate-fade-in py-5">
+  <!-- Header -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 mb-1">Sales Report</h1>
+      <p class="text-sm text-gray-500">Comprehensive overview of your sales performance</p>
+    </div>
+    <div>
+      <button id="export-pdf" class="mt-4 md:mt-0 px-5 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center shadow-sm">
+        <i class="fas fa-file-pdf mr-2"></i> Export to PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Total Orders</h3>
+        <div class="p-2 bg-gray-100 rounded-lg">
+          <i class="fas fa-shopping-cart text-gray-400"></i>
+        </div>
       </div>
-
-      <!-- Summary Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div
-          class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-gray-500">Total Orders</h3>
-            <div class="p-2 bg-gray-100 rounded-lg">
-              <i class="fas fa-shopping-cart text-gray-400"></i>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-900">156</p>
-          <div class="mt-2 flex items-center text-xs text-gray-500">
-            <i class="fas fa-arrow-up mr-1 text-gray-900"></i>
-            <span>12% from last month</span>
-          </div>
+      <p class="text-3xl font-bold text-gray-900"><%= metrics.totalOrders %></p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Total Revenue</h3>
+        <div class="p-2 bg-gray-100 rounded-lg">
+          <i class="fas fa-rupee-sign text-gray-400"></i>
         </div>
-
-        <div
-          class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-gray-500">Total Revenue</h3>
-            <div class="p-2 bg-gray-100 rounded-lg">
-              <i class="fas fa-rupee-sign text-gray-400"></i>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-900">₹2,45,600</p>
-          <div class="mt-2 flex items-center text-xs text-gray-500">
-            <i class="fas fa-arrow-up mr-1 text-gray-900"></i>
-            <span>8% from last month</span>
-          </div>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">₹<%= metrics.totalRevenue.toFixed(2) %></p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Total Discount</h3>
+        <div class="p-2 bg-gray-100 rounded-lg">
+          <i class="fas fa-tags text-gray-400"></i>
         </div>
-
-        <div
-          class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-gray-500">Total Discount</h3>
-            <div class="p-2 bg-gray-100 rounded-lg">
-              <i class="fas fa-tags text-gray-400"></i>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-900">₹12,400</p>
-          <div class="mt-2 flex items-center text-xs text-gray-500">
-            <span>5% of total revenue</span>
-          </div>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">₹<%= metrics.totalDiscount.toFixed(2) %></p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-medium text-gray-500">Coupon Discount</h3>
+        <div class="p-2 bg-gray-100 rounded-lg">
+          <i class="fas fa-ticket-alt text-gray-400"></i>
         </div>
+      </div>
+      <p class="text-3xl font-bold text-gray-900">₹<%= metrics.totalCouponDiscount.toFixed(2) %></p>
+    </div>
+  </div>
 
-        <div
-          class="bg-white rounded-xl shadow-sm p-6 card-hover border border-gray-100"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-sm font-medium text-gray-500">Coupon Discount</h3>
-            <div class="p-2 bg-gray-100 rounded-lg">
-              <i class="fas fa-ticket-alt text-gray-400"></i>
-            </div>
-          </div>
-          <p class="text-3xl font-bold text-gray-900">₹5,800</p>
-          <div class="mt-2 flex items-center text-xs text-gray-500">
-            <span>2.4% of total revenue</span>
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100">
+    <h2 class="text-lg font-semibold text-gray-900 mb-5">Filters</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Custom Date Range</label>
+        <div class="relative">
+          <input
+            type="text"
+            id="date-range"
+            placeholder="Select date range"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all duration-200"
+            value="<%= dateRange.start %> to <%= dateRange.end %>"
+          />
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <i class="fas fa-calendar-alt text-gray-400"></i>
           </div>
         </div>
       </div>
-
-      <!-- Simplified Filters -->
-      <div
-        class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-100"
-      >
-        <h2 class="text-lg font-semibold text-gray-900 mb-5">Filters</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Date Range Picker -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2"
-              >Custom Date Range</label
-            >
-            <div class="relative">
-              <input
-                type="text"
-                id="date-range"
-                placeholder="Select date range"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-black transition-all duration-200"
-              />
-              <div
-                class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-              >
-                <i class="fas fa-calendar-alt text-gray-400"></i>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick Date Filters -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2"
-              >Quick Filters</label
-            >
-            <div class="flex flex-wrap gap-2">
-              <button
-                class="quick-filter px-4 py-2.5 bg-black text-white text-sm rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm"
-              >
-                Today
-              </button>
-              <button
-                class="quick-filter px-4 py-2.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200 shadow-sm"
-              >
-                Weekly
-              </button>
-              <button
-                class="quick-filter px-4 py-2.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200 shadow-sm"
-              >
-                Monthly
-              </button>
-              <button
-                class="quick-filter px-4 py-2.5 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200 shadow-sm"
-              >
-                Yearly
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Apply Filters Button -->
-        <div class="mt-6 flex justify-end">
-          <button
-            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 mr-3 shadow-sm"
-          >
-            Reset
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Quick Filters</label>
+        <div class="flex flex-wrap gap-2">
+          <button class="quick-filter px-4 py-2.5 <%= filterType === 'daily' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700' %> text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200 shadow-sm">
+            Daily
           </button>
-          <button
-            class="px-5 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm"
-          >
-            Apply Filters
+          <button class="quick-filter px-4 py-2.5 <%= filterType === 'weekly' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700' %> text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200 shadow-sm">
+            Weekly
           </button>
-        </div>
-      </div>
-
-      <!-- Sales Report Table -->
-      <div
-        class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100"
-      >
-        <div class="px-6 py-5 border-b border-gray-200">
-          <h2 class="text-lg font-semibold text-gray-900">Sales Report</h2>
-          <p class="text-sm text-gray-500 mt-1">
-            Showing data for April 25-26, 2025
-          </p>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr class="bg-gray-50">
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  Order No.
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  User
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  Total Amount
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  Discount
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  Coupon Discount
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  Final Amount
-                </th>
-                <th
-                  scope="col"
-                  class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                >
-                  Payment Method
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              <!-- Row 1 -->
-              <tr class="hover:bg-gray-50 transition-colors duration-150">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    ORD-20250426-001
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-700">John Doe</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">2025-04-26</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">₹5,000</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹500</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹200</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">₹4,300</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                    >CARD</span
-                  >
-                </td>
-              </tr>
-
-              <!-- Row 2 -->
-              <tr class="hover:bg-gray-50 transition-colors duration-150">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    ORD-20250426-002
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-700">Mary Smith</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">2025-04-26</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">₹2,500</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹0</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹100</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">₹2,400</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                    >COD</span
-                  >
-                </td>
-              </tr>
-
-              <!-- Row 3 -->
-              <tr class="hover:bg-gray-50 transition-colors duration-150">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    ORD-20250426-003
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-700">Alex Kim</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">2025-04-25</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">₹1,000</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹100</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹0</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">₹900</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                    >WALLET</span
-                  >
-                </td>
-              </tr>
-
-              <!-- Row 4 (example) -->
-              <tr class="hover:bg-gray-50 transition-colors duration-150">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    ORD-20250425-004
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-700">Sarah Johnson</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">2025-04-25</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">₹3,200</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹320</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹150</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">₹2,730</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                    >UPI</span
-                  >
-                </td>
-              </tr>
-
-              <!-- Row 5 (example) -->
-              <tr class="hover:bg-gray-50 transition-colors duration-150">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">
-                    ORD-20250425-005
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-700">Michael Brown</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">2025-04-25</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">₹7,500</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹750</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-500">₹300</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-medium text-gray-900">₹6,450</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span
-                    class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800"
-                    >CARD</span
-                  >
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
-        <div
-          class="px-6 py-4 flex items-center justify-between border-t border-gray-200"
-        >
-          <div class="flex-1 flex justify-between sm:hidden">
-            <button
-              class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
-            >
-              Previous
-            </button>
-            <button
-              class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200"
-            >
-              Next
-            </button>
-          </div>
-          <div
-            class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between"
-          >
-            <div>
-              <p class="text-sm text-gray-700">
-                Showing <span class="font-medium">1</span> to
-                <span class="font-medium">5</span> of
-                <span class="font-medium">42</span> results
-              </p>
-            </div>
-            <div>
-              <nav
-                class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
-                aria-label="Pagination"
-              >
-                <button
-                  class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <span class="sr-only">Previous</span>
-                  <i class="fas fa-chevron-left h-4 w-4"></i>
-                </button>
-                <button
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  1
-                </button>
-                <button
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-black text-sm font-medium text-white transition-colors duration-200"
-                >
-                  2
-                </button>
-                <button
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  3
-                </button>
-                <span
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
-                  >...</span
-                >
-                <button
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  8
-                </button>
-                <button
-                  class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  9
-                </button>
-                <button
-                  class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <span class="sr-only">Next</span>
-                  <i class="fas fa-chevron-right h-4 w-4"></i>
-                </button>
-              </nav>
-            </div>
-          </div>
+          <button class="quick-filter px-4 py-2.5 <%= filterType === 'monthly' ? 'bg-black text-white' : 'bg-gray-100 text-gray-700' %> text-sm rounded-lg hover:bg-gray-200 transition-colors duration-200 shadow-sm">
+            Monthly
+          </button>
+        
         </div>
       </div>
     </div>
+    <div class="mt-6 flex justify-end">
+      <button id="reset-filters" class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 mr-3 shadow-sm">
+        Reset
+      </button>
+      <button id="apply-filters" class="px-5 py-2.5 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm">
+        Apply Filters
+      </button>
+    </div>
+  </div>
 
-    <script>
-      // Initialize date picker
-      flatpickr('#date-range', {
-        mode: 'range',
-        dateFormat: 'Y-m-d',
-        defaultDate: ['2025-04-25', '2025-04-26'],
-        maxDate: 'today',
+  <!-- Sales Report Table -->
+  <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+    <div class="px-6 py-5 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">Sales Report</h2>
+      <p class="text-sm text-gray-500 mt-1">
+        Showing data for <%= dateRange.start %> to <%= dateRange.end %>
+      </p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr class="bg-gray-50">
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Order No.
+            </th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              User
+            </th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Date
+            </th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Total Amount
+            </th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Discount
+            </th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Coupon Discount
+            </th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Final Amount
+            </th>
+            <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              Payment Method
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% orders.forEach(order => { %>
+            <tr class="hover:bg-gray-50 transition-colors duration-150">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900"><%= order.orderNumber %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-700"><%= order.user %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500"><%= order.date %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">₹<%= order.totalAmount.toFixed(2) %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500">₹<%= order.discount.toFixed(2) %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500">₹<%= order.couponDiscount.toFixed(2) %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">₹<%= order.finalAmount.toFixed(2) %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                  <%= order.paymentMethod %>
+                </span>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <!-- Pagination -->
+    <div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+      <div class="flex-1 flex justify-between sm:hidden">
+        <a href="/admin/salesreport?type=<%= filterType %>&page=<%= pagination.currentPage - 1 %>&startDate=<%= dateRange.start %>&endDate=<%= dateRange.end %>"
+           class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 <%= pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : '' %>">
+          Previous
+        </a>
+        <a href="/admin/salesreport?type=<%= filterType %>&page=<%= pagination.currentPage + 1 %>&startDate=<%= dateRange.start %>&endDate=<%= dateRange.end %>"
+           class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200 <%= pagination.currentPage === pagination.totalPages ? 'pointer-events-none opacity-50' : '' %>">
+          Next
+        </a>
+      </div>
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Showing <span class="font-medium"><%= (pagination.currentPage - 1) * pagination.limit + 1 %></span> to
+            <span class="font-medium"><%= Math.min(pagination.currentPage * pagination.limit, pagination.totalOrders) %></span> of
+            <span class="font-medium"><%= pagination.totalOrders %></span> results
+          </p>
+        </div>
+        <div>
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <a href="/admin/salesreport?type=<%= filterType %>&page=<%= pagination.currentPage - 1 %>&startDate=<%= dateRange.start %>&endDate=<%= dateRange.end %>"
+               class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200 <%= pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : '' %>">
+              <span class="sr-only">Previous</span>
+              <i class="fas fa-chevron-left h-4 w-4"></i>
+            </a>
+            <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+              <a href="/admin/salesreport?type=<%= filterType %>&page=<%= i %>&startDate=<%= dateRange.start %>&endDate=<%= dateRange.end %>"
+                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium <%= i === pagination.currentPage ? 'bg-black text-white' : 'bg-white text-gray-700 hover:bg-gray-50' %> transition-colors duration-200">
+                <%= i %>
+              </a>
+            <% } %>
+            <a href="/admin/salesreport?type=<%= filterType %>&page=<%= pagination.currentPage + 1 %>&startDate=<%= dateRange.start %>&endDate=<%= dateRange.end %>"
+               class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200 <%= pagination.currentPage === pagination.totalPages ? 'pointer-events-none opacity-50' : '' %>">
+              <span class="sr-only">Next</span>
+              <i class="fas fa-chevron-right h-4 w-4"></i>
+            </a>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Initialize date picker
+flatpickr('#date-range', {
+  mode: 'range',
+  dateFormat: 'Y-m-d',
+  defaultDate: ['<%- dateRange.start %>', '<%- dateRange.end %>'],
+  maxDate: 'today',
+  onChange: function(selectedDates) {
+    if (selectedDates.length === 2) {
+      applyFilters('custom', selectedDates[0], selectedDates[1]);
+    }
+  },
+});
+
+// Filter buttons
+document.addEventListener('DOMContentLoaded', function () {
+  const quickFilterButtons = document.querySelectorAll('.quick-filter');
+  const applyFiltersButton = document.querySelector('#apply-filters');
+  const resetFiltersButton = document.querySelector('#reset-filters');
+  const exportPdfButton = document.querySelector('#export-pdf');
+
+  quickFilterButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      quickFilterButtons.forEach(btn => {
+        btn.classList.remove('bg-black', 'text-white');
+        btn.classList.add('bg-gray-100', 'text-gray-700');
       });
+      this.classList.remove('bg-gray-100', 'text-gray-700');
+      this.classList.add('bg-black', 'text-white');
 
-      // Quick filter buttons functionality
-      document.addEventListener('DOMContentLoaded', function () {
-        const quickFilterButtons = document.querySelectorAll('.quick-filter');
+      const type = this.textContent.trim().toLowerCase();
+      applyFilters(type);
+    });
+  });
 
-        quickFilterButtons.forEach(button => {
-          button.addEventListener('click', function () {
-            // Remove active class from all buttons
-            quickFilterButtons.forEach(btn => {
-              btn.classList.remove('bg-black', 'text-white');
-              btn.classList.add('bg-gray-100', 'text-gray-700');
-            });
+  applyFiltersButton.addEventListener('click', function () {
+    const dates = document.querySelector('#date-range').value.split(' to ');
+    if (dates.length === 2) {
+      applyFilters('custom', dates[0], dates[1]);
+    }
+  });
 
-            // Add active class to clicked button
-            this.classList.remove('bg-gray-100', 'text-gray-700');
-            this.classList.add('bg-black', 'text-white');
+  resetFiltersButton.addEventListener('click', function () {
+    quickFilterButtons.forEach(btn => {
+      btn.classList.remove('bg-black', 'text-white');
+      btn.classList.add('bg-gray-100', 'text-gray-700');
+    });
+    document.querySelector('#date-range').value = '';
+    applyFilters('daily');
+  });
 
-            // Here you would add logic to filter the data based on the selected time period
-          });
-        });
-      });
-    </script>
-  
+  exportPdfButton.addEventListener('click', function () {
+    alert('PDF export is not implemented yet.');
+  });
+
+  function applyFilters(type, startDate, endDate) {
+    let url = `/admin/salesreport?type=${type}`;
+    if (startDate && endDate) {
+      url += `&startDate=${moment(startDate).format('YYYY-MM-DD')}&endDate=${moment(endDate).format('YYYY-MM-DD')}`;
+    }
+    window.location.href = url;
+  }
+});
+</script>
