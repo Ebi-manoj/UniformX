@@ -163,3 +163,135 @@ if (retryBtn) {
     }
   });
 }
+///////////////////////////////////////////////////////////////////////////
+// Coupon
+const generateCouponCard = coupon => {
+  const title =
+    coupon.discountType === 'percentage'
+      ? `${coupon.discountAmount}% Off Discount`
+      : `₹${coupon.discountAmount} Off Discount`;
+  const endDate = moment(coupon.endDate).format('MMMM DD, YYYY');
+  return `
+    <div class="coupon-card border border-gray-200 rounded-xl p-4 bg-white">
+      <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="flex-shrink-0 bg-gray-100 rounded-lg p-4 flex items-center justify-center">
+          <div class="text-center">
+            <span class="block text-xs text-gray-500 uppercase">Coupon Code</span>
+            <span class="block text-lg font-bold text-gray-900 mt-1">${coupon.code}</span>
+          </div>
+        </div>
+        <div class="flex-grow">
+          <h3 class="text-base font-semibold text-gray-900">${title}</h3>
+          <p class="text-sm text-gray-600 mt-1">${coupon.description}</p>
+          <div class="flex items-center mt-2 text-xs text-gray-500">
+            <i class="far fa-clock mr-1"></i>
+            <span>Valid till: <span class="font-medium">${endDate}</span></span>
+          </div>
+          <div class="flex items-center mt-2 text-xs text-gray-500">
+            <i class="fas fa-shopping-cart mr-1"></i>
+            <span>Applicable on orders above ₹${coupon.minimumPurchase}</span>
+          </div>
+        </div>
+        <div class="flex-shrink-0 flex items-center">
+          <button class="copy-btn px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors duration-200 flex items-center gap-2">
+            <i class="far fa-copy"></i>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+};
+const populateCoupons = async coupons => {
+  const couponList = document.querySelector('#couponModal .space-y-4');
+  const couponCountSpan = document.querySelector(
+    '#couponModal .text-sm.text-gray-500'
+  );
+
+  try {
+    // Generate HTML for all coupons
+    const couponsHTML = coupons
+      .map(coupon => generateCouponCard(coupon))
+      .join('');
+    // Insert into coupon list
+    couponList.innerHTML = couponsHTML;
+    // Update coupon count
+    couponCountSpan.textContent = `Showing ${coupons.length} active coupons`;
+  } catch (error) {
+    console.error('Error fetching coupons:', error);
+    couponList.innerHTML =
+      '<p class="text-sm text-gray-500">No coupons available</p>';
+    couponCountSpan.textContent = 'Showing 0 active coupons';
+  }
+};
+
+// modal functionalities
+const modal = document.getElementById('couponModal');
+const modalContent = document.getElementById('modalContent');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const openModalBtn = document.getElementById('view-coupons');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const closeModalBtn2 = document.getElementById('closeModalBtn2');
+
+// Open modal
+openModalBtn.addEventListener('click', async function () {
+  try {
+    const response = await fetch(`/coupons`);
+    const data = await response.json();
+    if (data.success) {
+      populateCoupons(data.coupons || []);
+      modalContent.classList.add('animate-scale-in');
+      modalBackdrop.classList.add('animate-fade-in');
+      modal.classList.remove('hidden');
+    } else {
+      showToast('Something went wrong');
+    }
+  } catch (error) {
+    console.log(error);
+    showToast('Server issue ,Please try late');
+  }
+});
+
+// Close modal functions
+function closeModal() {
+  modalContent.classList.remove('animate-scale-in');
+  modalBackdrop.classList.remove('animate-fade-in');
+
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 200);
+}
+
+closeModalBtn.addEventListener('click', closeModal);
+closeModalBtn2.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', closeModal);
+
+// Prevent closing when clicking on modal content
+modalContent.addEventListener('click', function (e) {
+  e.stopPropagation();
+});
+
+// Copy button functionality
+const copyButtons = document.querySelectorAll('.copy-btn');
+
+if (copyButtons) {
+  copyButtons.forEach(button => {
+    button.addEventListener('click', function () {
+      const couponCard = this.closest('.coupon-card');
+      const couponCode = couponCard.querySelector('.font-bold').textContent;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(couponCode).then(() => {
+        // Visual feedback
+        this.innerHTML = '<i class="fas fa-check"></i><span>Copied!</span>';
+        couponCard.classList.add('copy-animation');
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          this.innerHTML = '<i class="far fa-copy"></i><span>Copy</span>';
+          couponCard.classList.remove('copy-animation');
+        }, 2000);
+      });
+    });
+  });
+}

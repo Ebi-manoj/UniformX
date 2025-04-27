@@ -3,6 +3,29 @@ import { Coupon } from '../../model/coupon.js';
 import { User } from '../../model/user_model.js';
 import { Cart } from '../../model/cart_model.js';
 
+export const fetchAllCoupons = asyncHandler(async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      req.flash('error', 'Something went wrong');
+      return res.redirect('/checkout');
+    }
+    const coupons = await Coupon.find({
+      minimumPurchase: { $lte: cart.totalPrice },
+    });
+
+    const validCoupons = coupons.filter(coupon => coupon.isValid());
+
+    res.status(200).json({ success: true, coupons: validCoupons });
+  } catch (error) {
+    console.error('Error fetching coupons:', error);
+    req.flash('error', 'Failed to fetch coupons');
+    return res.redirect('/checkout');
+  }
+});
+
 export const applyCoupon = asyncHandler(async (req, res) => {
   const { couponCode } = req.body;
   const userId = req.user._id;

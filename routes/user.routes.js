@@ -44,6 +44,7 @@ import {
 import { getWallet } from '../controllers/user_controllers/wallet.controller.js';
 import {
   applyCoupon,
+  fetchAllCoupons,
   removeCoupon,
 } from '../controllers/user_controllers/coupon.controller.js';
 import {
@@ -154,6 +155,7 @@ router.post('/add-review/:productId', isUserAuthenticated, addReview);
 router.get('/wallet', isUserAuthenticated, fetchCartLength, getWallet);
 
 // coupon
+router.get('/coupons', isUserAuthenticated, fetchAllCoupons);
 router.post('/coupon/apply', isUserAuthenticated, applyCoupon);
 router.patch('/coupon/remove', isUserAuthenticated, removeCoupon);
 
