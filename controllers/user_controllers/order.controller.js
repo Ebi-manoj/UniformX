@@ -211,9 +211,13 @@ export const cancelOrder = asyncHandler(async (req, res) => {
         message: `Item cannot be cancelled - current status: ${item.status}`,
       });
     }
+    const baseAmount = item.price * item.quantity;
+    const totalSubtotal = order.subtotal;
+    const totalAmount = order.totalAmount;
+    const proportion = baseAmount / totalSubtotal;
+    item.returnRequest.refundAmount = +(proportion * totalAmount).toFixed(2);
 
-    // Calculate refund amount (confirmed correct)
-    const refundAmount = (item.totalPrice + item.tax) * item.quantity;
+    const refundAmount = item.returnRequest.refundAmount;
 
     // Handle refund for non-COD orders
     if (order.paymentMethod !== 'COD' && item.paymentStatus === 'COMPLETED') {
@@ -260,31 +264,6 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     } else {
       throw new Error(`Size ${item.size} not found for product`);
     }
-
-    // Recalculate order totals
-    const originalPrice = item.price;
-    const discountedPrice =
-      originalPrice - (originalPrice * (product.discountPercentage || 0)) / 100;
-    const itemSubtotal = originalPrice * item.quantity;
-    const itemDiscount = (originalPrice - discountedPrice) * item.quantity;
-    const itemOfferApplied = item.offerApplied * item.quantity;
-
-    // Deduct item contributions
-    order.subtotal -= itemSubtotal;
-    order.discount -= itemDiscount;
-    order.totalOfferApplied -= itemOfferApplied;
-    order.taxAmount -= item.tax * item.quantity;
-    order.totalAmount =
-      order.subtotal +
-      order.taxAmount -
-      order.discount -
-      order.couponDiscount -
-      order.totalOfferApplied;
-
-    // Ensure non-negative values
-    order.subtotal = Math.max(order.subtotal, 0);
-    order.taxAmount = Math.max(order.taxAmount, 0);
-    order.totalAmount = Math.max(order.totalAmount, 0);
 
     // If all items are cancelled, update order payment status
     const allCancelled = order.items.every(i => i.status === 'CANCELLED');

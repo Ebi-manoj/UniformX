@@ -7,6 +7,7 @@ export const fetchAllCoupons = asyncHandler(async (req, res) => {
   try {
     const userId = req.user._id;
     const cart = await Cart.findOne({ userId });
+    const user = await User.findById(userId);
 
     if (!cart) {
       req.flash('error', 'Something went wrong');
@@ -16,7 +17,9 @@ export const fetchAllCoupons = asyncHandler(async (req, res) => {
       minimumPurchase: { $lte: cart.totalPrice },
     });
 
-    const validCoupons = coupons.filter(coupon => coupon.isValid());
+    const validCoupons = coupons.filter(
+      coupon => coupon.isValid() && !user.couponApplied.includes(coupon._id)
+    );
 
     res.status(200).json({ success: true, coupons: validCoupons });
   } catch (error) {

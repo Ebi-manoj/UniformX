@@ -195,6 +195,7 @@ export const approveReturn = asyncHandler(async (req, res) => {
     item.returnRequest.refundAmount = +(proportion * totalAmount).toFixed(2);
 
     const refundAmount = item.returnRequest.refundAmount;
+    console.log(refundAmount);
 
     item.statusHistory.push({
       status: 'RETURNED',

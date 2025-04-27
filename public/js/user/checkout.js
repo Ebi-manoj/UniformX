@@ -203,7 +203,7 @@ const generateCouponCard = coupon => {
   `;
 };
 const populateCoupons = async coupons => {
-  const couponList = document.querySelector('#couponModal .space-y-4');
+  const couponList = document.querySelector('#couponList');
   const couponCountSpan = document.querySelector(
     '#couponModal .text-sm.text-gray-500'
   );
@@ -243,6 +243,7 @@ openModalBtn.addEventListener('click', async function () {
       modalContent.classList.add('animate-scale-in');
       modalBackdrop.classList.add('animate-fade-in');
       modal.classList.remove('hidden');
+      copyCouponCode();
     } else {
       showToast('Something went wrong');
     }
@@ -272,26 +273,28 @@ modalContent.addEventListener('click', function (e) {
 });
 
 // Copy button functionality
-const copyButtons = document.querySelectorAll('.copy-btn');
+function copyCouponCode() {
+  const copyButtons = document.querySelectorAll('.copy-btn');
 
-if (copyButtons) {
-  copyButtons.forEach(button => {
-    button.addEventListener('click', function () {
-      const couponCard = this.closest('.coupon-card');
-      const couponCode = couponCard.querySelector('.font-bold').textContent;
+  if (copyButtons) {
+    copyButtons.forEach(button => {
+      button.addEventListener('click', function () {
+        const couponCard = this.closest('.coupon-card');
+        const couponCode = couponCard.querySelector('.font-bold').textContent;
 
-      // Copy to clipboard
-      navigator.clipboard.writeText(couponCode).then(() => {
-        // Visual feedback
-        this.innerHTML = '<i class="fas fa-check"></i><span>Copied!</span>';
-        couponCard.classList.add('copy-animation');
+        // Copy to clipboard
+        navigator.clipboard.writeText(couponCode).then(() => {
+          // Visual feedback
+          this.innerHTML = '<i class="fas fa-check"></i><span>Copied!</span>';
+          couponCard.classList.add('copy-animation');
 
-        // Reset after 2 seconds
-        setTimeout(() => {
-          this.innerHTML = '<i class="far fa-copy"></i><span>Copy</span>';
-          couponCard.classList.remove('copy-animation');
-        }, 2000);
+          // Reset after 2 seconds
+          setTimeout(() => {
+            this.innerHTML = '<i class="far fa-copy"></i><span>Copy</span>';
+            couponCard.classList.remove('copy-animation');
+          }, 2000);
+        });
       });
     });
-  });
+  }
 }
