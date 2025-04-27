@@ -317,9 +317,6 @@ document.addEventListener('DOMContentLoaded', function () {
     applyFilters('daily');
   });
 
-  exportPdfButton.addEventListener('click', function () {
-    alert('PDF export is not implemented yet.');
-  });
 
   function applyFilters(type, startDate, endDate) {
     let url = `/admin/salesreport?type=${type}`;
@@ -328,5 +325,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     window.location.href = url;
   }
+
+  // export to pdf
+  exportPdfButton.addEventListener('click', function () {
+    const type = '<%- filterType %>';
+    const start = document.querySelector('#date-range').value.split(' to ')[0] || '<%- dateRange.start %>';
+    const end = document.querySelector('#date-range').value.split(' to ')[1] || '<%- dateRange.end %>';
+    window.location.href = `/admin/salesreport/download?type=${type}&startDate=${start}&endDate=${end}&download=pdf`;
+  });
 });
 </script>

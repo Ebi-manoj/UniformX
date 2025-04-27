@@ -1,123 +1,85 @@
 import asyncHandler from 'express-async-handler';
-import { Order } from '../../model/order_model.js';
 import moment from 'moment';
+import puppeteer from 'puppeteer';
+import { fetchSalesReportData } from '../../services/sales_report.js';
+import { generateSalesReportHTML } from '../../utilities/invoiceHtml.js';
+import { Buffer } from 'buffer';
 
 export const getSalesReport = asyncHandler(async (req, res) => {
-  const {
-    type = 'daily',
-    startDate,
-    endDate,
-    page = 1,
-    limit = 10,
-  } = req.query;
-  console.log(type);
+  const { type, startDate, endDate, page, limit } = req.query;
 
-  // Set date range based on filter type
-  let dateFilter = {};
-  const today = moment().startOf('day');
+  try {
+    const data = await fetchSalesReportData({
+      type,
+      startDate,
+      endDate,
+      page,
+      limit,
+      req,
+    });
 
-  switch (type.trim().toLowerCase()) {
-    case 'daily':
-      dateFilter = {
-        createdAt: {
-          $gte: today.toDate(),
-          $lte: moment(today).endOf('day').toDate(),
-        },
-      };
-      break;
-    case 'weekly':
-      dateFilter = {
-        createdAt: {
-          $gte: moment().subtract(7, 'days').startOf('day').toDate(),
-          $lte: today.toDate(),
-        },
-      };
-      break;
-    case 'monthly':
-      dateFilter = {
-        createdAt: {
-          $gte: moment().subtract(30, 'days').startOf('day').toDate(),
-          $lte: today.toDate(),
-        },
-      };
-      break;
-    case 'custom':
-      if (!startDate || !endDate) {
-        req.flash('error', 'Start and end dates are required for custom range');
-        return res.redirect('/admin/salesreport');
-      }
-      dateFilter = {
-        createdAt: {
-          $gte: moment(startDate).startOf('day').toDate(),
-          $lte: moment(endDate).endOf('day').toDate(),
-        },
-      };
-      break;
-    default:
-      req.flash('error', 'Invalid report type');
+    res.render('admin/salesreport', {
+      metrics: data.metrics,
+      orders: data.orders,
+      pagination: data.pagination,
+      dateRange: data.dateRange,
+      filterType: data.filterType,
+      messages: req.flash('error'),
+    });
+  } catch (error) {
+    if (error.message === 'Redirect required') {
       return res.redirect('/admin/salesreport');
+    }
+    throw error;
+  }
+});
+export const downloadSalesReport = asyncHandler(async (req, res) => {
+  const { type, startDate, endDate, download } = req.query;
+
+  if (download !== 'pdf') {
+    req.flash('error', 'Invalid download format');
+    return res.redirect('/admin/salesreport');
   }
 
-  // Aggregate summary metrics
-  const summary = await Order.aggregate([
-    { $match: dateFilter },
-    {
-      $group: {
-        _id: null,
-        totalOrders: { $sum: 1 },
-        totalRevenue: { $sum: '$totalAmount' },
-        totalDiscount: { $sum: '$discount' },
-        totalCouponDiscount: { $sum: '$couponDiscount' },
-      },
-    },
-  ]);
+  try {
+    // Fetch all orders for PDF (no pagination)
+    const data = await fetchSalesReportData({
+      type,
+      startDate,
+      endDate,
+      page: 1,
+      limit: 1000, // Large limit to include all orders
+      req,
+    });
 
-  const metrics = summary[0] || {
-    totalOrders: 0,
-    totalRevenue: 0,
-    totalDiscount: 0,
-    totalCouponDiscount: 0,
-  };
+    const browser = await puppeteer.launch({ headless: 'new' });
+    const page = await browser.newPage();
+    const htmlContent = generateSalesReportHTML(
+      data.metrics,
+      data.orders,
+      data.dateRange,
+      data.filterType
+    );
 
-  // Fetch orders for table
-  const skip = (page - 1) * limit;
-  const orders = await Order.find(dateFilter)
-    .populate('user', 'full_name')
-    .skip(skip)
-    .limit(Number(limit))
-    .select(
-      'orderNumber createdAt totalAmount discount couponDiscount paymentMethod'
-    )
-    .lean();
+    await page.setContent(htmlContent);
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
+    });
 
-  const totalOrders = await Order.countDocuments(dateFilter);
+    await browser.close();
 
-  // Format orders
-  const formattedOrders = orders.map(order => ({
-    orderNumber: order.orderNumber,
-    user: order.user?.full_name || 'Unknown',
-    date: moment(order.createdAt).format('YYYY-MM-DD'),
-    totalAmount: order.totalAmount,
-    discount: order.discount,
-    couponDiscount: order.couponDiscount,
-    finalAmount: order.totalAmount,
-    paymentMethod: order.paymentMethod,
-  }));
-
-  // Render template
-  res.render('admin/salesreport', {
-    metrics,
-    orders: formattedOrders,
-    pagination: {
-      currentPage: Number(page),
-      totalPages: Math.ceil(totalOrders / limit),
-      totalOrders,
-      limit: Number(limit),
-    },
-    dateRange: {
-      start: moment(dateFilter.createdAt.$gte).format('YYYY-MM-DD'),
-      end: moment(dateFilter.createdAt.$lte).format('YYYY-MM-DD'),
-    },
-    filterType: type,
-  });
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Sales_Report_${moment().format('YYYY-MM-DD')}.pdf`
+    );
+    res.send(Buffer.from(pdfBuffer));
+  } catch (error) {
+    if (error.message === 'Redirect required') {
+      return res.redirect('/admin/salesreport');
+    }
+    throw error;
+  }
 });

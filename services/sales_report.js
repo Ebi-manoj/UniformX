@@ -1,15 +1,18 @@
-import mongoose from 'mongoose';
 import { Order } from '../model/order_model.js';
 import moment from 'moment';
-
-// prettier-ignore
-export const fetchSalesReportData = async ({ type = 'daily', startDate, endDate, page = 1, limit = 10 }) => {
-  // Set date range based on filter type
+export const fetchSalesReportData = async ({
+  type = 'daily',
+  startDate,
+  endDate,
+  page = 1,
+  limit = 10,
+  req,
+}) => {
+  // Set date range
   let dateFilter = {};
   const today = moment().startOf('day');
-  let reportTitle = 'Sales Report';
 
-  switch (type.toLowerCase()) {
+  switch (type.trim().toLowerCase()) {
     case 'daily':
       dateFilter = {
         createdAt: {
@@ -17,7 +20,6 @@ export const fetchSalesReportData = async ({ type = 'daily', startDate, endDate,
           $lte: moment(today).endOf('day').toDate(),
         },
       };
-      reportTitle = 'Daily Sales Report';
       break;
     case 'weekly':
       dateFilter = {
@@ -26,7 +28,6 @@ export const fetchSalesReportData = async ({ type = 'daily', startDate, endDate,
           $lte: today.toDate(),
         },
       };
-      reportTitle = 'Weekly Sales Report';
       break;
     case 'monthly':
       dateFilter = {
@@ -35,11 +36,11 @@ export const fetchSalesReportData = async ({ type = 'daily', startDate, endDate,
           $lte: today.toDate(),
         },
       };
-      reportTitle = 'Monthly Sales Report';
       break;
     case 'custom':
       if (!startDate || !endDate) {
-        throw new Error('Start and end dates are required for custom range');
+        req.flash('error', 'Start and end dates are required for custom range');
+        throw new Error('Redirect required');
       }
       dateFilter = {
         createdAt: {
@@ -47,22 +48,191 @@ export const fetchSalesReportData = async ({ type = 'daily', startDate, endDate,
           $lte: moment(endDate).endOf('day').toDate(),
         },
       };
-      reportTitle = `Sales Report (${moment(startDate).format('YYYY-MM-DD')} to ${moment(endDate).format('YYYY-MM-DD')})`;
       break;
     default:
-      throw new Error('Invalid report type');
+      req.flash('error', 'Invalid report type');
+      throw new Error('Redirect required');
   }
 
-  // Aggregate summary metrics
-  const summary = await Order.aggregate([
+  // Aggregate to find orders with at least one delivered item
+  const deliveredOrders = await Order.aggregate([
     { $match: dateFilter },
+    {
+      $addFields: {
+        deliveredItems: {
+          $filter: {
+            input: '$items',
+            cond: { $eq: ['$$this.status', 'DELIVERED'] },
+          },
+        },
+      },
+    },
+    { $match: { 'deliveredItems.0': { $exists: true } } }, // At least one delivered item
+    {
+      $addFields: {
+        deliveredSubtotal: {
+          $sum: {
+            $map: {
+              input: '$deliveredItems',
+              as: 'item',
+              in: {
+                $subtract: [
+                  '$$item.totalPrice',
+                  { $ifNull: ['$$item.refundAmount', 0] },
+                ],
+              },
+            },
+          },
+        },
+        deliveredItemDiscount: {
+          $sum: {
+            $map: {
+              input: '$deliveredItems',
+              as: 'item',
+              in: { $ifNull: ['$$item.discount', 0] },
+            },
+          },
+        },
+        totalSubtotal: { $sum: '$items.totalPrice' },
+      },
+    },
+    {
+      $addFields: {
+        deliveredDiscount: {
+          $cond: {
+            if: { $gt: ['$deliveredItemDiscount', 0] },
+            then: '$deliveredItemDiscount',
+            else: {
+              $cond: {
+                if: { $gt: ['$totalSubtotal', 0] },
+                then: {
+                  $multiply: [
+                    '$discount',
+                    { $divide: ['$deliveredSubtotal', '$totalSubtotal'] },
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+        couponDiscountForDelivered: {
+          $cond: {
+            if: { $gt: ['$totalSubtotal', 0] },
+            then: {
+              $multiply: [
+                '$couponDiscount',
+                { $divide: ['$deliveredSubtotal', '$totalSubtotal'] },
+              ],
+            },
+            else: 0,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        orderNumber: 1,
+        deliveredDiscount: 1,
+        deliveredSubtotal: 1,
+        couponDiscountForDelivered: 1,
+      },
+    },
+  ]);
+
+  const orderIds = deliveredOrders.map(order => order._id);
+  console.log(
+    'Delivered Orders:',
+    deliveredOrders.map(o => ({
+      orderNumber: o.orderNumber,
+      deliveredDiscount: o.deliveredDiscount,
+      deliveredSubtotal: o.deliveredSubtotal,
+    }))
+  );
+
+  // Aggregate summary metrics for delivered orders
+  const summary = await Order.aggregate([
+    { $match: { _id: { $in: orderIds } } },
+    {
+      $addFields: {
+        deliveredItems: {
+          $filter: {
+            input: '$items',
+            cond: { $eq: ['$$this.status', 'DELIVERED'] },
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        deliveredSubtotal: {
+          $sum: {
+            $map: {
+              input: '$deliveredItems',
+              as: 'item',
+              in: {
+                $subtract: [
+                  '$$item.totalPrice',
+                  { $ifNull: ['$$item.refundAmount', 0] },
+                ],
+              },
+            },
+          },
+        },
+        deliveredItemDiscount: {
+          $sum: {
+            $map: {
+              input: '$deliveredItems',
+              as: 'item',
+              in: { $ifNull: ['$$item.discount', 0] },
+            },
+          },
+        },
+        totalSubtotal: { $sum: '$items.totalPrice' },
+      },
+    },
+    {
+      $addFields: {
+        deliveredDiscount: {
+          $cond: {
+            if: { $gt: ['$deliveredItemDiscount', 0] },
+            then: '$deliveredItemDiscount',
+            else: {
+              $cond: {
+                if: { $gt: ['$totalSubtotal', 0] },
+                then: {
+                  $multiply: [
+                    '$discount',
+                    { $divide: ['$deliveredSubtotal', '$totalSubtotal'] },
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+        couponDiscountForDelivered: {
+          $cond: {
+            if: { $gt: ['$totalSubtotal', 0] },
+            then: {
+              $multiply: [
+                '$couponDiscount',
+                { $divide: ['$deliveredSubtotal', '$totalSubtotal'] },
+              ],
+            },
+            else: 0,
+          },
+        },
+      },
+    },
     {
       $group: {
         _id: null,
         totalOrders: { $sum: 1 },
-        totalRevenue: { $sum: '$totalAmount' },
-        totalDiscount: { $sum: '$discount' },
-        totalCouponDiscount: { $sum: '$couponDiscount' },
+        totalRevenue: { $sum: '$deliveredSubtotal' },
+        totalDiscount: { $sum: '$deliveredDiscount' },
+        totalCouponDiscount: { $sum: '$couponDiscountForDelivered' },
       },
     },
   ]);
@@ -73,30 +243,39 @@ export const fetchSalesReportData = async ({ type = 'daily', startDate, endDate,
     totalDiscount: 0,
     totalCouponDiscount: 0,
   };
-  metrics.totalOverallDiscount = metrics.totalDiscount + metrics.totalCouponDiscount;
+  console.log('Metrics:', metrics);
 
-  // Fetch detailed orders for table
+  // Fetch orders for table
   const skip = (page - 1) * limit;
-  const orders = await Order.find(dateFilter)
-    .populate('user', 'name')
+  const orders = await Order.find({ _id: { $in: orderIds } })
+    .populate('user', 'full_name')
     .skip(skip)
     .limit(Number(limit))
-    .select('orderNumber createdAt totalAmount discount couponDiscount paymentMethod')
+    .select(
+      'orderNumber createdAt subtotal totalAmount discount couponDiscount paymentMethod items'
+    )
     .lean();
 
-  const totalOrders = await Order.countDocuments(dateFilter);
+  const totalOrders = orderIds.length;
 
   // Format orders
-  const formattedOrders = orders.map(order => ({
-    orderNumber: order.orderNumber,
-    user: order.user?.name || 'Unknown',
-    date: moment(order.createdAt).format('YYYY-MM-DD'),
-    totalAmount: order.totalAmount,
-    discount: order.discount,
-    couponDiscount: order.couponDiscount,
-    finalAmount: order.totalAmount, // totalAmount is final
-    paymentMethod: order.paymentMethod,
-  }));
+  const formattedOrders = orders.map(order => {
+    const deliveredItems = order.items.filter(
+      item => item.status === 'DELIVERED'
+    );
+    return {
+      orderNumber: order.orderNumber,
+      user: order.user?.full_name || 'Unknown',
+      date: moment(order.createdAt).format('YYYY-MM-DD'),
+      totalAmount: order.subtotal,
+      discount: order.discount,
+      couponDiscount: order.couponDiscount,
+      finalAmount: order.totalAmount,
+      paymentMethod: order.paymentMethod,
+      deliveredItemCount: deliveredItems.length,
+      totalItemCount: order.items.length,
+    };
+  });
 
   return {
     metrics,
@@ -111,7 +290,6 @@ export const fetchSalesReportData = async ({ type = 'daily', startDate, endDate,
       start: moment(dateFilter.createdAt.$gte).format('YYYY-MM-DD'),
       end: moment(dateFilter.createdAt.$lte).format('YYYY-MM-DD'),
     },
-    reportTitle,
     filterType: type,
   };
 };

@@ -122,7 +122,6 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    invoiceUrl: String,
     orderNumber: {
       type: String,
       unique: true,
