@@ -181,7 +181,10 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     const userId = req.user._id;
 
     // Find the order
-    const order = await Order.findOne({ _id: orderId, user: userId });
+    const order = await Order.findOne({ _id: orderId, user: userId }).populate(
+      'coupon',
+      'minimumPurchase'
+    );
 
     if (!order) {
       return res.status(404).json({
@@ -217,8 +220,19 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     const proportion = baseAmount / totalSubtotal;
     item.returnRequest.refundAmount = +(proportion * totalAmount).toFixed(2);
 
-    const refundAmount = item.returnRequest.refundAmount;
+    let refundAmount = item.returnRequest.refundAmount;
 
+    // check coupon valid or not
+    const currentSubtotal = totalSubtotal - baseAmount;
+    const minimumPurchase = order.coupon?.minimumPurchase;
+    if (
+      order.couponDiscount !== 0 &&
+      currentSubtotal < minimumPurchase &&
+      currentSubtotal !== 0
+    ) {
+      refundAmount -= order.couponDiscount;
+      order.couponDiscount = 0;
+    }
     // Handle refund for non-COD orders
     if (order.paymentMethod !== 'COD' && item.paymentStatus === 'COMPLETED') {
       const transaction = new Transaction({

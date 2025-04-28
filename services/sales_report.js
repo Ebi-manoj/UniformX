@@ -11,7 +11,6 @@ export const fetchSalesReportData = async ({
   // Set date range based on filter type
   let dateFilter = {};
   const today = moment().startOf('day');
-
   switch (type.trim().toLowerCase()) {
     case 'daily':
       dateFilter = {
@@ -25,7 +24,7 @@ export const fetchSalesReportData = async ({
       dateFilter = {
         createdAt: {
           $gte: moment().subtract(7, 'days').startOf('day').toDate(),
-          $lte: today.toDate(),
+          $lte: moment(today).endOf('day').toDate(), // changed here
         },
       };
       break;
@@ -33,7 +32,7 @@ export const fetchSalesReportData = async ({
       dateFilter = {
         createdAt: {
           $gte: moment().subtract(30, 'days').startOf('day').toDate(),
-          $lte: today.toDate(),
+          $lte: moment(today).endOf('day').toDate(), // changed here
         },
       };
       break;
@@ -53,6 +52,7 @@ export const fetchSalesReportData = async ({
       req.flash('error', 'Invalid report type');
       throw new Error('Redirect required');
   }
+
   // Aggregate summary metrics
   const summary = await Order.aggregate([
     { $match: dateFilter },

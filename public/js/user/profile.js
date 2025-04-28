@@ -101,13 +101,6 @@ function ProfileFunctionality() {
       showToast('Phone number must be 10 digits!', 'error');
       return;
     }
-
-    // Address Validation (optional)
-    if (!addressId) {
-      e.preventDefault();
-      showToast('Please select or add an address!', 'error');
-      return;
-    }
   });
 }
 const isProfile = document.getElementById('profile');

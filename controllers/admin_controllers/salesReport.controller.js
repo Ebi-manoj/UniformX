@@ -48,7 +48,7 @@ export const downloadSalesReport = asyncHandler(async (req, res) => {
       startDate,
       endDate,
       page: 1,
-      limit: 1000, // Large limit to include all orders
+      limit: 1000,
       req,
     });
 
