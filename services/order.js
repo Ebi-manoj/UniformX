@@ -5,6 +5,7 @@ import { Order } from '../model/order_model.js';
 import { Product } from '../model/product_model.js';
 
 const TAX_RATE = 0.05;
+const CODTHRESHOLD = 10000;
 export const calculateCartTotal = async function (cart) {
   // Recalculate cart total
   cart.totalPrice = cart.products.reduce(
@@ -56,7 +57,12 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
       const taxPerItem=taxAmount/cart.products.length
       const offerApplied=cart.totalOfferDiscount||0
       const totalAmount = subtotal + taxAmount - discount - couponDiscount - offerApplied;
-     
+
+      // Validate Cod only under 5000
+      if(totalAmount>CODTHRESHOLD&&paymentMethod==='COD'){
+        throw new Error(`Cash on Delivery is not available above ${CODTHRESHOLD} `)
+      }
+        
         const orderItems = cart.products.map(item => { 
         const originalPrice = item.productId.price;
         const discount = item.productId.discountPercentage || 0;

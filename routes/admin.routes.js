@@ -4,6 +4,7 @@ import {
   getLogin,
   getDashboard,
   logout,
+  getDashboardDetails,
 } from '../controllers/admin_controllers/auth_admin.controller.js';
 import { isProtected } from '../middlewares/auth_middleware.js';
 import {
@@ -66,6 +67,7 @@ const router = express.Router();
 router.get('/login', getLogin);
 router.post('/login', adminLogin);
 router.get('/dashboard', isProtected, getDashboard);
+router.get('/dashboard-details', isProtected, getDashboardDetails);
 router.post('/logout', logout);
 router.get('/customers', isProtected, getUser);
 router.patch('/customers/block/:id', isProtected, toggleBlock);
