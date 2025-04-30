@@ -1,4 +1,3 @@
-<!-- admin-dashboard.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +6,6 @@
   <title>Admin Dashboard</title>
   <!-- Include Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Include date-fns for date formatting -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script> -->
   <style>
     :root {
       --primary-color: #4361ee;
@@ -150,12 +147,26 @@
       font-weight: 600;
     }
 
-    .filter-dropdown {
+    .filter-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .filter-btn {
       background-color: white;
       border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 6px 12px;
+      border-radius: 20px;
+      padding: 6px 16px;
+      cursor: pointer;
       font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
     }
 
     .recent-orders {
@@ -218,28 +229,6 @@
       margin-top: 20px;
     }
 
-    .filter-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .filter-btn {
-      background-color: white;
-      border: 1px solid var(--border-color);
-      border-radius: 20px;
-      padding: 6px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-    }
-
-    .filter-btn.active {
-      background-color: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-    }
-
     .top-lists-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -280,7 +269,6 @@
       color: var(--primary-color);
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
       .two-column-layout {
         grid-template-columns: 1fr;
@@ -293,10 +281,7 @@
     <div class="dashboard-header">
       <h1 class="dashboard-title">Admin Dashboard</h1>
       <div class="filter-controls">
-        <button class="filter-button">
-          <span>This Month</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
+       
       </div>
     </div>
 
@@ -305,7 +290,7 @@
       <div class="card">
         <div class="card-header">Total Sales</div>
         <div class="card-subtitle">THIS MONTH</div>
-        <div class="card-title">₹<span id="total-sales">4,235</span></div>
+        <div class="card-title">₹<span id="total-sales">0</span></div>
         <div class="chart-container">
           <canvas id="sales-chart"></canvas>
         </div>
@@ -314,7 +299,7 @@
       <div class="card">
         <div class="card-header">Customers</div>
         <div class="card-subtitle">THIS MONTH</div>
-        <div class="card-title"><span id="total-customers">2,571</span></div>
+        <div class="card-title"><span id="total-customers">0</span></div>
         <div class="chart-container">
           <canvas id="customers-chart"></canvas>
         </div>
@@ -322,12 +307,12 @@
 
       <div class="card">
         <div class="card-header">Orders</div>
-        <div class="card-subtitle">MONTHLY GOAL: 100</div>
-        <div class="card-title"><span id="total-orders">734</span></div>
+        <div class="card-subtitle">MONTHLY GOAL: <span id="monthly-goal">1000</span></div>
+        <div class="card-title"><span id="total-orders">0</span></div>
         <div class="progress-container">
-          <div class="progress-bar" style="width: 73.4%;"></div>
+          <div class="progress-bar" style="width: 0%;"></div>
         </div>
-        <div class="card-subtitle"><span id="orders-left">266</span> left</div>
+        <div class="card-subtitle"><span id="orders-left">1000</span> left</div>
       </div>
     </div>
 
@@ -337,8 +322,8 @@
         <div class="chart-title">Sales Overview</div>
         <div class="filter-group">
           <button class="filter-btn" data-period="daily">Daily</button>
-          <button class="filter-btn active" data-period="weekly">Weekly</button>
-          <button class="filter-btn" data-period="monthly">Monthly</button>
+          <button class="filter-btn" data-period="weekly">Weekly</button>
+          <button class="filter-btn active" data-period="monthly">Monthly</button>
           <button class="filter-btn" data-period="yearly">Yearly</button>
         </div>
       </div>
@@ -355,15 +340,14 @@
           <div class="chart-title">Best Selling</div>
           <div>THIS MONTH</div>
         </div>
-        <h2 class="card-title">$<span id="best-selling-total">2,400</span></h2>
+        <h2 class="card-title">$<span id="best-selling-total">0</span></h2>
         <div class="card-subtitle">Total Sales</div>
-        
         <div style="width: 200px; height: 200px; margin: 0 auto;">
           <canvas id="doughnut-chart"></canvas>
         </div>
         <div style="text-align: center; margin-top: 20px;">
-          <div style="font-weight: 600; font-size: 18px;">Classic Monochrome Tees</div>
-          <div style="color: #6c757d; margin-top: 5px;">$940 Sales</div>
+          <div style="font-weight: 600; font-size: 18px;" id="top-product-name"></div>
+          <div style="color: #6c757d; margin-top: 5px;" id="top-product-sales"></div>
         </div>
       </div>
 
@@ -376,7 +360,7 @@
         <table>
           <thead>
             <tr>
-              <th>Item</th>
+              <th>Customer</th>
               <th>Date</th>
               <th>Total</th>
               <th>Status</th>
@@ -393,187 +377,106 @@
     <div class="top-lists-container">
       <div class="top-list-card">
         <h3 class="top-list-title">Best Selling Products (Top 10)</h3>
-        <ul class="top-list" id="top-products-list">
-          <!-- Will be populated by JavaScript -->
-        </ul>
+        <ul class="top-list" id="top-products-list"></ul>
       </div>
 
       <div class="top-list-card">
         <h3 class="top-list-title">Best Selling Categories (Top 10)</h3>
-        <ul class="top-list" id="top-categories-list">
-          <!-- Will be populated by JavaScript -->
-        </ul>
+        <ul class="top-list" id="top-categories-list"></ul>
       </div>
 
       <div class="top-list-card">
         <h3 class="top-list-title">Best Selling Brands (Top 10)</h3>
-        <ul class="top-list" id="top-brands-list">
-          <!-- Will be populated by JavaScript -->
-        </ul>
+        <ul class="top-list" id="top-brands-list"></ul>
       </div>
     </div>
   </div>
 
   <script>
-    // Sample data - In a production environment, you would fetch this from your backend API
-    const mockOrdersData = [
-      {
-        _id: '1',
-        createdAt: '2023-03-20T12:30:00',
-        items: [
-          { 
-            title: 'Mens Black T-Shirts',
-            price: 75,
-            status: 'PROCESSING'
-          }
-        ],
-        totalAmount: 75
-      },
-      {
-        _id: '2',
-        createdAt: '2023-03-19T10:15:00',
-        items: [
-          { 
-            title: 'Essential Neutrals',
-            price: 22,
-            status: 'PROCESSING'
-          }
-        ],
-        totalAmount: 22
-      },
-      {
-        _id: '3',
-        createdAt: '2023-02-07T14:45:00',
-        items: [
-          { 
-            title: 'Sleek and Cozy Black',
-            price: 57,
-            status: 'DELIVERED'
-          }
-        ],
-        totalAmount: 57
-      },
-      {
-        _id: '4',
-        createdAt: '2023-01-29T09:20:00',
-        items: [
-          { 
-            title: 'MOCKUP Black',
-            price: 30,
-            status: 'DELIVERED'
-          }
-        ],
-        totalAmount: 30
-      }
-    ];
-
-    // Mock data for best selling products, categories, and brands
-    const topProducts = [
-      { name: 'Classic Black T-Shirt', sales: 940 },
-      { name: 'Premium Denim Jeans', sales: 785 },
-      { name: 'Casual White Sneakers', sales: 650 },
-      { name: 'Essential Hoodie', sales: 520 },
-      { name: 'Comfortable Lounge Pants', sales: 495 },
-      { name: 'Basic Cotton Socks (5-Pack)', sales: 410 },
-      { name: 'Slim Fit Oxford Shirt', sales: 385 },
-      { name: 'Leather Belt', sales: 320 },
-      { name: 'Knit Beanie', sales: 280 },
-      { name: 'Canvas Backpack', sales: 245 }
-    ];
-
-    const topCategories = [
-      { name: 'T-Shirts', sales: 2100 },
-      { name: 'Jeans', sales: 1750 },
-      { name: 'Sneakers', sales: 1450 },
-      { name: 'Accessories', sales: 1200 },
-      { name: 'Outerwear', sales: 980 },
-      { name: 'Formal Wear', sales: 850 },
-      { name: 'Sportswear', sales: 780 },
-      { name: 'Underwear', sales: 650 },
-      { name: 'Socks', sales: 580 },
-      { name: 'Hats', sales: 450 }
-    ];
-
-    const topBrands = [
-      { name: 'FashionCore', sales: 3200 },
-      { name: 'UrbanTrend', sales: 2800 },
-      { name: 'ClassicWear', sales: 2300 },
-      { name: 'SportElite', sales: 1950 },
-      { name: 'LuxuryLine', sales: 1700 },
-      { name: 'EssentialBasics', sales: 1550 },
-      { name: 'StreetStyle', sales: 1400 },
-      { name: 'ComfortZone', sales: 1250 },
-      { name: 'EcoFriendly', sales: 1100 },
-      { name: 'VintageVibes', sales: 950 }
-    ];
-    
-
-        
     // Function to format date
     function formatDate(dateString) {
       const date = new Date(dateString);
       return `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}, ${date.getFullYear()}`;
     }
 
+    // Function to format currency
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+    }
+
+    // Fetch dashboard data
+    async function fetchDashboardData(timeFilter = 'monthly') {
+      try {
+        const response = await fetch(`/admin/dashboard-details?timeFilter=${timeFilter}`);
+        if (!response.ok) throw new Error('Failed to fetch dashboard data');
+        return await response.json();
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        return null;
+      }
+    }
+
     // Populate recent orders table
-    function populateRecentOrders() {
+    function populateRecentOrders(orders) {
       const tableBody = document.getElementById('recent-orders-table');
       tableBody.innerHTML = '';
 
-      mockOrdersData.forEach(order => {
-        const item = order.items[0];
+      orders.forEach(order => {
         const tr = document.createElement('tr');
-        
+        const status = order.status || 'PROCESSING'; // Assume a status field or default to PROCESSING
         tr.innerHTML = `
-          <td>${item.title}</td>
+          <td>${order.user?.name || 'Unknown'}</td>
           <td>${formatDate(order.createdAt)}</td>
-          <td>$${order.totalAmount.toFixed(2)}</td>
+          <td>${formatCurrency(order.totalAmount)}</td>
           <td>
-            <span class="status-badge ${item.status === 'DELIVERED' ? 'status-completed' : 'status-processing'}">
-              ${item.status === 'DELIVERED' ? 'Completed' : 'Processing'}
+            <span class="status-badge ${status === 'DELIVERED' ? 'status-completed' : 'status-processing'}">
+              ${status === 'DELIVERED' ? 'Completed' : 'Processing'}
             </span>
           </td>
         `;
-        
         tableBody.appendChild(tr);
       });
     }
 
     // Populate top lists
-    function populateTopLists() {
+    function populateTopLists(products, categories, brands) {
       const productsListEl = document.getElementById('top-products-list');
       const categoriesListEl = document.getElementById('top-categories-list');
       const brandsListEl = document.getElementById('top-brands-list');
-      
+
+      productsListEl.innerHTML = '';
+      categoriesListEl.innerHTML = '';
+      brandsListEl.innerHTML = '';
+
       // Products
-      topProducts.forEach(product => {
+      products.forEach(product => {
         const li = document.createElement('li');
         li.className = 'top-list-item';
         li.innerHTML = `
-          <span class="top-list-name">${product.name}</span>
-          <span class="top-list-value">$${product.sales}</span>
+          <span class="top-list-name">${product.title}</span>
+          <span class="top-list-value">${formatCurrency(product.totalSales)}</span>
         `;
         productsListEl.appendChild(li);
       });
-      
+
       // Categories
-      topCategories.forEach(category => {
+      categories.forEach(category => {
         const li = document.createElement('li');
         li.className = 'top-list-item';
         li.innerHTML = `
           <span class="top-list-name">${category.name}</span>
-          <span class="top-list-value">$${category.sales}</span>
+          <span class="top-list-value">${formatCurrency(category.totalSales)}</span>
         `;
         categoriesListEl.appendChild(li);
       });
-      
+
       // Brands
-      topBrands.forEach(brand => {
+      brands.forEach(brand => {
         const li = document.createElement('li');
         li.className = 'top-list-item';
         li.innerHTML = `
           <span class="top-list-name">${brand.name}</span>
-          <span class="top-list-value">$${brand.sales}</span>
+          <span class="top-list-value">${formatCurrency(brand.totalSales)}</span>
         `;
         brandsListEl.appendChild(li);
       });
@@ -581,42 +484,42 @@
 
     // Initialize Charts
     function initCharts(data) {
-      const {dailySales,sales,dailyUserCount,totalUserCount}=data
-      const formatedDailySales=dailySales.map(d=>d.total)
-      const formatedDailyUserCount=dailyUserCount.map(d=>d.count)
-      console.log(formatedDailyUserCount)
-      console.log(totalUserCount)
-       
-      // init textValues
-      const totalSalesEL=document.getElementById('total-sales')
-      const totalCustomerEL=document.getElementById('total-customers')
-      
+      const {
+        totalSales,
+        totalOrders,
+        customers,
+        monthlyGoal,
+        currentMonthOrders,
+        ordersLeft,
+        goalProgress,
+        timeSeriesData,
+        timeSeriesLabels,
+        topProducts
+      } = data;
 
+      // Update static values
+      document.getElementById('total-sales').textContent = formatCurrency(totalSales).replace('₹', '');
+      document.getElementById('total-customers').textContent = customers;
+      document.getElementById('total-orders').textContent = totalOrders;
+      document.getElementById('monthly-goal').textContent = monthlyGoal;
+      document.getElementById('orders-left').textContent = ordersLeft;
+      document.querySelector('.progress-bar').style.width = `${goalProgress}%`;
 
-      totalSalesEL.textContent=sales.totalRevenue
-      totalCustomerEL.textContent=totalUserCount
-   
+      // Update best selling section
+      if (topProducts.length > 0) {
+        document.getElementById('best-selling-total').textContent = formatCurrency(topProducts[0].totalSales).replace('₹', '');
+        document.getElementById('top-product-name').textContent = topProducts[0].title;
+        document.getElementById('top-product-sales').textContent = `${formatCurrency(topProducts[0].totalSales)} Sales`;
+      }
 
-      const totalOrdersEl=document.getElementById('total-orders')
-      const ordersLeftEl=document.getElementById('orders-left')
-      const progressBar=document.querySelector('.progress-bar')
-      const targetOrder=100
-      const orderLeft=targetOrder-sales.orderCount
-      const remainPercentage=sales.orderCount/targetOrder*100
-      console.log(remainPercentage)
-      
-
-      totalOrdersEl.textContent=sales.orderCount
-      ordersLeftEl.textContent=orderLeft
-      progressBar.style.width=remainPercentage+'%'
       // Sales small chart
       const salesChartCtx = document.getElementById('sales-chart').getContext('2d');
-      const salesChart = new Chart(salesChartCtx, {
+      new Chart(salesChartCtx, {
         type: 'bar',
         data: {
-          labels: Array(30).fill(''),
+          labels: timeSeriesLabels,
           datasets: [{
-            data: formatedDailySales,
+            data: timeSeriesData,
             backgroundColor: '#4361ee',
             borderRadius: 4,
             barThickness: 4,
@@ -626,32 +529,24 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              enabled: false
-            }
+            legend: { display: false },
+            tooltip: { enabled: false }
           },
           scales: {
-            x: {
-              display: false,
-            },
-            y: {
-              display: false,
-            }
+            x: { display: false },
+            y: { display: false }
           }
         }
       });
 
-      // Customers small chart
+      // Customers small chart (using same time series data as placeholder)
       const customersChartCtx = document.getElementById('customers-chart').getContext('2d');
-      const customersChart = new Chart(customersChartCtx, {
+      new Chart(customersChartCtx, {
         type: 'line',
         data: {
-          labels: Array(10).fill(''),
+          labels: timeSeriesLabels,
           datasets: [{
-            data: formatedDailyUserCount,
+            data: timeSeriesData.map(val => val / 10), // Scale down for visualization
             borderColor: '#4361ee',
             tension: 0.4,
             pointRadius: 0,
@@ -662,36 +557,25 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              enabled: false
-            }
+            legend: { display: false },
+            tooltip: { enabled: false }
           },
           scales: {
-            x: {
-              display: false,
-            },
-            y: {
-              display: false,
-            }
+            x: { display: false },
+            y: { display: false }
           }
         }
       });
 
       // Doughnut chart for best selling
       const doughnutChartCtx = document.getElementById('doughnut-chart').getContext('2d');
-      const doughnutChart = new Chart(doughnutChartCtx, {
+      new Chart(doughnutChartCtx, {
         type: 'doughnut',
         data: {
-          labels: ['Completed', 'Remaining'],
+          labels: ['Top Product', 'Others'],
           datasets: [{
-            data: [75, 25],
-            backgroundColor: [
-              '#4361ee',
-              '#e9ecef',
-            ],
+            data: topProducts.length > 0 ? [topProducts[0].totalSales, totalSales - topProducts[0].totalSales] : [0, 0],
+            backgroundColor: ['#4361ee', '#e9ecef'],
             borderWidth: 0,
           }]
         },
@@ -700,93 +584,38 @@
           maintainAspectRatio: false,
           cutout: '75%',
           plugins: {
-            legend: {
-              display: false,
-            },
-            tooltip: {
-              enabled: false
-            }
+            legend: { display: false },
+            tooltip: { enabled: false }
           }
         }
       });
 
-      // Main sales chart with filter
+      // Main sales chart
       const mainSalesChartCtx = document.getElementById('main-sales-chart').getContext('2d');
-      
-      // Weekly data (default)
-      const weeklyData = {
-        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-        datasets: [{
-          label: 'Sales',
-          data: [1200, 1900, 1700, 2400],
-          borderColor: '#4361ee',
-          backgroundColor: 'rgba(67, 97, 238, 0.1)',
-          tension: 0.4,
-          fill: true,
-        }]
-      };
-      
-      // Monthly data
-      const monthlyData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        datasets: [{
-          label: 'Sales',
-          data: [4200, 5100, 5800, 6200, 6100, 7200, 7800, 8400, 8700, 9100, 9400, 10000],
-          borderColor: '#4361ee',
-          backgroundColor: 'rgba(67, 97, 238, 0.1)',
-          tension: 0.4,
-          fill: true,
-        }]
-      };
-      
-      // Daily data
-      const dailyData = {
-        labels: Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`),
-        datasets: [{
-          label: 'Sales',
-          data: Array.from({ length: 30 }, () => Math.floor(Math.random() * 500) + 100),
-          borderColor: '#4361ee',
-          backgroundColor: 'rgba(67, 97, 238, 0.1)',
-          tension: 0.4,
-          fill: true,
-        }]
-      };
-      
-      // Yearly data
-      const yearlyData = {
-        labels: ['2020', '2021', '2022', '2023', '2024'],
-        datasets: [{
-          label: 'Sales',
-          data: [48000, 61000, 75000, 92000, 103000],
-          borderColor: '#4361ee',
-          backgroundColor: 'rgba(67, 97, 238, 0.1)',
-          tension: 0.4,
-          fill: true,
-        }]
-      };
-
       const mainSalesChart = new Chart(mainSalesChartCtx, {
         type: 'line',
-        data: weeklyData,
+        data: {
+          labels: timeSeriesLabels,
+          datasets: [{
+            label: 'Sales',
+            data: timeSeriesData,
+            borderColor: '#4361ee',
+            backgroundColor: 'rgba(67, 97, 238, 0.1)',
+            tension: 0.4,
+            fill: true,
+          }]
+        },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              display: false,
-            }
+            legend: { display: false }
           },
           scales: {
-            x: {
-              grid: {
-                display: false
-              }
-            },
+            x: { grid: { display: false } },
             y: {
               beginAtZero: true,
-              grid: {
-                borderDash: [5, 5]
-              }
+              grid: { borderDash: [5, 5] }
             }
           }
         }
@@ -795,60 +624,55 @@
       // Filter buttons event listeners
       const filterButtons = document.querySelectorAll('.filter-btn');
       filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          // Remove active class from all buttons
+        button.addEventListener('click', async function() {
           filterButtons.forEach(btn => btn.classList.remove('active'));
-          
-          // Add active class to clicked button
           this.classList.add('active');
-          
-          // Update chart data based on selected period
+
           const period = this.dataset.period;
-          let chartData;
-          
-          switch(period) {
-            case 'daily':
-              chartData = dailyData;
-              break;
-            case 'weekly':
-              chartData = weeklyData;
-              break;
-            case 'monthly':
-              chartData = monthlyData;
-              break;
-            case 'yearly':
-              chartData = yearlyData;
-              break;
-            default:
-              chartData = weeklyData;
+          const newData = await fetchDashboardData(period);
+          if (newData) {
+            // Update static values
+            document.getElementById('total-sales').textContent = formatCurrency(newData.totalSales).replace('₹', '');
+            document.getElementById('total-customers').textContent = newData.customers;
+            document.getElementById('total-orders').textContent = newData.totalOrders;
+            document.getElementById('monthly-goal').textContent = newData.monthlyGoal;
+            document.getElementById('orders-left').textContent = newData.ordersLeft;
+            document.querySelector('.progress-bar').style.width = `${newData.goalProgress}%`;
+
+            // Update best selling section
+            if (newData.topProducts.length > 0) {
+              document.getElementById('best-selling-total').textContent = formatCurrency(newData.topProducts[0].totalSales).replace('₹', '');
+              document.getElementById('top-product-name').textContent = newData.topProducts[0].title;
+              document.getElementById('top-product-sales').textContent = `${formatCurrency(newData.topProducts[0].totalSales)} Sales`;
+            }
+
+            // Update charts
+            mainSalesChart.data.labels = newData.timeSeriesLabels;
+            mainSalesChart.data.datasets[0].data = newData.timeSeriesData;
+            mainSalesChart.update();
+
+            // Update lists
+            populateRecentOrders(newData.recentOrders);
+            populateTopLists(newData.topProducts, newData.topCategories, newData.topClubs);
           }
-          
-          mainSalesChart.data = chartData;
-          mainSalesChart.update();
         });
       });
     }
 
     // Initialize the dashboard
-   async function initDashboard() {
-    try {
-      const response=await fetch('/admin/dashboard-details')
-      const data=await response.json()
-      console.log(data)
-      populateRecentOrders();
-      populateTopLists();
-      initCharts(data);
-      
-    } catch (error) {
-      console.log(error)
-    }
-     
-   
+    async function initDashboard() {
+      const data = await fetchDashboardData('monthly');
+      if (data) {
+        populateRecentOrders(data.recentOrders);
+        populateTopLists(data.topProducts, data.topCategories, data.topClubs);
+        initCharts(data);
+      } else {
+        console.error('Failed to initialize dashboard');
+      }
     }
 
     // Run initialization when DOM is loaded
     document.addEventListener('DOMContentLoaded', initDashboard);
-    
   </script>
 </body>
 </html>
