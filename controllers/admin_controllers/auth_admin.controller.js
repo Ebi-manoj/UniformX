@@ -3,7 +3,8 @@ import { Admin } from '../../model/admin_model.js';
 import { Order } from '../../model/order_model.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../config/jwt.js';
-import moment from 'moment';
+import { dashboardQueries } from '../../utilities/DbQueries.js';
+import { User } from '../../model/user_model.js';
 
 const adminLogin_layout = './layouts/admin_login';
 
@@ -48,30 +49,17 @@ export const getDashboard = asyncHandler(async (req, res) => {
 });
 
 export const getDashboardDetails = asyncHandler(async (req, res) => {
-  const today = moment().startOf('day').toDate();
-  const startOfMonth = moment().startOf('month').toDate();
-  const endOfMonth = moment().endOf('month').toDate();
+  const totalSales = await Order.aggregate(dashboardQueries.totalSales);
+  const dailySales = await Order.aggregate(dashboardQueries.dailySales);
+  const dailyUserCount = await User.aggregate(dashboardQueries.dailyCustomers);
+  const totalUserCount = await User.countDocuments(
+    dashboardQueries.totalUserCount
+  );
 
-  const totalSales = await Order.aggregate([
-    {
-      $match: {
-        createdAt: {
-          $gte: startOfMonth,
-          $lte: endOfMonth,
-        },
-        paymentStatus: 'COMPLETED',
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        totalRevenue: { $sum: '$totalAmount' },
-        orderCount: { $sum: 1 },
-      },
-    },
-  ]);
   const sales = totalSales[0] || { totalRevenue: 0, orderCount: 0 };
-  res.status(200).json({ sales });
+  console.log(dailySales);
+
+  res.status(200).json({ sales, dailySales, dailyUserCount, totalUserCount });
 });
 
 export const logout = asyncHandler(async (req, res) => {

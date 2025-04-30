@@ -8,7 +8,7 @@
   <!-- Include Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Include date-fns for date formatting -->
-  <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/date-fns@2.30.0/index.min.js"></script> -->
   <style>
     :root {
       --primary-color: #4361ee;
@@ -305,7 +305,7 @@
       <div class="card">
         <div class="card-header">Total Sales</div>
         <div class="card-subtitle">THIS MONTH</div>
-        <div class="card-title">$<span id="total-sales">4,235</span></div>
+        <div class="card-title">₹<span id="total-sales">4,235</span></div>
         <div class="chart-container">
           <canvas id="sales-chart"></canvas>
         </div>
@@ -322,7 +322,7 @@
 
       <div class="card">
         <div class="card-header">Orders</div>
-        <div class="card-subtitle">MONTHLY GOAL: 1,000</div>
+        <div class="card-subtitle">MONTHLY GOAL: 100</div>
         <div class="card-title"><span id="total-orders">734</span></div>
         <div class="progress-container">
           <div class="progress-bar" style="width: 73.4%;"></div>
@@ -350,7 +350,7 @@
     <!-- Two Column Layout -->
     <div class="two-column-layout">
       <!-- Best Selling Chart -->
-      <div class="chart-card">
+      <div class="chart-card mt-4">
         <div class="chart-header">
           <div class="chart-title">Best Selling</div>
           <div>THIS MONTH</div>
@@ -368,7 +368,7 @@
       </div>
 
       <!-- Recent Orders Table -->
-      <div class="recent-orders">
+      <div class="recent-orders mt-4">
         <div class="recent-orders-header">
           <div class="chart-title">Recent Orders</div>
           <a href="#" class="view-all">View All</a>
@@ -506,7 +506,9 @@
       { name: 'EcoFriendly', sales: 1100 },
       { name: 'VintageVibes', sales: 950 }
     ];
+    
 
+        
     // Function to format date
     function formatDate(dateString) {
       const date = new Date(dateString);
@@ -578,15 +580,43 @@
     }
 
     // Initialize Charts
-    function initCharts() {
+    function initCharts(data) {
+      const {dailySales,sales,dailyUserCount,totalUserCount}=data
+      const formatedDailySales=dailySales.map(d=>d.total)
+      const formatedDailyUserCount=dailyUserCount.map(d=>d.count)
+      console.log(formatedDailyUserCount)
+      console.log(totalUserCount)
+       
+      // init textValues
+      const totalSalesEL=document.getElementById('total-sales')
+      const totalCustomerEL=document.getElementById('total-customers')
+      
+
+
+      totalSalesEL.textContent=sales.totalRevenue
+      totalCustomerEL.textContent=totalUserCount
+   
+
+      const totalOrdersEl=document.getElementById('total-orders')
+      const ordersLeftEl=document.getElementById('orders-left')
+      const progressBar=document.querySelector('.progress-bar')
+      const targetOrder=100
+      const orderLeft=targetOrder-sales.orderCount
+      const remainPercentage=sales.orderCount/targetOrder*100
+      console.log(remainPercentage)
+      
+
+      totalOrdersEl.textContent=sales.orderCount
+      ordersLeftEl.textContent=orderLeft
+      progressBar.style.width=remainPercentage+'%'
       // Sales small chart
       const salesChartCtx = document.getElementById('sales-chart').getContext('2d');
       const salesChart = new Chart(salesChartCtx, {
         type: 'bar',
         data: {
-          labels: Array(24).fill(''),
+          labels: Array(30).fill(''),
           datasets: [{
-            data: [65, 59, 80, 81, 56, 55, 70, 65, 59, 80, 81, 56, 55, 70, 65, 59, 80, 81, 56, 55, 70, 65, 59, 80],
+            data: formatedDailySales,
             backgroundColor: '#4361ee',
             borderRadius: 4,
             barThickness: 4,
@@ -619,9 +649,9 @@
       const customersChart = new Chart(customersChartCtx, {
         type: 'line',
         data: {
-          labels: Array(12).fill(''),
+          labels: Array(10).fill(''),
           datasets: [{
-            data: [65, 59, 80, 81, 56, 55, 70, 65, 59, 80, 81, 56],
+            data: formatedDailyUserCount,
             borderColor: '#4361ee',
             tension: 0.4,
             pointRadius: 0,
@@ -800,14 +830,25 @@
     }
 
     // Initialize the dashboard
-    function initDashboard() {
+   async function initDashboard() {
+    try {
+      const response=await fetch('/admin/dashboard-details')
+      const data=await response.json()
+      console.log(data)
       populateRecentOrders();
       populateTopLists();
-      initCharts();
+      initCharts(data);
+      
+    } catch (error) {
+      console.log(error)
+    }
+     
+   
     }
 
     // Run initialization when DOM is loaded
     document.addEventListener('DOMContentLoaded', initDashboard);
+    
   </script>
 </body>
 </html>

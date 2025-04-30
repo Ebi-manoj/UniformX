@@ -1,3 +1,4 @@
+import moment from 'moment';
 ////////////////////////////////////////////////
 //////////Product Details Fetching
 export function productDetails(slug) {
@@ -123,3 +124,66 @@ export function productDetails(slug) {
     },
   ];
 }
+
+const today = moment().startOf('day').toDate();
+const startOfMonth = moment().startOf('month').toDate();
+const endOfMonth = moment().endOf('month').toDate();
+export const dashboardQueries = {
+  totalSales: [
+    {
+      $match: {
+        createdAt: {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        },
+        paymentStatus: 'COMPLETED',
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalRevenue: { $sum: '$totalAmount' },
+        orderCount: { $sum: 1 },
+      },
+    },
+  ],
+  dailySales: [
+    {
+      $match: {
+        createdAt: {
+          $gte: startOfMonth,
+          $lte: endOfMonth,
+        },
+        paymentStatus: 'COMPLETED',
+      },
+    },
+    {
+      $group: {
+        _id: { $dayOfMonth: '$createdAt' },
+        total: { $sum: '$totalAmount' },
+      },
+    },
+    {
+      $sort: { _id: 1 },
+    },
+  ],
+
+  dailyCustomers: [
+    {
+      $match: {
+        createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+      },
+    },
+    {
+      $group: {
+        _id: { $dayOfMonth: '$createdAt' },
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ],
+
+  totalUserCount: {
+    createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+  },
+};
