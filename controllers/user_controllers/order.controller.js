@@ -222,17 +222,6 @@ export const cancelOrder = asyncHandler(async (req, res) => {
 
     let refundAmount = item.returnRequest.refundAmount;
 
-    // check coupon valid or not
-    const currentSubtotal = totalSubtotal - baseAmount;
-    const minimumPurchase = order.coupon?.minimumPurchase;
-    if (
-      order.couponDiscount !== 0 &&
-      currentSubtotal < minimumPurchase &&
-      currentSubtotal !== 0
-    ) {
-      refundAmount -= order.couponDiscount;
-      order.couponDiscount = 0;
-    }
     // Handle refund for non-COD orders
     if (order.paymentMethod !== 'COD' && item.paymentStatus === 'COMPLETED') {
       const transaction = new Transaction({

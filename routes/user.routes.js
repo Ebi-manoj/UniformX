@@ -1,5 +1,8 @@
 import express from 'express';
-import { getHome } from '../controllers/user_controllers/auth_user.controller.js';
+import {
+  getAbout,
+  getHome,
+} from '../controllers/user_controllers/auth_user.controller.js';
 import { isUserAuthenticated } from '../middlewares/auth_middleware.js';
 import { fetchCartLength, fetchCategories } from '../middlewares/middleware.js';
 import {
@@ -60,6 +63,9 @@ import {
 
 const router = express.Router();
 router.use(fetchCategories);
+
+// About and contact
+router.get('/about', isUserAuthenticated, fetchCartLength, getAbout);
 
 router.get('', isUserAuthenticated, fetchCartLength, getHome);
 router.get('/products', isUserAuthenticated, fetchCartLength, listProducts);

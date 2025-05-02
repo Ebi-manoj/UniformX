@@ -32,6 +32,12 @@ export const getResetPassword = asyncHandler(async (req, res) => {
   res.render('auth/reset_password', { layout: userLogin });
 });
 
+////////////////
+//Get about
+export const getAbout = asyncHandler(async (req, res) => {
+  res.render('user/about', { layout: userMain });
+});
+
 ///////////////////////////////////////////////
 //Get Home
 export const getHome = asyncHandler(async (req, res) => {

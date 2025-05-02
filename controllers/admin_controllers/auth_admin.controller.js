@@ -3,8 +3,15 @@ import { Admin } from '../../model/admin_model.js';
 import { Order } from '../../model/order_model.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../../config/jwt.js';
-import { dashboardQueries } from '../../utilities/DbQueries.js';
-import { User } from '../../model/user_model.js';
+import {
+  getDailyTimeSeriesData,
+  getMonthlyTimeSeriesData,
+  getTopCategories,
+  getTopClubs,
+  getTopProducts,
+  getWeeklyTimeSeriesData,
+  getYearlyTimeSeriesData,
+} from '../../utilities/DbQueries.js';
 
 const adminLogin_layout = './layouts/admin_login';
 
@@ -157,7 +164,7 @@ export const getDashboardDetails = asyncHandler(async (req, res) => {
     const recentOrders = await Order.find()
       .sort({ createdAt: -1 })
       .limit(10)
-      .populate('user', 'name email')
+      .populate('user', 'full_name email')
       .lean();
 
     // Get time series data for charts
@@ -232,7 +239,7 @@ export const getDashboardDetails = asyncHandler(async (req, res) => {
     const topCategories = await getTopCategories(startDate, endDate);
     const topClubs = await getTopClubs(startDate, endDate);
 
-    // Calculate monthly goal progress (example goal: 1000 orders)
+    // Calculate monthly goal progress
     const monthlyGoal = 1000;
     const currentMonthStart = new Date(
       currentDate.getFullYear(),
@@ -276,258 +283,3 @@ export const getDashboardDetails = asyncHandler(async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
-// Helper functions for time series data
-async function getDailyTimeSeriesData(startDate, endDate) {
-  const hourlyData = await Order.aggregate([
-    {
-      $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
-      },
-    },
-    {
-      $group: {
-        _id: { $hour: '$createdAt' },
-        totalAmount: { $sum: '$totalAmount' },
-      },
-    },
-    {
-      $sort: { _id: 1 },
-    },
-  ]);
-
-  // Fill in missing hours with 0
-  const result = Array(24).fill(0);
-  hourlyData.forEach(item => {
-    result[item._id] = item.totalAmount;
-  });
-
-  return result;
-}
-
-async function getWeeklyTimeSeriesData(startDate, endDate) {
-  const dailyData = await Order.aggregate([
-    {
-      $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
-      },
-    },
-    {
-      $group: {
-        _id: { $dayOfWeek: '$createdAt' }, // 1 for Sunday, 2 for Monday, etc.
-        totalAmount: { $sum: '$totalAmount' },
-      },
-    },
-    {
-      $sort: { _id: 1 },
-    },
-  ]);
-
-  // Fill in missing days with 0 (dayOfWeek is 1-7, where 1 is Sunday)
-  const result = Array(7).fill(0);
-  dailyData.forEach(item => {
-    result[item._id - 1] = item.totalAmount; // Adjust index to 0-6
-  });
-
-  return result;
-}
-
-async function getMonthlyTimeSeriesData(startDate, endDate) {
-  const dailyData = await Order.aggregate([
-    {
-      $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
-      },
-    },
-    {
-      $group: {
-        _id: { $dayOfMonth: '$createdAt' },
-        totalAmount: { $sum: '$totalAmount' },
-      },
-    },
-    {
-      $sort: { _id: 1 },
-    },
-  ]);
-
-  // Get number of days in the month
-  const daysInMonth = new Date(
-    endDate.getFullYear(),
-    endDate.getMonth() + 1,
-    0
-  ).getDate();
-
-  // Fill in missing days with 0
-  const result = Array(daysInMonth).fill(0);
-  dailyData.forEach(item => {
-    result[item._id - 1] = item.totalAmount; // Adjust index to 0-based
-  });
-
-  return result;
-}
-
-async function getYearlyTimeSeriesData(startDate, endDate) {
-  const monthlyData = await Order.aggregate([
-    {
-      $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
-      },
-    },
-    {
-      $group: {
-        _id: { $month: '$createdAt' }, // 1 for January, 2 for February, etc.
-        totalAmount: { $sum: '$totalAmount' },
-      },
-    },
-    {
-      $sort: { _id: 1 },
-    },
-  ]);
-
-  // Fill in missing months with 0
-  const result = Array(12).fill(0);
-  monthlyData.forEach(item => {
-    result[item._id - 1] = item.totalAmount; // Adjust index to 0-based
-  });
-
-  return result;
-}
-
-// Helper functions for top items
-async function getTopProducts(startDate, endDate) {
-  return Order.aggregate([
-    {
-      $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
-      },
-    },
-    {
-      $unwind: '$items',
-    },
-    {
-      $group: {
-        _id: '$items.product',
-        title: { $first: '$items.title' },
-        totalSales: {
-          $sum: { $multiply: ['$items.price', '$items.quantity'] },
-        },
-      },
-    },
-    {
-      $sort: { totalSales: -1 },
-    },
-    {
-      $limit: 10,
-    },
-  ]);
-}
-
-async function getTopCategories(startDate, endDate) {
-  return Order.aggregate([
-    {
-      $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
-      },
-    },
-    {
-      $unwind: '$items',
-    },
-    {
-      $lookup: {
-        from: 'products', // Collection name is lowercase plural in MongoDB
-        localField: 'items.product',
-        foreignField: '_id',
-        as: 'productInfo',
-      },
-    },
-    {
-      $unwind: '$productInfo',
-    },
-    {
-      $group: {
-        _id: '$productInfo.category_id', // Changed to match your schema
-        totalSales: {
-          $sum: { $multiply: ['$items.price', '$items.quantity'] },
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: 'categories', // Collection name is lowercase plural in MongoDB
-        localField: '_id',
-        foreignField: '_id',
-        as: 'categoryInfo',
-      },
-    },
-    {
-      $unwind: '$categoryInfo',
-    },
-    {
-      $project: {
-        name: '$categoryInfo.name',
-        totalSales: 1,
-      },
-    },
-    {
-      $sort: { totalSales: -1 },
-    },
-    {
-      $limit: 10,
-    },
-  ]);
-}
-
-async function getTopClubs(startDate, endDate) {
-  return Order.aggregate([
-    {
-      $match: {
-        createdAt: { $gte: startDate, $lte: endDate },
-      },
-    },
-    {
-      $unwind: '$items',
-    },
-    {
-      $lookup: {
-        from: 'products', // Collection name for your products
-        localField: 'items.product',
-        foreignField: '_id',
-        as: 'productInfo',
-      },
-    },
-    {
-      $unwind: '$productInfo',
-    },
-    {
-      $group: {
-        _id: '$productInfo.club_id', // Changed from brand to club_id to match your schema
-        totalSales: {
-          $sum: { $multiply: ['$items.price', '$items.quantity'] },
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: 'clubs', // Your Club model is exported with collection name 'clubs'
-        localField: '_id',
-        foreignField: '_id',
-        as: 'clubInfo',
-      },
-    },
-    {
-      $unwind: '$clubInfo',
-    },
-    {
-      $project: {
-        name: '$clubInfo.name', // Project the club name
-        totalSales: 1,
-      },
-    },
-    {
-      $sort: { totalSales: -1 },
-    },
-    {
-      $limit: 10,
-    },
-  ]);
-}

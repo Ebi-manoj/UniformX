@@ -340,7 +340,7 @@
           <div class="chart-title">Best Selling</div>
           <div>THIS MONTH</div>
         </div>
-        <h2 class="card-title">$<span id="best-selling-total">0</span></h2>
+        <h2 class="card-title">₹<span id="best-selling-total">0</span></h2>
         <div class="card-subtitle">Total Sales</div>
         <div style="width: 200px; height: 200px; margin: 0 auto;">
           <canvas id="doughnut-chart"></canvas>
@@ -355,7 +355,7 @@
       <div class="recent-orders mt-4">
         <div class="recent-orders-header">
           <div class="chart-title">Recent Orders</div>
-          <a href="#" class="view-all">View All</a>
+          <a href="/admin/orders" class="view-all">View All</a>
         </div>
         <table>
           <thead>
@@ -423,9 +423,9 @@
 
       orders.forEach(order => {
         const tr = document.createElement('tr');
-        const status = order.status || 'PROCESSING'; // Assume a status field or default to PROCESSING
+        const status = order.items[0].status || 'PROCESSING'; 
         tr.innerHTML = `
-          <td>${order.user?.name || 'Unknown'}</td>
+          <td>${order.user?.full_name || 'Unknown'}</td>
           <td>${formatDate(order.createdAt)}</td>
           <td>${formatCurrency(order.totalAmount)}</td>
           <td>
