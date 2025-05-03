@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getAbout,
+  getContact,
   getHome,
 } from '../controllers/user_controllers/auth_user.controller.js';
 import { isUserAuthenticated } from '../middlewares/auth_middleware.js';
@@ -66,6 +67,7 @@ router.use(fetchCategories);
 
 // About and contact
 router.get('/about', isUserAuthenticated, fetchCartLength, getAbout);
+router.get('/contact', isUserAuthenticated, fetchCartLength, getContact);
 
 router.get('', isUserAuthenticated, fetchCartLength, getHome);
 router.get('/products', isUserAuthenticated, fetchCartLength, listProducts);

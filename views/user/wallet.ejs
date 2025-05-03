@@ -70,6 +70,34 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Pagination -->
+      <% if (pagination.totalPages > 1) { %>
+        <div class="mt-6 flex justify-between items-center">
+          <p class="text-sm text-gray-700">
+            Showing <span class="font-medium"><%= (pagination.currentPage - 1) * pagination.limit + 1 %></span> to
+            <span class="font-medium"><%= Math.min(pagination.currentPage * pagination.limit, pagination.totalTransactions) %></span> of
+            <span class="font-medium"><%= pagination.totalTransactions %></span> transactions
+          </p>
+
+          <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <a href="/wallet?page=<%= pagination.currentPage - 1 %>"
+               class="relative inline-flex items-center px-3 py-2 rounded-l-lg border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200 <%= pagination.currentPage === 1 ? 'pointer-events-none opacity-50' : '' %>">
+              <i class="fas fa-chevron-left h-4 w-4"></i>
+            </a>
+            <% for (let i = 1; i <= pagination.totalPages; i++) { %>
+              <a href="/wallet?page=<%= i %>"
+                 class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium <%= i === pagination.currentPage ? 'bg-black text-white' : 'bg-white text-gray-700 hover:bg-gray-50' %> transition-colors duration-200">
+                <%= i %>
+              </a>
+            <% } %>
+            <a href="/wallet?page=<%= pagination.currentPage + 1 %>"
+               class="relative inline-flex items-center px-3 py-2 rounded-r-lg border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200 <%= pagination.currentPage === pagination.totalPages ? 'pointer-events-none opacity-50' : '' %>">
+              <i class="fas fa-chevron-right h-4 w-4"></i>
+            </a>
+          </nav>
+        </div>
+      <% } %>
     </div>
   </div>
 </div>

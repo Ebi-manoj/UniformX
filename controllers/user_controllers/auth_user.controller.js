@@ -38,6 +38,12 @@ export const getAbout = asyncHandler(async (req, res) => {
   res.render('user/about', { layout: userMain });
 });
 
+//////////////////
+//Get contact
+export const getContact = asyncHandler(async (req, res) => {
+  res.render('user/contact', { layout: userMain });
+});
+
 ///////////////////////////////////////////////
 //Get Home
 export const getHome = asyncHandler(async (req, res) => {

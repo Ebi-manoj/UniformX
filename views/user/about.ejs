@@ -18,50 +18,44 @@
       transition-delay: 600ms;
     }
   </style>
-</head>
 <body class="bg-gray-50 text-gray-800 font-sans">
   <!-- Hero Section -->
-  <section
-  class="min-h-screen flex items-center justify-center bg-gradient-to-r from-black to-white text-white relative overflow-hidden"
->
-  <!-- Background image with grayscale filter and blend for black & white effect -->
-  <div class="absolute inset-0">
-    <div
-      class="absolute inset-0 bg-[url('/images/about1.jpg')] bg-cover bg-center grayscale opacity-30 mix-blend-overlay"
-    ></div>
-  </div>
+  <section class="min-h-screen flex items-center justify-center bg-gradient-to-r from-black to-gray-800 text-white relative overflow-hidden">
+    <!-- Background image with grayscale filter and blend for black & white effect -->
+    <div class="absolute inset-0">
+      <div class="absolute inset-0 bg-[url('/images/about1.jpg')] bg-cover bg-center grayscale opacity-30 mix-blend-overlay"></div>
+    </div>
 
-  <!-- Content -->
-  <div class="container mx-auto px-6 py-16 relative z-10 text-center">
-    <h1 class="text-5xl md:text-7xl font-extrabold mb-6 text-white reveal">
-      UniformX
-    </h1>
-    <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-10 text-white/90 reveal delay-200">
-      Where Passion Meets Performance
-    </p>
-    <p class="max-w-2xl mx-auto text-lg text-white/80 reveal delay-400">
-      We bring authentic sports culture to fans worldwide with premium
-      quality jerseys from football, cricket, basketball, and more.
-    </p>
-    <a href="#story" class="mt-10 inline-block animate-bounce">
-      <svg
-        class="w-8 h-8 text-white"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M19 14l-7 7m0 0l-7-7m7 7V3"
-        ></path>
-      </svg>
-    </a>
-  </div>
-</section>
-
+    <!-- Content -->
+    <div class="container mx-auto px-6 py-16 relative z-10 text-center">
+      <h1 class="text-5xl md:text-7xl font-extrabold mb-6 text-white reveal">
+        UniformX
+      </h1>
+      <p class="text-xl md:text-2xl max-w-3xl mx-auto mb-10 text-white/90 reveal delay-200">
+        Where Passion Meets Performance
+      </p>
+      <p class="max-w-2xl mx-auto text-lg text-white/80 reveal delay-400">
+        We bring authentic sports culture to fans worldwide with premium
+        quality jerseys from football, cricket, basketball, and more.
+      </p>
+      <a href="#story" class="mt-10 inline-block animate-bounce">
+        <svg
+          class="w-8 h-8 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+          ></path>
+        </svg>
+      </a>
+    </div>
+  </section>
 
   <!-- Our Story Section -->
   <section id="story" class="py-20 bg-white">
@@ -71,42 +65,41 @@
           <img
             src="/images/about2.jpg"
             alt="Our Story"
-            class="rounded-lg shadow-xl w-[70%]"
+            class="rounded-lg shadow-xl w-[70%] grayscale"
           />
         </div>
         <div class="md:w-1/2 md:pl-12">
-          <h2 class="text-4xl font-bold mb-6 reveal">Our Story</h2>
-          <p class="text-lg mb-6 reveal delay-200">
+          <h2 class="text-4xl font-bold mb-6 reveal text-black">Our Story</h2>
+          <p class="text-lg mb-6 reveal delay-200 text-gray-800">
             This project is a result of my journey into learning web development.
             With a strong passion for both coding and sports, I decided to combine
             them into something meaningful and creative.
           </p>
-          <p class="text-lg mb-6 reveal delay-400">
+          <p class="text-lg mb-6 reveal delay-400 text-gray-800">
             As a sports enthusiast, I've always admired the pride fans take in
             representing their favorite teams. So I thought — why not create a
             platform where fans like me can find their favorite jerseys easily?
           </p>
-          <p class="text-lg reveal delay-600">
+          <p class="text-lg reveal delay-600 text-gray-800">
             This ecommerce website is a learning project, built with love for the
-            game and a desire to grow as a developer. It’s more than a project —
-            it’s a step toward turning passion into skill.
+            game and a desire to grow as a developer. It's more than a project —
+            it's a step toward turning passion into skill.
           </p>
         </div>
       </div>
     </div>
   </section>
   
-
   <!-- What We Offer Section -->
   <section class="py-20 bg-gray-100">
     <div class="container mx-auto px-6">
-      <h2 class="text-4xl font-bold text-center mb-16 reveal">
+      <h2 class="text-4xl font-bold text-center mb-16 reveal text-black">
         What We Offer
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
         <div class="bg-white rounded-lg shadow-lg p-8 text-center reveal">
           <div
-            class="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6"
           >
             <svg
               class="w-10 h-10 text-white"
@@ -123,7 +116,7 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-2xl font-bold mb-4">Football Jerseys</h3>
+          <h3 class="text-2xl font-bold mb-4 text-black">Football Jerseys</h3>
           <p class="text-gray-600">
             From Premier League to La Liga, we offer authentic jerseys from
             top clubs and national teams worldwide.
@@ -133,7 +126,7 @@
           class="bg-white rounded-lg shadow-lg p-8 text-center reveal delay-200"
         >
           <div
-            class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6"
           >
             <svg
               class="w-10 h-10 text-white"
@@ -150,7 +143,7 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-2xl font-bold mb-4">Cricket Jerseys</h3>
+          <h3 class="text-2xl font-bold mb-4 text-black">Cricket Jerseys</h3>
           <p class="text-gray-600">
             Represent your favorite cricket teams with our collection of
             international and IPL team jerseys.
@@ -160,7 +153,7 @@
           class="bg-white rounded-lg shadow-lg p-8 text-center reveal delay-400"
         >
           <div
-            class="w-20 h-20 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6"
           >
             <svg
               class="w-10 h-10 text-white"
@@ -177,7 +170,7 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-2xl font-bold mb-4">Basketball Jerseys</h3>
+          <h3 class="text-2xl font-bold mb-4 text-black">Basketball Jerseys</h3>
           <p class="text-gray-600">
             From NBA legends to current stars, our basketball collection
             covers all your favorite teams.
@@ -190,13 +183,13 @@
   <!-- Why Choose Us Section -->
   <section class="py-20 bg-white">
     <div class="container mx-auto px-6">
-      <h2 class="text-4xl font-bold text-center mb-16 reveal">
+      <h2 class="text-4xl font-bold text-center mb-16 reveal text-black">
         Why Choose Us
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         <div class="text-center reveal">
           <div
-            class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6"
           >
             <svg
               class="w-8 h-8 text-white"
@@ -213,7 +206,7 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-xl font-bold mb-3">Authentic Products</h3>
+          <h3 class="text-xl font-bold mb-3 text-black">Authentic Products</h3>
           <p class="text-gray-600">
             We source directly from official manufacturers to ensure
             authenticity.
@@ -221,7 +214,7 @@
         </div>
         <div class="text-center reveal delay-200">
           <div
-            class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6"
           >
             <svg
               class="w-8 h-8 text-white"
@@ -238,14 +231,14 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-xl font-bold mb-3">24/7 Support</h3>
+          <h3 class="text-xl font-bold mb-3 text-black">24/7 Support</h3>
           <p class="text-gray-600">
             Our customer service team is always available to assist you.
           </p>
         </div>
         <div class="text-center reveal delay-400">
           <div
-            class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6"
           >
             <svg
               class="w-8 h-8 text-white"
@@ -262,14 +255,14 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-xl font-bold mb-3">Global Shipping</h3>
+          <h3 class="text-xl font-bold mb-3 text-black">Global Shipping</h3>
           <p class="text-gray-600">
             We deliver to over 50 countries with fast and reliable shipping.
           </p>
         </div>
         <div class="text-center reveal delay-600">
           <div
-            class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6"
+            class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6"
           >
             <svg
               class="w-8 h-8 text-white"
@@ -286,7 +279,7 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-xl font-bold mb-3">Best Prices</h3>
+          <h3 class="text-xl font-bold mb-3 text-black">Best Prices</h3>
           <p class="text-gray-600">
             We offer competitive prices without compromising on quality.
           </p>
@@ -296,9 +289,7 @@
   </section>
 
   <!-- CTA Section -->
-  <section
-    class="py-20 bg-gradient-to-r from-indigo-900 to-blue-900 text-white"
-  >
+  <section class="py-20 bg-gradient-to-r from-black to-gray-800 text-white">
     <div class="container mx-auto px-6 text-center">
       <h2 class="text-4xl font-bold mb-8 reveal">
         Ready to Represent Your Team?
@@ -309,9 +300,8 @@
       </p>
       <a
         href="/"
-        class="bg-white text-indigo-900 px-8 py-4 rounded-lg font-bold text-lg inline-block hover:bg-gray-100 transition duration-300 reveal delay-400"
-        >Shop Now</a
-      >
+        class="bg-white text-black px-8 py-4 rounded-lg font-bold text-lg inline-block hover:bg-gray-200 transition duration-300 reveal delay-400"
+        >Shop Now</a>
     </div>
   </section>
 

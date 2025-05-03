@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Not Found - UniformX</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* Animation styles */
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .delay-200 {
+      transition-delay: 200ms;
+    }
+    .delay-400 {
+      transition-delay: 400ms;
+    }
+    
+    /* Subtle line animation */
+    .animated-line {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .animated-line::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: #000;
+      transform-origin: bottom right;
+      transition: transform 0.3s ease-out;
+    }
+    
+    .animated-line:hover::after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
+    
+    /* Gradient overlay */
+    .gradient-overlay {
+      background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="bg-white text-gray-900 font-sans min-h-screen flex items-center justify-center relative">
+  <!-- Background pattern -->
+  <div class="absolute inset-0 bg-gray-50" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23f0f0f0\' fill-opacity=\'1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E'); z-index: -1;"></div>
+  
+  <div class="container mx-auto px-6 py-12 relative z-10">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div class="flex flex-col md:flex-row">
+        <!-- Left side with illustration -->
+        <div class="w-full md:w-5/12 bg-gray-50 flex items-center justify-center p-8">
+          <div class="reveal">
+            <svg class="w-full h-auto max-w-xs" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Stylized 404 -->
+              <path d="M50 160V120L90 60V160" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="120" cy="110" r="50" stroke="black" stroke-width="8"/>
+              <path d="M190 160V120L150 60V160" stroke="black" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Broken link icon -->
+              <path d="M90 180C90 180 105 195 120 195C135 195 150 180 150 180" stroke="black" stroke-width="6" stroke-linecap="round" stroke-dasharray="10 5"/>
+            </svg>
+          </div>
+        </div>
+        
+        <!-- Right side with content -->
+        <div class="w-full md:w-7/12 p-8 md:p-12">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2 reveal">404</h1>
+          <h2 class="text-xl md:text-2xl font-medium text-gray-800 mb-6 reveal delay-200">Page Not Found</h2>
+          
+          <div class="w-20 h-1 bg-black mb-6 reveal delay-200"></div>
+          
+          <p class="text-gray-600 mb-8 reveal delay-400">
+            We're sorry, but the page you requested could not be found. It might have been removed, had its name changed, or is temporarily unavailable.
+          </p>
+          
+          <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 reveal delay-400">
+            <a href="/" class="px-6 py-3 bg-black text-white font-medium rounded hover:bg-gray-800 transition duration-300 text-center">
+              Return to Homepage
+            </a>
+            <a href="/contact" class="px-6 py-3 border border-black text-black font-medium rounded hover:bg-gray-100 transition duration-300 text-center">
+              Contact Support
+            </a>
+          </div>
+          
+          <div class="mt-12 pt-6 border-t border-gray-200 reveal delay-600">
+            <p class="text-sm text-gray-500">
+              You may also navigate to one of our popular sections:
+            </p>
+            <div class="mt-4 flex flex-wrap gap-4">
+              <a href="/products" class="text-sm text-black animated-line">Shop Collection</a>
+              <a href="/products" class="text-sm text-black animated-line">New Arrivals</a>
+              <a href="/about" class="text-sm text-black animated-line">About Us</a>
+              <a href="/contact" class="text-sm text-black animated-line">FAQ</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="text-center mt-8 text-sm text-gray-500 reveal delay-600">
+      <p>&copy; 2025 UniformX. All rights reserved.</p>
+    </div>
+  </div>
+  
+  <!-- JavaScript for Animations -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const revealElements = document.querySelectorAll('.reveal');
+      
+      function checkReveal() {
+        revealElements.forEach(element => {
+          element.classList.add('active');
+        });
+      }
+      
+      // Immediate reveal for 404 page
+      setTimeout(checkReveal, 100);
+    });
+  </script>
+</body>
+</html>

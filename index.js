@@ -98,6 +98,11 @@ app.get('/spinner', (req, res) => {
 app.use('/', userRoutes);
 app.use('/admin', adminRoutes);
 app.use('/auth', authRoutes);
+app.use((req, res, next) => {
+  const layout = './layouts/user_main';
+
+  res.render('user/404', { layout, cartLength: null });
+});
 
 // error Handling
 app.use(errorhandling);
