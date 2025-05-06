@@ -106,6 +106,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   if (!order) {
     return res.status(404).json({ success: false, message: 'Order not found' });
   }
+  const userId = order.user;
 
   const validStatus = [
     'PROCESSING',
@@ -127,6 +128,43 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   }
 
   const item = order.items[itemIndex];
+
+  // my logic is in if block
+  if (status === 'CANCELLED' && order.paymentMethod !== 'COD') {
+    const baseAmount = item.price * item.quantity;
+    const totalSubtotal = order.subtotal;
+    const totalAmount = order.totalAmount;
+    const proportion = baseAmount / totalSubtotal;
+    item.returnRequest = item.returnRequest || {};
+    item.returnRequest.refundAmount = +(proportion * totalAmount).toFixed(2);
+    let refundAmount = item.returnRequest.refundAmount;
+
+    // Handle refund for non-COD orders
+    if (order.paymentMethod !== 'COD' && item.paymentStatus === 'COMPLETED') {
+      const transaction = new Transaction({
+        user: userId,
+        amount: refundAmount,
+        type: 'REFUND',
+        status: 'SUCCESS',
+      });
+      await transaction.save();
+
+      let wallet = await Wallet.findOne({ user: userId });
+      if (!wallet) {
+        wallet = new Wallet({
+          user: userId,
+          transactionHistory: [],
+        });
+      }
+      wallet.balance += refundAmount;
+      wallet.transactionHistory.push(transaction._id);
+      await wallet.save();
+
+      // Update refund status
+      item.paymentStatus = 'REFUNDED';
+    }
+  }
+
   item.status = status;
   item.statusHistory.push({
     status,

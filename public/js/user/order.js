@@ -16,6 +16,9 @@ const btnCancel = document.querySelectorAll('.btn-cancel');
 const cancelModal = document.getElementById('deleteModal');
 const cancelBtnModal = document.getElementById('cancelModal');
 const confirmModal = document.getElementById('confirmModal');
+const cancelForm = document.getElementById('cancelForm');
+const btnCloseCancel = document.getElementById('btnCloseCancel');
+const btnSubmitCancel = document.getElementById('btnSubmitCancel');
 
 let selectedOrderId = null;
 let selectedItemId = null;
@@ -41,11 +44,22 @@ if (cancelModal) {
 
     // Confirm cancellation
     if (e.target === confirmModal) {
+      cancelForm.classList.remove('hidden');
+    }
+  });
+
+  if (cancelForm) {
+    btnCloseCancel.addEventListener('click', function () {
+      cancelForm.classList.add('hidden');
+    });
+
+    btnSubmitCancel.addEventListener('click', async function () {
       try {
+        const cancelNote = document.getElementById('cancel-note').value.trim();
         const response = await fetch(`/cancel-order/${selectedOrderId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemId: selectedItemId }),
+          body: JSON.stringify({ itemId: selectedItemId, reason: cancelNote }),
         });
 
         if (!response.ok) {
@@ -64,8 +78,8 @@ if (cancelModal) {
         showToast('Something went wrong');
         console.error(error);
       }
-    }
-  });
+    });
+  }
 }
 
 // Return request Handling

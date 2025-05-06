@@ -179,6 +179,7 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     const { orderId } = req.params;
     const { itemId, reason } = req.body;
     const userId = req.user._id;
+    console.log(reason);
 
     // Find the order
     const order = await Order.findOne({ _id: orderId, user: userId }).populate(
