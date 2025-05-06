@@ -89,6 +89,18 @@ export const editClub = asyncHandler(async (req, res) => {
     return res.redirect('/admin/club-category');
   }
 
+  if (name && name !== club.name) {
+    const titleRegex = new RegExp(`^${name.trim()}$`, 'i');
+    const existingCategory = await Club.findOne({
+      name: titleRegex,
+      _id: { $ne: club._id },
+    });
+    if (existingCategory) {
+      req.flash('error', 'Category already exist with this name');
+      return res.redirect('/admin/club-category');
+    }
+  }
+
   // Validate required fields
   if (!name || !description) {
     req.flash('error', 'Name and description are required');

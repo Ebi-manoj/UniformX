@@ -75,6 +75,18 @@ export const editCategory = asyncHandler(async (req, res) => {
     return res.redirect('/admin/category');
   }
 
+  if (name && name !== category.name) {
+    const titleRegex = new RegExp(`^${name.trim()}$`, 'i');
+    const existingCategory = await Category.findOne({
+      name: titleRegex,
+      _id: { $ne: category._id },
+    });
+    if (existingCategory) {
+      req.flash('error', 'Category already exist with this name');
+      return res.redirect('/admin/category');
+    }
+  }
+
   let imageUrl = category.image;
   if (req.file) {
     imageUrl = req.file.path;

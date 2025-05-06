@@ -37,6 +37,11 @@ if (btnPlaceOrder) {
       mobile: formData.get('mobile'),
       pincode: formData.get('pincode'),
     };
+    for (const [key, value] of Object.entries(shippingAddress)) {
+      if (!value || value.trim() === '') {
+        return showToast(`Please fill out the ${key.replace('_', ' ')} field.`);
+      }
+    }
     console.log(paymentMethod);
 
     ///Fetch the Place Order

@@ -378,6 +378,7 @@ export const forgotPasswordHandler = asyncHandler(async (req, res, next) => {
 
     // Delete existing OTPs for the email
     await OTP.deleteMany({ email, purpose: 'reset-password' });
+    console.log(`Forgot Otp:${otp}`);
 
     // Save OTP to the database
     await new OTP({

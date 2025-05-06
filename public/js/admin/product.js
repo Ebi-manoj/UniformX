@@ -616,7 +616,7 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.reload();
           }, 1000);
         } else {
-          showToast(result.error || 'Failed to save product', 'error');
+          showToast(result.message || 'Failed to save product', 'error');
         }
       } catch (error) {
         console.error('Error submitting form:', error);

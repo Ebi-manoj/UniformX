@@ -88,7 +88,7 @@ updateStatusBtn.forEach(btn =>
           window.location.reload();
         }, 1000);
       } else {
-        showToast('Something Went Wrong');
+        showToast(data.message || 'Something Went Wrong');
       }
     } catch (error) {
       showToast('Internal Server issue');

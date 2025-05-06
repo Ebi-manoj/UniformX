@@ -129,6 +129,11 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 
   const item = order.items[itemIndex];
 
+  if (item.status === 'CANCELLED' || item.status === 'RETURNED') {
+    return res
+      .status(404)
+      .json({ success: false, message: 'Status Cannot be Updated' });
+  }
   // my logic is in if block
   if (status === 'CANCELLED' && order.paymentMethod !== 'COD') {
     const baseAmount = item.price * item.quantity;

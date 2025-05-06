@@ -14,7 +14,13 @@ const TAX_RATE = 0.05;
 
 export const getCart = asyncHandler(async (req, res) => {
   const userId = req.user?._id;
-  const [cart] = await Cart.find({ userId }).populate('products.productId');
+  const [cart] = await Cart.find({ userId }).populate({
+    path: 'products.productId',
+    populate: [
+      { path: 'category_id', select: 'isActive' },
+      { path: 'club_id', select: 'isActive' },
+    ],
+  });
 
   const total = cart?.totalPrice ?? 0;
   const discount = cart?.discountPrice ?? 0;
@@ -22,7 +28,7 @@ export const getCart = asyncHandler(async (req, res) => {
   const taxAmount = (total - discount) * TAX_RATE;
   const finalPrice = total - discount - offerApplied + taxAmount;
 
-  console.log(cart);
+  console.log(cart.products[0].productId);
 
   res.render('user/cart', {
     layout: userMain,

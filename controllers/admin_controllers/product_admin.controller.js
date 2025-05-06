@@ -59,8 +59,15 @@ export const getProducts = asyncHandler(async (req, res) => {
 });
 
 export const addProducts = asyncHandler(async (req, res, next) => {
-  console.log(req.body);
-  console.log(req.files);
+  const titleRegex = new RegExp(`^${req.body.title.trim()}$`, 'i');
+  const existingProduct = await Product.findOne({ title: titleRegex });
+
+  if (existingProduct) {
+    return res.status(400).json({
+      success: false,
+      message: 'Product with this title already exists',
+    });
+  }
 
   // Extract and transform sizes from req.body
   const sizes = [];
@@ -82,7 +89,7 @@ export const addProducts = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // Map image URLs from req.files (Cloudinary response)
+  // Map image URLs from req.files
   const imageUrls = req.files ? req.files.map(file => file.path) : [];
   let slug;
   try {
@@ -137,6 +144,23 @@ export const updateProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(id);
   if (!product) {
     return res.status(404).json({ error: 'Product not found' });
+  }
+
+  const productTitle = req.body?.title;
+  if (productTitle && productTitle !== product.title) {
+    const titleRegex = new RegExp(`^${req.body.title.trim()}$`, 'i');
+    const existingProduct = await Product.findOne({
+      title: titleRegex,
+      _id: { $ne: product._id },
+    });
+
+    if (existingProduct) {
+      return res.status(400).json({
+        message: 'Another product with this title already exists',
+      });
+    }
+
+    product.slug = await generateSlug(req.body.title);
   }
   // Update fields
   product.title = req.body.title || product.title;

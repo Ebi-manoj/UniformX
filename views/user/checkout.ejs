@@ -110,13 +110,22 @@
             </div>
             <input type="hidden" id="allAddresses" value='<%- JSON.stringify(addresses) %>'>
             <div class="w-full flex justify-end">
-              <select id="addressSelect" class="border rounded-md px-3 py-2">
+              <select id="addressSelect" class="<%= addresses.length===0?'hidden':'' %> border rounded-md px-3 py-2">
                 <% addresses.forEach((addr, index) => { %>
                   <option value="<%= index %>"><%= addr.name %></option>
                 <% }) %>
               </select>
             </div>
-            <form id="addressForm" action="/profile/update-address" method="post">
+            <% if (addresses.length==-0) { %>
+              <div class="mt-10 text-center">
+                <p class="text-gray-400 text-s font-medium">
+                  <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+                  No address found. Add a new one to continue.
+                </p>
+              </div>
+             
+            <% } %>
+            <form id="addressForm" action="/profile/update-address" method="post" class="<%= addresses.length===0?'hidden':'' %>">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
                 <input type="hidden" value="" name="id" id="addressId">
                 <!-- Street Address -->

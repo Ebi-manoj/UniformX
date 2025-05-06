@@ -43,12 +43,16 @@
                   <span class="ml-1 w-3 h-3 rounded-full" style="background-color: <%= product.productId.color %>"></span>
                   <span class="ml-3">Size:</span>
                   <span class="ml-1"><%= product.size %></span>
-                  <% if (stockQuantity > 10) { %>
-                    <span class="ml-3 text-green-600 font-medium">(In Stock)</span>
-                  <% } else if (stockQuantity > 0 && stockQuantity <= 10) { %>
-                    <span class="ml-3 text-yellow-500 font-medium">(Only a few left!)</span>
+                  <% if (product.productId.is_deleted || !product.productId.category_id.isActive || !product.productId.club_id.isActive) { %>
+                    <span class="ml-3 text-red-600 font-medium">(Currently unavailable)</span>
                   <% } else { %>
-                    <span class="ml-3 text-red-500 font-medium">(Out of Stock)</span>
+                    <% if (stockQuantity > 10) { %>
+                      <span class="ml-3 text-green-600 font-medium">(In Stock)</span>
+                    <% } else if (stockQuantity > 0 && stockQuantity <= 10) { %>
+                      <span class="ml-3 text-yellow-500 font-medium">(Only a few left!)</span>
+                    <% } else { %>
+                      <span class="ml-3 text-red-500 font-medium">(Out of Stock)</span>
+                    <% } %>
                   <% } %>
                   
                 </div>
