@@ -105,4 +105,6 @@ app.use((req, res, next) => {
 
 // error Handling
 app.use(errorhandling);
-app.listen(PORT, () => console.log(`Server is running on the ${PORT}`));
+app.listen(PORT, '0.0.0.0', () =>
+  console.log(`Server is running on the ${PORT}`)
+);
