@@ -16,7 +16,6 @@ import adminRoutes from './routes/admin.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import { User } from './model/user_model.js';
-import { generateReferralToken } from './utilities/generator.js';
 
 dotenv.config();
 connectDB();
@@ -25,7 +24,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // flash
 app.use(
