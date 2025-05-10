@@ -91,6 +91,7 @@ export const attachUserIfAuthenticated = asyncHandler(
       res.locals.isAuthenticated = true;
     } catch (err) {
       res.clearCookie('token');
+      res.locals.isAuthenticated = false;
     }
 
     next();

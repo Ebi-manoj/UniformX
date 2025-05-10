@@ -96,16 +96,19 @@ export const uploadProfilePic = asyncHandler(async (req, res, next) => {
 
 // Get Route for Password
 export const getChangePassword = asyncHandler(async (req, res) => {
-  res.render('user/change_password', { layout: userMain });
+  res.render('user/change_password', { layout: userMain, js_file: 'profile' });
 });
 
 //Change Password
 export const changePassword = asyncHandler(async (req, res) => {
   const { oldpassword, newpassword, confirmpassword } = req.body;
+  console.log(oldpassword, newpassword, confirmpassword);
+
   if (!oldpassword || !newpassword || !confirmpassword) {
     req.flash('error', 'All fields are required');
     return res.redirect('/profile/password');
   }
+
   if (newpassword !== confirmpassword) {
     req.flash('error', 'Password are not matching');
     return res.redirect('/profile/password');
@@ -116,7 +119,7 @@ export const changePassword = asyncHandler(async (req, res) => {
     return res.redirect('/profile/password');
   }
   const user = await User.findById(id);
-  const isMatch = user.comparePassword(oldpassword);
+  const isMatch = await user.comparePassword(oldpassword);
   if (!isMatch) {
     req.flash('error', 'Incorrect password');
     return res.redirect('/profile/password');

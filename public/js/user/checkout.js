@@ -235,8 +235,7 @@ const modal = document.getElementById('couponModal');
 const modalContent = document.getElementById('modalContent');
 const modalBackdrop = document.getElementById('modalBackdrop');
 const openModalBtn = document.getElementById('view-coupons');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const closeModalBtn2 = document.getElementById('closeModalBtn2');
+const closeModalBtn = document.querySelectorAll('.closeCouponModalBtn');
 
 // Open modal
 openModalBtn.addEventListener('click', async function () {
@@ -268,8 +267,7 @@ function closeModal() {
   }, 200);
 }
 
-closeModalBtn.addEventListener('click', closeModal);
-closeModalBtn2.addEventListener('click', closeModal);
+closeModalBtn.forEach(btn => btn.addEventListener('click', closeModal));
 modalBackdrop.addEventListener('click', closeModal);
 
 // Prevent closing when clicking on modal content

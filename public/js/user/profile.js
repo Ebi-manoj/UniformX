@@ -1,5 +1,5 @@
 import { showToast } from '/js/toast.js';
-
+import { changePasswordSchema } from '../validation.js';
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //////EDIT PROFILE
 function ProfileFunctionality() {
@@ -352,4 +352,34 @@ export const AddressFunctionality = function () {
 const isAddress = document.querySelector('#address');
 if (isAddress) {
   AddressFunctionality();
+}
+
+// Change password
+const changePasswordForm = document.getElementById('change-password-form');
+
+if (changePasswordForm) {
+  changePasswordForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    document
+      .querySelectorAll("span[id$='Error']")
+      .forEach(el => (el.textContent = ''));
+
+    const formData = new FormData(changePasswordForm);
+    const data = {
+      oldpassword: formData.get('oldpassword'),
+      newpassword: formData.get('newpassword'),
+      confirmpassword: formData.get('confirmpassword'),
+    };
+
+    const result = changePasswordSchema.safeParse(data);
+
+    if (result.success) return changePasswordForm.submit();
+    result.error.errors.forEach(error => {
+      const field = error.path[0];
+      const errorElement = document.getElementById(`${field}Error`);
+      if (errorElement) {
+        errorElement.textContent = error.message;
+      }
+    });
+  });
 }

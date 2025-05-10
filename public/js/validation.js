@@ -60,3 +60,18 @@ export const addOfferSchema = z.object({
   validFrom: z.string().min(1, 'Start date is required'),
   validTo: z.string().min(1, 'End date is required'),
 });
+
+export const changePasswordSchema = z
+  .object({
+    oldpassword: z
+      .string()
+      .min(6, 'Current password required min 6 Characters'),
+    newpassword: z
+      .string()
+      .min(6, 'New password must be at least 6 characters'),
+    confirmpassword: z.string(),
+  })
+  .refine(data => data.newpassword === data.confirmpassword, {
+    path: ['confirmpassword'],
+    message: 'Passwords do not match',
+  });
