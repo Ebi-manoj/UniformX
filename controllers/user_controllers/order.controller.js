@@ -57,9 +57,6 @@ export const getCheckout = asyncHandler(async (req, res) => {
     offerApplied +
     taxAmount;
 
-  console.log(cart);
-  console.log(taxAmount);
-  console.log(finalPrice);
   res.render('user/checkout', {
     js_file: 'checkout',
     layout: userMain,
@@ -80,7 +77,7 @@ export const placeOrder = asyncHandler(async (req, res) => {
     req.flash('error', 'Session expired');
     return res.redirect('/checkout');
   }
-  console.log(paymentMethod);
+
   try {
     const result = await confirmOrder(userId, shippingAddress, paymentMethod);
     res.status(200).json({
@@ -103,14 +100,13 @@ export const placeOrder = asyncHandler(async (req, res) => {
 
 export const getOrderSucces = asyncHandler(async (req, res) => {
   const orderNumber = req.params.id;
-  console.log(orderNumber);
 
   const order = await Order.findOne({ orderNumber }).populate('user', 'email');
   if (!order) {
     req.flash('error', 'Something went wrong');
     return res.redirect('/cart');
   }
-  console.log(order);
+
   const details = {
     orderNumber: order.orderNumber,
     orderDate: order.createdAt.toLocaleDateString('en-US', {
@@ -132,7 +128,6 @@ export const getOrderFailure = asyncHandler(async (req, res) => {
     orderId,
     date: new Date().toDateString(),
   };
-  console.log(orderId, details);
 
   res.render('user/order_failure', {
     js_file: 'checkout',
@@ -179,7 +174,6 @@ export const cancelOrder = asyncHandler(async (req, res) => {
     const { orderId } = req.params;
     const { itemId, reason } = req.body;
     const userId = req.user._id;
-    console.log(reason);
 
     // Find the order
     const order = await Order.findOne({ _id: orderId, user: userId }).populate(

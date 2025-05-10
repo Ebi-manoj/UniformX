@@ -156,7 +156,6 @@ export const listProducts = asyncHandler(async (req, res) => {
   // Fetch Total Product Count for Pagination
   const totalProducts = await Product.countDocuments(query);
   const totalPages = Math.ceil(totalProducts / limitNumber);
-  console.log(products);
 
   // Render Page
   res.render('user/productlist', {
@@ -177,7 +176,7 @@ export const listProducts = asyncHandler(async (req, res) => {
 // Get Product Details
 export const getProductDetails = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  const userId = req.user._id;
+  const userId = req.user?._id;
 
   const product = await Product.aggregate(productDetails(slug));
   if (!product.length) {
@@ -194,15 +193,10 @@ export const getProductDetails = asyncHandler(async (req, res) => {
 
   const categoriesList = await Category.find();
   const clubsList = await Club.find();
-  console.log(isWishlisted);
-
-  // Review
-  console.log(product[0]._id);
 
   const reviews = await Review.find({ product: product[0]._id })
     .populate('user', 'full_name')
     .sort({ createdAt: -1 });
-  console.log(reviews);
 
   const formattedReviews = reviews.map(r => ({
     name: r.user.full_name,
@@ -241,7 +235,6 @@ export const getProductDetails = asyncHandler(async (req, res) => {
   });
 
   hasPurchased = !!order.length;
-  console.log(product[0]);
 
   res.render('user/product_details', {
     layout: userMain,
@@ -264,7 +257,7 @@ export const addReview = asyncHandler(async (req, res) => {
       .status(404)
       .json({ success: false, message: 'Field cannot be empty' });
   }
-  const userId = req.user._id;
+  const userId = req.user?._id;
   if (!validateId(userId)) {
     return res.status(401).json({ success: false, message: 'Session expired' });
   }

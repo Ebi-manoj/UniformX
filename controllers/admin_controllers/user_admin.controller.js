@@ -54,7 +54,6 @@ export const toggleBlock = asyncHandler(async (req, res) => {
 
   if (!user) {
     res.status(404).json({ success: false, message: 'User not found' });
-    console.log('error in updating database');
     return;
   }
 

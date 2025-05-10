@@ -27,7 +27,6 @@ export const addToWhishlist = asyncHandler(async (req, res) => {
 
   const productId = req.body.productId;
   const userId = req.user._id;
-  console.log(productId);
 
   if (!validateId(productId)) {
     return res

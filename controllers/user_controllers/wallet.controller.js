@@ -36,7 +36,7 @@ export const getWallet = asyncHandler(async (req, res) => {
     limit,
     totalTransactions,
   };
-  console.log(pagination);
+
   res.render('user/wallet', {
     js_file: 'wallet',
     layout: userMain,

@@ -47,7 +47,6 @@ export const getContact = asyncHandler(async (req, res) => {
 ///////////////////////////////////////////////
 //Get Home
 export const getHome = asyncHandler(async (req, res) => {
-  if (!req.cookies.token) return res.redirect('/auth/login');
   const categories = await Category.find();
   const clubs = await Club.find();
   const bestSelling = await Product.aggregate([
@@ -112,7 +111,6 @@ export const getHome = asyncHandler(async (req, res) => {
       },
     },
   ]);
-  console.log(req.user?.referalClaimed);
 
   res.render('user/home', {
     css_file: null,

@@ -30,7 +30,6 @@ export const editProfile = asyncHandler(async (req, res) => {
     req.flash('error', 'All fields are required!');
     return res.redirect('/profile');
   }
-  console.log(addressId);
 
   const userId = req.user?._id;
   if (!validateId(userId)) {
@@ -50,7 +49,6 @@ export const editProfile = asyncHandler(async (req, res) => {
       return res.redirect('/profile');
     }
     const address = await Address.findOne({ _id: addressId, userId });
-    console.log(address);
 
     if (!address) {
       req.flash('error', 'Address not found!');

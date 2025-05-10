@@ -43,8 +43,6 @@ export const getClubCategory = asyncHandler(async (req, res) => {
 /////////addClub
 export const addClub = asyncHandler(async (req, res) => {
   const { name, description, category_id } = req.body;
-  console.log(req.file);
-  console.log(name, description, category_id);
   if (!name || !category_id || !req.file) {
     req.flash('error', 'Fill all the fields');
     res.redirect('/admin/club-category');

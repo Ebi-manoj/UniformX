@@ -28,8 +28,6 @@ export const getCart = asyncHandler(async (req, res) => {
   const taxAmount = (total - discount) * TAX_RATE;
   const finalPrice = total - discount - offerApplied + taxAmount;
 
-  console.log(cart.products[0].productId);
-
   res.render('user/cart', {
     layout: userMain,
     js_file: 'cart',
@@ -44,7 +42,6 @@ export const getCart = asyncHandler(async (req, res) => {
 export const addToCart = asyncHandler(async (req, res) => {
   const { productId, size } = req.body;
   const quantity = parseInt(req.body.quantity);
-  console.log(productId, size, quantity);
 
   const product = await Product.findById(productId)
     .populate('club_id')
@@ -128,12 +125,9 @@ export const addToCart = asyncHandler(async (req, res) => {
       ? Math.max(...validOffers.map(offer => offer.discountPercentage))
       : 0;
 
-    console.log(offer);
-
     let offerApplied = 0;
     if (offer) {
       offerApplied = (product.price * offer) / 100;
-      console.log(offerApplied);
     }
 
     cart.products.push({
@@ -177,7 +171,9 @@ export const updateCartQunatity = asyncHandler(async (req, res) => {
 
   // Find the product in cart
   const productIndex = cart.products.findIndex(
-    p => p.productId.toString() === productId && p.size === size
+    p =>
+      p.productId._id.toString() === productId.toString() &&
+      p.size.toLowerCase() === size.toLowerCase()
   );
 
   if (productIndex === -1) {

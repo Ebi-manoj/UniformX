@@ -93,8 +93,6 @@ export const editCategory = asyncHandler(async (req, res) => {
     console.log('file checked');
 
     if (category.image) {
-      console.log('Category checked');
-
       const publicId = category.image.split('/').pop().split('.')[0];
       await cloudinary.uploader.destroy(`uniformx/categories/${publicId}`);
     }

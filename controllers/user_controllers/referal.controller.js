@@ -12,7 +12,6 @@ export const getReferal = asyncHandler(async (req, res) => {
     totalUsed: user.sharedReferals.length ?? 0,
     totalEarned: user.sharedReferals * 100,
   };
-  console.log(referals);
 
   res.render('user/referal', { layout: userMain, referals });
 });
@@ -20,7 +19,6 @@ export const getReferal = asyncHandler(async (req, res) => {
 export const applyReferal = asyncHandler(async (req, res) => {
   const userId = req.user._id;
   const referalToken = req.params.referalToken;
-  console.log(referalToken);
 
   if (!referalToken || referalToken.length < 9) {
     return res

@@ -99,7 +99,6 @@ export const verifyPayment = asyncHandler(async (req, res) => {
 
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, type } =
     req.body;
-  console.log(req.body);
 
   const body = razorpay_order_id + '|' + razorpay_payment_id;
   const expectedSignature = crypto
@@ -151,8 +150,6 @@ export const verifyPayment = asyncHandler(async (req, res) => {
 
   // for the order
   if (type === 'order') {
-    console.log('Here');
-
     try {
       const userId = req.user?._id;
       const { shippingAddress, paymentMethod } = req.body;
@@ -165,7 +162,6 @@ export const verifyPayment = asyncHandler(async (req, res) => {
         paymentMethod,
         'COMPLETED'
       );
-      console.log(result.orderNumber);
 
       res.status(200).json({
         success: true,
@@ -193,7 +189,6 @@ export const retryPayment = asyncHandler(async (req, res) => {
       .status(400)
       .json({ success: false, message: 'Invalid or completed transaction' });
   }
-  console.log(transaction);
 
   res.status(200).json({
     success: true,

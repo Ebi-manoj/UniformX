@@ -4,7 +4,10 @@ import {
   getContact,
   getHome,
 } from '../controllers/user_controllers/auth_user.controller.js';
-import { isUserAuthenticated } from '../middlewares/auth_middleware.js';
+import {
+  attachUserIfAuthenticated,
+  isUserAuthenticated,
+} from '../middlewares/auth_middleware.js';
 import { fetchCartLength, fetchCategories } from '../middlewares/middleware.js';
 import {
   addReview,
@@ -64,19 +67,14 @@ import {
 
 const router = express.Router();
 router.use(fetchCategories);
-
+router.use(attachUserIfAuthenticated);
 // About and contact
-router.get('/about', isUserAuthenticated, fetchCartLength, getAbout);
-router.get('/contact', isUserAuthenticated, fetchCartLength, getContact);
+router.get('/about', fetchCartLength, getAbout);
+router.get('/contact', fetchCartLength, getContact);
 
-router.get('', isUserAuthenticated, fetchCartLength, getHome);
-router.get('/products', isUserAuthenticated, fetchCartLength, listProducts);
-router.get(
-  '/product/:slug',
-  isUserAuthenticated,
-  fetchCartLength,
-  getProductDetails
-);
+router.get('', fetchCartLength, getHome);
+router.get('/products', fetchCartLength, listProducts);
+router.get('/product/:slug', fetchCartLength, getProductDetails);
 
 // Account Details
 router.get('/profile', isUserAuthenticated, fetchCartLength, fetchDetails);

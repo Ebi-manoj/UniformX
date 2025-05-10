@@ -212,11 +212,16 @@ export async function addToCart(e) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
     },
     body: JSON.stringify({ productId, quantity, size }),
   });
 
   const data = await response.json();
+  if (response.status === 401 && data.redirect) {
+    window.location.href = data.redirect;
+    return;
+  }
   if (data.success) {
     showToast(data.message, 'success');
     document.getElementById('cartText').textContent = data?.cartLength;
