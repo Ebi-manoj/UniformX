@@ -33,7 +33,7 @@ if (btnPay) {
       body: JSON.stringify({ amount }),
     });
     const data = await res.json();
-    if (!data.success) return showToast('something went wrong');
+    if (!data.success) return showToast(data.message || 'something went wrong');
 
     const options = {
       key: 'rzp_test_lRSohoS3jcGAN1',

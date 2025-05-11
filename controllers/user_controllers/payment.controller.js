@@ -18,6 +18,14 @@ export const createWalletOrder = asyncHandler(async (req, res) => {
   try {
     const amount = parseInt(req.body.amount);
     const userId = req.user._id;
+    if (amount < 1) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: 'Amount must be greater than 1rupee',
+        });
+    }
 
     const options = {
       amount: amount * 100,
