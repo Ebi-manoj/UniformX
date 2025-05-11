@@ -15,6 +15,7 @@ export const fetchWishlist = asyncHandler(async (req, res) => {
   const wishlist = await Wishlist.findOne({ userId }).populate(
     'items.productId'
   );
+
   res.render('user/wishlist', {
     layout: userMain,
     js_file: 'wishlist',
@@ -64,4 +65,31 @@ export const addToWhishlist = asyncHandler(async (req, res) => {
       .status(200)
       .json({ success: true, message: 'Added to Wishlist' });
   }
+});
+
+export const removeWishlist = asyncHandler(async (req, res) => {
+  const { productId } = req.body;
+  if (!validateId(productId)) {
+    return res.status(404).json({ success: false, message: 'No item Found' });
+  }
+  const userId = req.user._id;
+
+  const wishlist = await Wishlist.findOneAndUpdate(
+    { userId },
+    {
+      $pull: { items: { productId } },
+    },
+    { new: true }
+  );
+
+  if (!wishlist) {
+    return res
+      .status(404)
+      .json({ success: false, message: 'Wishlist not found' });
+  }
+  return res.status(200).json({
+    success: true,
+    message: 'Item removed from wishlist',
+    wishlist,
+  });
 });

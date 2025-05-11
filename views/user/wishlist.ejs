@@ -64,7 +64,7 @@
             <% wishlist.items.forEach(item => { %>
                 <div class="flex items-center border-b p-2 pb-6 wishlist-item" 
                      data-product-id="<%= item.productId._id %>" 
-                     data-product-name="<%= item.productId.name %>">
+                     data-product-name="<%= item.productId.title %>">
                     <div class="w-24 h-24 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden">
                         <img src="<%= item.productId.image_url?.[0] || '/placeholder.svg?height=80&width=80' %>" 
                              alt="<%= item.productId.title %>" 
@@ -76,7 +76,8 @@
                         <p class="text-sm text-gray-500 mt-1">
                             Added On: <%= new Date(item.addedAt).toLocaleDateString() %>
                         </p>
-                        <button class="remove-btn text-sm text-gray-500 mt-2 remove-item">
+                        <button class="remove-btn text-sm text-gray-500 mt-2 remove-item" data-product-id="<%= item.productId._id %>" 
+                            data-product-name="<%= item.productId.title %>">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -137,3 +138,22 @@
         </div>
     </div>
 </div>
+<!-- remove Modal -->
+<div id="deleteModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white text-black p-6 rounded-lg w-96 shadow-lg">
+      <h3 class="text-xl font-bold mb-4">Confirm Remove Item</h3>
+      <p class="mb-6 confirm-text">
+        Are you sure you want to Remove this Item? This action cannot be undone.
+      </p>
+      <div class="flex justify-end space-x-3">
+        <button id="cancelModal" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
+          Cancel
+        </button>
+        <form id="deleteForm">
+          <button id="confirmModal" type="button" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+            Confirm
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>

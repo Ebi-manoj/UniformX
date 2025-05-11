@@ -47,6 +47,7 @@ import { validateCartForCheckout } from '../middlewares/validatecart.js';
 import {
   addToWhishlist,
   fetchWishlist,
+  removeWishlist,
 } from '../controllers/user_controllers/wishlist.controller.js';
 import { getWallet } from '../controllers/user_controllers/wallet.controller.js';
 import {
@@ -110,12 +111,8 @@ router.delete('/cart/remove-item', isUserAuthenticated, removecartItem);
 
 // Wishlist
 router.get('/wishlist', isUserAuthenticated, fetchCartLength, fetchWishlist);
-router.post(
-  '/add-wishlist',
-  isUserAuthenticated,
-  fetchCartLength,
-  addToWhishlist
-);
+router.post('/add-wishlist', isUserAuthenticated, addToWhishlist);
+router.patch('/remove-wishlist', isUserAuthenticated, removeWishlist);
 // order
 router.get(
   '/checkout',

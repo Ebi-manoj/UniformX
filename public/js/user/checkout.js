@@ -47,7 +47,7 @@ if (btnPlaceOrder) {
     ///Fetch the Place Order
 
     try {
-      if (paymentMethod === 'COD') {
+      if (['COD', 'WALLET'].includes(paymentMethod)) {
         const res = await fetch('/place-order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

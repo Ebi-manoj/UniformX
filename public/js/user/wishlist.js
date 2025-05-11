@@ -77,32 +77,55 @@ addToCartBtn.addEventListener('click', async function () {
   }
 });
 
+// remove wishlist item
+const removeModal = document.getElementById('deleteModal');
+const cancelModal = document.getElementById('cancelModal');
+const confirmModal = document.getElementById('confirmModal');
+const confirmText = document.querySelector('.confirm-text');
+let productId;
+let productName;
+
 document.querySelectorAll('.remove-item').forEach(button => {
   button.addEventListener('click', async function () {
-    const item = this.closest('[data-product-id]');
-    const productId = item.dataset.productId;
-    const productName = item.dataset.productName;
+    productId = this.dataset.productId;
+    productName = this.dataset.productName;
+    console.log(productId);
 
-    if (confirm(`Remove ${productName} from your wishlist?`)) {
-      try {
-        const response = await fetch('/wishlist/remove', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productId }),
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          item.style.opacity = '0';
-          item.style.transition = 'opacity 0.3s ease';
-          setTimeout(() => item.remove(), 300);
-        } else {
-          alert(data.message || 'Failed to remove item');
-        }
-      } catch (error) {
-        alert('Error removing item');
-        console.error(error);
-      }
+    if (confirmText) {
+      confirmText.textContent = `Are you sure you want to Remove ${productName}? This action cannot be undone.`;
     }
+    removeModal.classList.remove('hidden');
   });
 });
+
+if (cancelModal) {
+  cancelModal.addEventListener('click', function () {
+    removeModal.classList.add('hidden');
+  });
+}
+if (confirmModal) {
+  confirmModal.addEventListener('click', async function () {
+    try {
+      const response = await fetch('/remove-wishlist', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productId }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        showToast('Item removed SuccessFully', 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        showToast(data.message || 'Failed to remove item');
+      }
+    } catch (error) {
+      showToast('Error removing item');
+      console.error(error);
+    } finally {
+      removeModal.classList.add('hidden');
+    }
+  });
+}

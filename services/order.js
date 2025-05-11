@@ -3,6 +3,8 @@ import { Cart } from '../model/cart_model.js';
 import { User } from '../model/user_model.js';
 import { Order } from '../model/order_model.js';
 import { Product } from '../model/product_model.js';
+import { Transaction } from '../model/transaction.js';
+import { Wallet } from '../model/wallet.js';
 
 const TAX_RATE = 0.05;
 const CODTHRESHOLD = 10000;
@@ -61,6 +63,28 @@ export const confirmOrder = async function ( userId, shippingAddress, paymentMet
       // Validate Cod only under 5000
       if(totalAmount>CODTHRESHOLD&&paymentMethod==='COD'){
         throw new Error(`Cash on Delivery is not available above ${CODTHRESHOLD} `)
+      }
+
+      // check wallet payment and create transaction
+
+      if(paymentMethod==='WALLET'){
+        const wallet=await Wallet.findOne({user:userId}).session(session)
+        if(!wallet||wallet.balance<totalAmount){
+          throw new Error('You dont have enough balance')
+        }
+        const transaction= new Transaction({
+          user:userId,
+          amount:totalAmount,
+          type:'DEBIT',
+          status:'SUCCESS',
+          shippingAddress,
+          paymentMethod:'WALLET'
+      })
+       await transaction.save({ session })
+        wallet.transactionHistory.push(transaction)
+        wallet.balance-=totalAmount
+        await wallet.save({ session })
+        paymentStatus='COMPLETED'
       }
         
         const orderItems = cart.products.map(item => { 
