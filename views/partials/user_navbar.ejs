@@ -1,142 +1,180 @@
 <div class="w-full bg-black text-white text-center py-2 text-sm">
-    Get 25% OFF on your first order. Order now
-  </div>
+  Get 25% OFF on your first order. Order now
+</div>
 
-  <!-- Header/Navigation -->
-  <header class="bg-white py-4 px-6 shadow-sm">
-    <div class="container mx-auto flex items-center justify-between">
-      <!-- Logo -->
-      <a href="/">
-        <div class="flex items-center">
-          <img
-            class="w-28 h-auto max-w-xs"
-            src="/images/logo.png"
-            alt="Logo"
-          />
+<!-- Header/Navigation -->
+<header class="bg-white py-4 px-6 shadow-sm">
+  <div class="container mx-auto flex items-center justify-between">
+    <!-- Logo -->
+    <a href="/">
+      <div class="flex items-center">
+        <img class="w-28 h-auto max-w-xs" src="/images/logo.png" alt="Logo" />
+      </div>
+    </a>
+
+    <!-- Navigation -->
+    <nav class="hidden md:flex space-x-6">
+      <a href="/" class="w-32 text-center text-gray-700 hover:text-gray-900">Home</a>
+      
+      <!-- Modern Category Dropdown -->
+      <div class="relative w-32 group">
+        <button class="w-full text-center text-gray-700 hover:text-gray-900 flex items-center justify-center">
+          Category
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="py-1 max-h-60 overflow-y-auto">
+            <a href="/products?categories=" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">All Categories</a>
+            <% categories.forEach(category => { %>
+              <a href="/products?categories=<%= category._id %>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"><%= category.name %></a>
+            <% }); %>
+          </div>
         </div>
-      </a>
+      </div>
+      
+      <div class="hidden" id="clubData" data-clubs='<%= JSON.stringify(clubs) %>'></div>
+      
+      <!-- Modern Club Dropdown -->
+      <div class="relative w-32 group">
+        <button class="w-full text-center text-gray-700 hover:text-gray-900 flex items-center justify-center">
+          Club
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div class="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+          <div class="py-1 max-h-60 overflow-y-auto">
+            <a href="/products?club=" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">All Clubs</a>
+            <% clubs.forEach(club => { %>
+              <a href="/products?club=<%= club._id %>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"><%= club.name %></a>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      
+      <a href="/about" class="w-32 text-center text-gray-700 hover:text-gray-900">About</a>
+      <a href="/contact" class="w-32 text-center text-gray-700 hover:text-gray-900">Contact</a>
+    </nav>
 
-      <!-- Navigation -->
-<nav class="hidden md:flex space-x-6">
-    <a href="/" class="w-32 text-center text-gray-700 hover:text-gray-900">Home</a>
-    
-    <select id="category" class="w-32 text-center text-gray-700 hover:text-gray-900">
-      <option value="">Category</option>
-      <% categories.forEach(category => { %>
-        <option value="<%= category._id %>"><%= category.name %></option>
-      <% }); %>
-    </select>
-    
-  
-    <div class="hidden" id="clubData" data-clubs='<%= JSON.stringify(clubs) %>'></div>
-  
-    <select id="club" class="w-32 text-center text-gray-700 hover:text-gray-900">
-      <option value="">Club</option>
-      <% clubs.forEach(club => { %>
-        <option value="<%= club._id %>"><%= club.name %></option>
-      <% }); %>
-    </select>
-  
-    <a href="/about" class="w-32 text-center text-gray-700 hover:text-gray-900">About</a>
-    <a href="/contact" class="w-32 text-center text-gray-700 hover:text-gray-900">Contact</a>
-  </nav>
-  
-
-      <!-- Search and Cart -->
-      <div class="flex items-center space-x-4">
-        <div class="relative">
-          <input
-            id="searchInput"
-            type="text"
-            placeholder="Search products"
-            value="<%= searchQuery %>"
-            class="pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 w-full md:w-64"
-          />
-          <button
-          id="clearButton"
-          class="absolute right-2 top-2 text-gray-500 hidden"
-        >
+    <!-- Search and Cart -->
+    <div class="flex items-center space-x-4">
+      <div class="relative">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search products"
+          value="<%= searchQuery %>"
+          class="pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 w-full md:w-64"
+        />
+        <button id="clearButton" class="absolute right-2 top-2 text-gray-500 hidden">
           ✖
         </button>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-gray-400 absolute left-3 top-2.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
-
-        <!-- Wishlist Button -->
-        <a href="/wishlist" class="text-gray-700 hover:text-gray-900">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            />
-          </svg>
-        </a>
-
-        <!-- Cart Button -->
-        <a href="/cart" class="relative text-gray-700 hover:text-gray-900">
-          <!-- Cart Icon -->
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-            />
-          </svg>
-        
-          <!-- Badge (Cart Item Count) -->
-            <span
-              id="cartText"
-              class="absolute <%= cartLength?'block':'hidden' %> -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full"
-            >
-              <%= cartLength %>
-            </span>
-         
-        </a>
-        
-         <!-- profile -->
-        <a href="/profile" class="text-gray-700 hover:text-gray-900">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-        </a>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 text-gray-400 absolute left-3 top-2.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
       </div>
+
+      <!-- Wishlist Button -->
+      <a href="/wishlist" class="text-gray-700 hover:text-gray-900">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+          />
+        </svg>
+      </a>
+
+      <!-- Cart Button -->
+      <a href="/cart" class="relative text-gray-700 hover:text-gray-900">
+        <!-- Cart Icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+          />
+        </svg>
+      
+        <!-- Badge (Cart Item Count) -->
+        <span
+          id="cartText"
+          class="absolute <%= cartLength?'block':'hidden' %> -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full"
+        >
+          <%= cartLength %>
+        </span>
+      </a>
+      
+      <!-- profile -->
+      <a href="/profile" class="text-gray-700 hover:text-gray-900">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+          />
+        </svg>
+      </a>
     </div>
-  </header>
+  </div>
+</header>
+
+<!-- Add this CSS to your stylesheet -->
+<style>
+  /* Smooth dropdown animation */
+  .group:hover .group-hover\:opacity-100 {
+    transition-delay: 150ms;
+  }
+  
+  /* Custom scrollbar for dropdowns */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+</style>

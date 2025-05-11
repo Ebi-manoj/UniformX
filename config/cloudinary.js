@@ -5,6 +5,20 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only JPEG, PNG, or WEBP image files are allowed'));
+  }
+};
+
+// Limit file size to 2MB
+const limits = {
+  fileSize: 2 * 1024 * 1024,
+};
+
 // Cloudinary Configuration
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -53,8 +67,20 @@ const profileStorage = new CloudinaryStorage({
 });
 
 // Create multer instances
-export const categoryUpload = multer({ storage: categoryStorage });
-export const productUpload = multer({ storage: productStorage });
-export const clubUpload = multer({ storage: clubStorage });
-export const profileUpload = multer({ storage: profileStorage });
+export const categoryUpload = multer({
+  storage: categoryStorage,
+  fileFilter,
+  limits,
+});
+export const productUpload = multer({
+  storage: productStorage,
+  fileFilter,
+  limits,
+});
+export const clubUpload = multer({ storage: clubStorage, fileFilter, limits });
+export const profileUpload = multer({
+  storage: profileStorage,
+  fileFilter,
+  limits,
+});
 export { cloudinary };

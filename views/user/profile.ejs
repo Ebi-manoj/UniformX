@@ -207,19 +207,27 @@
             <label class="block text-sm font-medium text-gray-300">Address</label>
             <input type="hidden" id="allAddresses" value='<%- JSON.stringify(addresses) %>'>
             <div class="flex items-center gap-2">
-                <div class="relative pl-10 border border-gray-600 rounded-lg p-2 flex-1 bg-gray-800 text-gray-300 flex items-center">
-                    <i class="fa-solid fa-location-dot absolute left-3 top-3"></i>
-                    <span id="addressSpan"><%= addresses.length ? addresses.length : "No Address set" %></span>
-                    <input type="hidden" name="addressId" id="addressId" value=''>
-                </div>
+              <div class="relative pl-10 border border-gray-600 rounded-lg p-2 flex-1 bg-gray-800 text-gray-300 flex items-center">
+                <i class="fa-solid fa-location-dot absolute left-3 top-3"></i>
+                <span id="addressSpan">
+                  <%= addresses && addresses.length ? addresses[0].name : "No Address set" %>
+                </span>
+                <input type="hidden" name="addressId" id="addressId" value=''>
+              </div>
+          
+              <% if (addresses && addresses.length) { %>
                 <select id="addressSelect" class="border border-gray-600 rounded-lg bg-gray-800 text-white p-2">
-                    <% addresses.forEach((address,index) => { %>
-                        <option value="<%= index %>"><%= address.name %></option>
-                    <% }) %>
-                    <option value="add_new">+ Add New Address</option>
+                  <% addresses.forEach((address, index) => { %>
+                    <option value="<%= index %>"><%= address.name %></option>
+                  <% }) %>
                 </select>
+              <% } else { %>
+                <a href="/profile/address"><span class="text-sm text-gray-400 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2">Add new+</span></a>
+              <% } %>
+          
             </div>
-        </div>
+          </div>
+          
        
 
         <!-- Buttons -->

@@ -169,7 +169,9 @@ export const signUpHandler = asyncHandler(async (req, res, next) => {
     return res.redirect('/auth/signup');
   }
   try {
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({
+      $or: [{ email }, { phone: mobile }],
+    });
     if (existingUser) {
       req.flash('error', 'User Already exists');
       return res.redirect('/auth/signup');

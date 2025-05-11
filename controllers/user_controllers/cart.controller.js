@@ -68,7 +68,7 @@ export const addToCart = asyncHandler(async (req, res) => {
       .status(404)
       .json({ success: false, message: 'Product out of stock' });
   }
-  if (product.maxQuantity < size) {
+  if (product.maxQuantity < quantity) {
     return res
       .status(404)
       .json({ success: false, message: 'You cant order this much quantity' });
@@ -95,7 +95,11 @@ export const addToCart = asyncHandler(async (req, res) => {
   if (existingItemIndex > -1) {
     // Update quantity of existing item
     const newQuantity = cart.products[existingItemIndex].quantity + quantity;
-
+    if (newQuantity > product.maxQuantity) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'You cant order this much quantity' });
+    }
     // Validate against stock and max quantity per order
     if (newQuantity > selectedSize.stock_quantity) {
       return res
