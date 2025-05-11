@@ -1,5 +1,34 @@
 import * as z from 'https://esm.sh/zod@3.24.2';
 
+export const signupSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, 'Name must be at least 3 characters long.')
+      .max(50, 'Name must not exceed 50 characters.'),
+
+    email: z.string().email('Enter a valid email address.'),
+
+    password: z.string().min(6, 'Password must be at least 6 characters long.'),
+
+    confirmpassword: z
+      .string()
+      .min(6, 'Confirm password must be at least 6 characters long.'),
+
+    mobile: z
+      .string()
+      .regex(/^\d{10}$/, 'Mobile number must be exactly 10 digits.'),
+  })
+  .refine(data => data.password === data.confirmpassword, {
+    path: ['confirmpassword'],
+    message: 'Passwords do not match.',
+  });
+
+export const loginSchema = z.object({
+  email: z.string().email('Enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters long.'),
+});
+
 export const couponSchema = z.object({
   code: z
     .string()

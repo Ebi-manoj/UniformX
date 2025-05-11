@@ -1,61 +1,35 @@
+import { loginSchema, signupSchema } from '../validation.js';
+
 document.addEventListener('DOMContentLoaded', function () {
-  // Email validation function
-  function validateEmail(email) {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailPattern.test(email);
+  const signupForm = document.getElementById('sign_up_form');
+  const loginForm = document.getElementById('log_in_form');
+
+  if (signupForm) {
+    validateAndSubmit(signupForm, signupSchema);
   }
-
-  // Show error message
-  function showError(message) {
-    errorMessage.textContent = message;
-    errorMessage.classList.remove('hidden');
+  if (loginForm) {
+    validateAndSubmit(loginForm, loginSchema);
   }
+  function validateAndSubmit(form, schema) {
+    form.addEventListener('submit', function (e) {
+      document
+        .querySelectorAll("span[id$='Error']")
+        .forEach(el => (el.textContent = ''));
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
 
-  const form = document.getElementById('sign_loginForm');
-  const nameInput = document.getElementById('name');
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const mobileInput = document.getElementById('mobile');
-  const errorMessage = document.querySelector('.errorMessage');
+      // Validate using Zod schema
+      const result = schema.safeParse(data);
 
-  if (form) {
-    form.addEventListener('submit', function (event) {
-      event.preventDefault();
-
-      // Reset error message
-      errorMessage.classList.add('hidden');
-      errorMessage.textContent = '';
-
-      // Get input values
-      const name = nameInput ? nameInput.value.trim() : null;
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
-      const mobile = mobileInput ? mobileInput.value.trim() : null;
-
-      // Check if it's login or signup based on available fields
-      const isSignup = nameInput !== null && mobileInput !== null;
-
-      // Validation rules for signup
-      if (isSignup) {
-        if (name.length < 3) {
-          showError('Name must be at least 3 characters long.');
-          return;
-        }
-
-        if (!/^\d{10}$/.test(mobile)) {
-          showError('Mobile number must be exactly 10 digits.');
-          return;
-        }
-      }
-
-      // Common validation for both login & signup
-      if (!validateEmail(email)) {
-        showError('Enter a valid email address.');
-        return;
-      }
-
-      if (password.length < 6) {
-        showError('Password must be at least 6 characters long.');
+      if (!result.success) {
+        result.error.errors.forEach(error => {
+          const field = error.path[0];
+          const errorElement = document.getElementById(`${field}Error`);
+          if (errorElement) {
+            errorElement.textContent = error.message;
+          }
+        });
         return;
       }
 
@@ -68,7 +42,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const resetForm = document.getElementById('reset-password');
   const newPasswordInput = document.getElementById('newPassword');
   const confirmPasswordInput = document.getElementById('confirmPassword');
-  console.log(resetForm);
 
   if (resetForm) {
     resetForm.addEventListener('submit', function (e) {
