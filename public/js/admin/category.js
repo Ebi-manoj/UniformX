@@ -30,8 +30,10 @@ const validateForm = function () {
   const isEdit = categoryForm.action.includes('edit');
   const isClubForm = categoryForm.action.includes('club');
 
-  if (!name) {
-    showToast('Name is required!', 'warning');
+  const namePattern = /^[a-zA-Z\s]{2,50}$/;
+
+  if (!name || !namePattern.test(name.trim())) {
+    showToast('Please enter a valid name (only letters and spaces)', 'warning');
     return false;
   }
 

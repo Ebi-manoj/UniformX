@@ -53,6 +53,7 @@ import {
 } from '../controllers/admin_controllers/coupon.controller.js';
 import {
   addOffer,
+  deleteOffer,
   editOffer,
   fetchAllOffers,
   fetchOffer,
@@ -143,6 +144,7 @@ router.get('/offer/:id', isProtected, fetchOffer);
 router.get('/offers/add', isProtected, getAddOffer);
 router.post('/offers/add', isProtected, addOffer);
 router.put('/offers/edit', isProtected, editOffer);
+router.delete('/offer-delete', isProtected, deleteOffer);
 
 // sales reports
 router.get('/salesreport', isProtected, getSalesReport);

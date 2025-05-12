@@ -55,7 +55,7 @@ export const addCoupons = asyncHandler(async (req, res) => {
   });
   await newCoupon.save();
   req.flash('success', 'Coupon created successfully');
-  res.redirect('/admin/coupons/create');
+  res.redirect('/admin/coupons');
 });
 
 export const getEditCoupon = asyncHandler(async (req, res) => {

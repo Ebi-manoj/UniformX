@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const resetForm = document.getElementById('reset-password');
   const newPasswordInput = document.getElementById('newPassword');
   const confirmPasswordInput = document.getElementById('confirmPassword');
+  const errorMessage = document.querySelector('.errorMessage');
 
   if (resetForm) {
     resetForm.addEventListener('submit', function (e) {
@@ -69,7 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
       resetForm.submit();
     });
   }
-
+  function showError(message) {
+    errorMessage.classList.remove('hidden');
+    errorMessage.textContent = message;
+  }
   ///////////////////////////////////////////////////////////
   ////////////OTP TIMER
   const timerElement = document.getElementById('timer');

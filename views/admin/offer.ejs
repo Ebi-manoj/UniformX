@@ -167,12 +167,15 @@
                   >
                     <i class="fas fa-edit"></i>
                 </button>
-                  <a
-                    href="/admin/offers/delete/<%= offer._id %>"
-                    class="text-gray-600 hover:text-black transition-colors duration-150 ease-in-out"
+                <form action="/admin/offer-delete" method="POST">
+                  <input type="hidden" name="_method" value="delete">
+                  <input type="hidden" name="id" value="<%= offer._id %>">
+                  <button
+                  class="text-gray-600 hover:text-black transition-colors duration-150 ease-in-out"
                   >
-                    <i class="fas fa-trash"></i>
-                  </a>
+                  <i class="fas fa-trash"></i>
+                </button>
+              </form>
                 </div>
               </td>
             </tr>

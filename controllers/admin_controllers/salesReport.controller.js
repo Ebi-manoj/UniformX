@@ -52,7 +52,14 @@ export const downloadSalesReport = asyncHandler(async (req, res) => {
       req,
     });
 
-    const browser = await puppeteer.launch({ headless: 'new' });
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath:
+        process.env.NODE_ENV === 'production'
+          ? '/usr/bin/chromium-browser'
+          : undefined,
+    });
     const page = await browser.newPage();
     const htmlContent = generateSalesReportHTML(
       data.metrics,

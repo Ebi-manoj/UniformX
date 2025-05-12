@@ -5,7 +5,8 @@ export const signupSchema = z
     name: z
       .string()
       .min(3, 'Name must be at least 3 characters long.')
-      .max(50, 'Name must not exceed 50 characters.'),
+      .max(50, 'Name must not exceed 50 characters.')
+      .regex(/^[A-Za-z ]+$/, 'Name must contain only letters and spaces'),
 
     email: z.string().email('Enter a valid email address.'),
 
@@ -70,7 +71,12 @@ export const couponSchema = z.object({
 });
 
 export const addOfferSchema = z.object({
-  name: z.string().min(3, 'Offer name must be at least 3 characters').max(50),
+  name: z
+    .string()
+    .min(3, 'Name must be at least 3 characters')
+    .max(50, 'Name must be at most 50 characters')
+    .regex(/^[A-Za-z ]+$/, 'Name must contain only letters and spaces'),
+
   type: z.enum(['product', 'category'], { message: 'Offer type is required' }),
 
   products: z.array(z.string()).optional(),

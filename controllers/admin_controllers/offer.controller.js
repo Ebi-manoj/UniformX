@@ -106,3 +106,14 @@ export const editOffer = asyncHandler(async (req, res) => {
   req.flash('success', 'Offer updated successfully');
   return res.redirect('/admin/offer-management');
 });
+
+export const deleteOffer = asyncHandler(async (req, res) => {
+  const { id } = req.body;
+  if (!validateId(id)) {
+    req.flash('error', 'Offer not Found');
+    return res.redirect('/admin/offer-management');
+  }
+  await Offer.findByIdAndDelete(id);
+  req.flash('success', 'Offer deleted successfully');
+  return res.redirect('/admin/offer-management');
+});

@@ -408,8 +408,13 @@ function validateAddProductForm() {
   const sizes = sizesContainer.querySelectorAll('.size-input');
   const stockQuantities = sizesContainer.querySelectorAll('.stock-input');
 
-  if (!title) {
-    showToast('Title is required!', 'warning');
+  const namePattern = /^[a-zA-Z\s]{2,50}$/;
+
+  if (!title || !namePattern.test(title.trim())) {
+    showToast(
+      'Please enter a valid title (only letters and spaces)',
+      'warning'
+    );
     return false;
   }
 
