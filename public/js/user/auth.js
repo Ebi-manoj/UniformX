@@ -80,12 +80,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const resendBtn = document.getElementById('resend-btn');
 
   if (timerElement && resendBtn) {
-    const expiresAt = new Date(timerElement.dataset.expiryTime).getTime(); // Convert to milliseconds
+    let timeLeft = parseInt(timerElement.dataset.remainingSeconds, 10);
 
     const updateTimer = () => {
-      const currentTime = Date.now(); // Get current time
-      let timeLeft = Math.floor((expiresAt - currentTime) / 1000); // Remaining time in seconds
-
       if (timeLeft <= 0) {
         timerElement.textContent = 'Expired';
         resendBtn.disabled = false;
@@ -95,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
         timerElement.textContent = `${minutes}:${
           seconds < 10 ? '0' : ''
         }${seconds}`;
+        timeLeft--;
         setTimeout(updateTimer, 1000);
       }
     };

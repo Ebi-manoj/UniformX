@@ -6,9 +6,8 @@
             
             <!-- Timer -->
             <div class="mt-4">
-                <span id="timer" class="text-gray-500 font-medium" data-expiry-time="<%= expiresAt %>">02:00</span>
+                <span id="timer" class="text-gray-500 font-medium"  data-remaining-seconds="<%= remainingSeconds %>">02:00</span>
             </div>
-            
         </div>
         <form action="/auth/verify-otp?purpose=<%= purpose %>" method="post">
         <div class="mb-6">

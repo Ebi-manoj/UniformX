@@ -151,10 +151,16 @@ export const getVerifyOTP = asyncHandler(async (req, res) => {
     );
   }
 
+  const currentTime = new Date();
+  const remainingSeconds = Math.max(
+    Math.floor((otpEntry.expiresAt - currentTime) / 1000),
+    0
+  );
+
   res.render('auth/otp', {
     layout: userLogin,
     js_file: 'auth',
-    expiresAt: otpEntry.expiresAt,
+    remainingSeconds,
     purpose,
   });
 });

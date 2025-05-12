@@ -10,7 +10,7 @@ export const getReferal = asyncHandler(async (req, res) => {
   const referals = {
     referalToken: user.referalToken,
     totalUsed: user.sharedReferals.length ?? 0,
-    totalEarned: user.sharedReferals * 100,
+    totalEarned: user.sharedReferals.length * 100 ?? 0,
   };
 
   res.render('user/referal', { layout: userMain, referals });
