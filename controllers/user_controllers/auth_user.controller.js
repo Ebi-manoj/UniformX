@@ -473,11 +473,13 @@ passport.use(
         });
 
         if (!user) {
+          const referalToken = await generateReferralToken();
           user = new User({
             full_name: profile.displayName,
             email: profile.emails[0].value,
             googleId: profile.id,
             phone: profile.id,
+            referalToken,
           });
 
           await user.save();
