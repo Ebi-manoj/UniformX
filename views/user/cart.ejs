@@ -1,18 +1,18 @@
 <div class="bg-white min-h-screen flex w-full justify-center">
   <!-- Main Content -->
-  <main id="cart-section" class="max-w-7xl py-8 px-6 pr-20 w-[100%]">
-    <div class="flex flex-col w-[100%] lg:flex-row gap-8">
+  <main id="cart-section" class="max-w-7xl py-8 px-4 sm:px-6 w-full">
+    <div class="flex flex-col w-full lg:flex-row gap-4 sm:gap-8">
       <!-- Cart Items -->
       <div class="flex-1">
         <h2 class="text-lg font-medium mb-6">Your cart</h2>
         <div id="item-box" class="space-y-6">
           <% if (!cart || cart?.products?.length === 0) { %>
             <!-- Modern Empty Cart Message -->
-            <div class="flex flex-col items-center justify-center text-center p-10 bg-gray-100 rounded-lg">
-              <img src="/images/empty-cart.svg" alt="Empty Cart" class="w-32 h-32 mb-4 opacity-70" />
-              <h2 class="text-xl font-semibold text-gray-700">Your cart is empty</h2>
-              <p class="text-gray-500 mt-2">Looks like you haven't added anything yet.</p>
-              <a href="/products" class="mt-4 px-6 py-2 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition">
+            <div class="flex flex-col items-center justify-center text-center p-6 sm:p-10 bg-gray-100 rounded-lg">
+              <img src="/images/empty-cart.svg" alt="Empty Cart" class="w-24 sm:w-32 h-24 sm:h-32 mb-4 opacity-70" />
+              <h2 class="text-lg sm:text-xl font-semibold text-gray-700">Your cart is empty</h2>
+              <p class="text-gray-500 mt-2 text-sm sm:text-base">Looks like you haven't added anything yet.</p>
+              <a href="/products" class="mt-4 px-4 sm:px-6 py-2 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition">
                 Continue Shopping
               </a>
             </div>
@@ -24,9 +24,9 @@
               const isOutOfStock = stockQuantity <= 0;
               const isAtMaxStock = product.quantity >= stockQuantity;
             %>
-              <div class="flex items-center border-b pb-6">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center border-b pb-6 gap-4 sm:gap-0">
                 <!-- Product Image -->
-                <div class="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                <div class="w-16 sm:w-20 h-16 sm:h-20 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
                   <img
                     src="<%= product.productId.image_url[0] || '/placeholder.svg?height=80&width=80' %>"
                     alt="<%= product.productId.name %>"
@@ -34,43 +34,41 @@
                   />
                 </div>
         
-                
-              <!-- Product Details -->
-              <div class="ml-4 flex-1">
-                <h3 class="font-medium"><%= product.productId.title %></h3>
-                <div class="flex items-center mt-1 text-sm text-gray-500">
-                  <span>Color:</span>
-                  <span class="ml-1 w-3 h-3 rounded-full" style="background-color: <%= product.productId.color %>"></span>
-                  <span class="ml-3">Size:</span>
-                  <span class="ml-1"><%= product.size %></span>
-                  <% if (product.productId.is_deleted || !product.productId.category_id.isActive || !product.productId.club_id.isActive) { %>
-                    <span class="ml-3 text-red-600 font-medium">(Currently unavailable)</span>
-                  <% } else { %>
-                    <% if (stockQuantity > 10) { %>
-                      <span class="ml-3 text-green-600 font-medium">(In Stock)</span>
-                    <% } else if (stockQuantity > 0 && stockQuantity <= 10) { %>
-                      <span class="ml-3 text-yellow-500 font-medium">(Only a few left!)</span>
+                <!-- Product Details -->
+                <div class="ml-0 sm:ml-4 flex-1">
+                  <h3 class="font-medium text-sm sm:text-base"><%= product.productId.title %></h3>
+                  <div class="flex flex-wrap items-center mt-1 text-xs sm:text-sm text-gray-500 gap-x-3 gap-y-1">
+                    <span>Color:</span>
+                    <span class="ml-1 w-3 h-3 rounded-full" style="background-color: <%= product.productId.color %>"></span>
+                    <span class="ml-3">Size:</span>
+                    <span class="ml-1"><%= product.size %></span>
+                    <% if (product.productId.is_deleted || !product.productId.category_id.isActive || !product.productId.club_id.isActive) { %>
+                      <span class="ml-3 text-red-600 font-medium">(Currently unavailable)</span>
                     <% } else { %>
-                      <span class="ml-3 text-red-500 font-medium">(Out of Stock)</span>
+                      <% if (stockQuantity > 10) { %>
+                        <span class="ml-3 text-green-600 font-medium">(In Stock)</span>
+                      <% } else if (stockQuantity > 0 && stockQuantity <= 10) { %>
+                        <span class="ml-3 text-yellow-500 font-medium">(Only a few left!)</span>
+                      <% } else { %>
+                        <span class="ml-3 text-red-500 font-medium">(Out of Stock)</span>
+                      <% } %>
                     <% } %>
-                  <% } %>
-                  
+                  </div>
                 </div>
-              </div>
         
                 <!-- Price & Quantity Controls -->
-                <div class="flex items-center">
-                  <span class="mr-6 font-medium">₹<%= product.productId.price.toFixed(2) %></span>
+                <div class="flex items-center mt-4 sm:mt-0">
+                  <span class="mr-4 sm:mr-6 font-medium text-sm sm:text-base">₹<%= product.productId.price.toFixed(2) %></span>
         
                   <div class="flex items-center border rounded-md quantity">
-                    <button class="btn-decrement px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity"  data-product-id="<%= product.productId._id %>" data-action="decrease">−</button>
-                    <span data-size="<%= product.size %>"  class=" px-2 py-1"><%= product.quantity %></span>
-                    <button class="btn-increment px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity" data-quantity="<%= stockQuantity %>" data-max-quantity="<%= product.productId.maxQuantity %>" data-product-id="<%= product.productId._id %>" data-action="increase">+</button>
+                    <button class="btn-decrement px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity text-sm" data-product-id="<%= product.productId._id %>" data-action="decrease">−</button>
+                    <span data-size="<%= product.size %>" class="px-2 py-1 text-sm"><%= product.quantity %></span>
+                    <button class="btn-increment px-2 py-1 text-gray-500 hover:text-gray-700 update-quantity text-sm" data-quantity="<%= stockQuantity %>" data-max-quantity="<%= product.productId.maxQuantity %>" data-product-id="<%= product.productId._id %>" data-action="increase">+</button>
                   </div>
         
                   <!-- Remove Button -->
-                  <button class="ml-6 text-gray-400 hover:text-gray-600 remove-item" data-size="<%= product.size %>" data-product-id="<%= product.productId._id %>">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <button class="ml-4 sm:ml-6 text-gray-400 hover:text-gray-600 remove-item" data-size="<%= product.size %>" data-product-id="<%= product.productId._id %>">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
                   </button>
@@ -83,46 +81,46 @@
       </div>
 
       <!-- Order Summary -->
-      <div class="w-full lg:w-80 <%= !cart|| cart.products.length === 0?'hidden':'block' %>">
+      <div class="w-full sm:w-72 lg:w-80 <%= !cart|| cart.products.length === 0?'hidden':'block' %>">
         <h2 class="text-lg font-medium mb-6">Order Summary</h2>
 
-        <div class="bg-white rounded-lg shadow-sm p-6">
+        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6">
           <div class="space-y-4">
             <div class="flex justify-between">
-              <span class="text-gray-600">Subtotal</span>
-              <span class="font-medium subTotal">₹ <%= cart?.totalPrice %></span>
+              <span class="text-gray-600 text-sm sm:text-base">Subtotal</span>
+              <span class="font-medium subTotal text-sm sm:text-base">₹ <%= cart?.totalPrice %></span>
             </div>
 
             <div class="flex justify-between">
-              <span class="text-gray-600">Total discount</span>
-              <span class="font-medium text-green-600 discountPrice">-₹<%= cart?.discountPrice %></span>
+              <span class="text-gray-600 text-sm sm:text-base">Total discount</span>
+              <span class="font-medium text-green-600 discountPrice text-sm sm:text-base">-₹<%= cart?.discountPrice %></span>
             </div>
             <% if (cart.totalOfferDiscount) { %>
               <div class="flex justify-between">
-                <span class="text-gray-600">Offer applied</span>
-                <span class="font-medium text-green-600 offerApplied">-₹<%= cart?.totalOfferDiscount %></span>
+                <span class="text-gray-600 text-sm sm:text-base">Offer applied</span>
+                <span class="font-medium text-green-600 offerApplied text-sm sm:text-base">-₹<%= cart?.totalOfferDiscount %></span>
               </div>
              
             <% } %>
             
             <div class="flex justify-between">
-              <span class="text-gray-600">Shipping</span>
-              <span class="font-medium text-green-600">Free</span>
+              <span class="text-gray-600 text-sm sm:text-base">Shipping</span>
+              <span class="font-medium text-green-600 text-sm sm:text-base">Free</span>
             </div>
 
             <div class="flex justify-between">
-              <span class="text-gray-600">Tax</span>
-              <span class="font-medium tax">₹ <%= taxAmount.toFixed(2) %></span>
+              <span class="text-gray-600 text-sm sm:text-base">Tax</span>
+              <span class="font-medium tax text-sm sm:text-base">₹ <%= taxAmount.toFixed(2) %></span>
             </div>
 
             <div class="border-t pt-4 flex justify-between">
-              <span class="font-medium">Total</span>
-              <span class="font-medium total">₹ <%= finalPrice %></span>
+              <span class="font-medium text-sm sm:text-base">Total</span>
+              <span class="font-medium total text-sm sm:text-base">₹ <%= finalPrice %></span>
             </div>
           </div>
           <a href="/checkout">
           <button
-          class="w-full mt-6 py-3 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition-colors"
+          class="w-full mt-6 py-2 sm:py-3 bg-gray-900 text-white font-medium rounded-md hover:bg-gray-800 transition-colors text-sm sm:text-base"
         >
           Checkout
         </button>
@@ -132,7 +130,7 @@
           <div class="mt-4 text-center">
             <a
               href="/products"
-              class="text-sm text-gray-600 hover:text-gray-900 hover:underline"
+              class="text-xs sm:text-sm text-gray-600 hover:text-gray-900 hover:underline"
               >Continue Shopping</a
             >
           </div>
@@ -143,22 +141,21 @@
   </main>
 </div>
 
-<!-- ///////////////////////////////// -->
 <!-- Delete Confirmation Modal -->
 <div
   id="deleteModal"
   class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden"
 >
-  <div class="bg-white text-black p-6 rounded-lg w-96 shadow-lg">
-    <h3 class="text-xl font-bold mb-4">Confirm Deletion</h3>
-    <p class="mb-6">
+  <div class="bg-white text-black p-4 sm:p-6 rounded-lg w-11/12 sm:w-96 shadow-lg">
+    <h3 class="text-lg sm:text-xl font-bold mb-4">Confirm Deletion</h3>
+    <p class="mb-4 sm:mb-6 text-sm sm:text-base">
       Are you sure you want to remove? This action
       cannot be undone.
     </p>
-    <div class="flex justify-end space-x-3">
+    <div class="flex justify-end space-x-2 sm:space-x-3">
       <button
         id="cancelDelete"
-        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
+        class="px-3 sm:px-4 py-1 sm:py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 text-sm sm:text-base"
       >
         Cancel
       </button>
@@ -168,7 +165,7 @@
         <input type="hidden" id="input-size" name="size" />
         <button
           type="submit"
-          class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          class="px-3 sm:px-4 py-1 sm:py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm sm:text-base"
         >
           Remove
         </button>

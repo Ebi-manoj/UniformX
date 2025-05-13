@@ -1,6 +1,12 @@
-<aside class="w-80 px-10 h-screen  bg-white">
+<aside id="sidebar" class="relative top-0 left-0 w-full h-full bg-white z-20 transform -translate-x-full transition-transform duration-300 md:static md:w-80 md:h-screen md:translate-x-0 hidden md:block">
     <nav class="p-4 py-8 h-full overflow-y-auto">
-        <ul class="space-y-4">
+        <!-- Close Button (Mobile) -->
+        <button id="closeSidebar" class="md:hidden absolute top-4 right-4 text-gray-700 hover:text-gray-900">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <ul class="space-y-4 ml-10">
             <li>
                 <a href="/profile" class="flex items-center py-2 px-3 text-sm rounded-md hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -19,7 +25,10 @@
             </li>
             <li>
                 <a href="/wallet" class="flex items-center py-2 px-3 text-sm rounded-md hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet mr-2 h-4 w-4"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet mr-2 h-4 w-4">
+                        <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
+                        <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
+                    </svg>
                     Wallet
                 </a>
             </li>
@@ -40,16 +49,14 @@
                     Password
                 </a>
             </li>
-
             <li>
                 <a href="/referal" class="flex items-center py-2 px-3 text-sm rounded-md hover:bg-gray-100">
-                    <svg xmlns="http://www.w3.org/2000/svg"  class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                      </svg>
+                    </svg>
                     Refer & Earn
                 </a>
             </li>
-            
             <li>
                 <a href="/auth/logout" class="flex items-center py-2 px-3 text-sm rounded-md hover:bg-gray-100">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -76,3 +83,35 @@
         />
         <% } %>
 </aside>
+
+<!-- CSS for Sidebar -->
+<style>
+    /* Mobile sidebar transition */
+    #sidebar.active {
+        transform: translateX(0);
+    }
+</style>
+
+<!-- JavaScript for Sidebar Toggle -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.getElementById('sidebar');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        // Function to toggle sidebar
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar event
+        if (closeSidebar) {
+            closeSidebar.addEventListener('click', toggleSidebar);
+        }
+
+        // Expose toggle function to global scope for hamburger button
+        window.toggleSidebar = toggleSidebar;
+
+        // Debugging: Log if sidebar script is loaded
+        console.log('Sidebar script loaded');
+    });
+</script>

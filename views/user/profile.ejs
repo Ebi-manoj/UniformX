@@ -1,8 +1,14 @@
 <div class="bg-white min-h-screen flex relative">
+    <!-- Hamburger Menu (Mobile) -->
+    <button id="hamburgerButton" class="md:hidden fixed top-4 left-4 z-50 text-gray-700 hover:text-gray-900 focus:outline-none">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
     <!-- Sidebar Navigation -->
     <%- include('../partials/profile_sidebar') %> 
     <!-- Main Content -->
-    <main id="profile" class=" flex w-[80%]  py-0 px-6">
+    <main id="profile" class="flex w-full md:w-[80%] py-0 px-4 sm:px-6">
         <div class="w-full bg-white rounded-xl shadow-lg overflow-hidden">
             <!-- Header with profile image -->
             <div class="relative h-32 bg-cyan-50">
@@ -30,8 +36,7 @@
                         <form action="/upload-profile" id="uploadProfilePicForm" method="post" class="hidden" enctype="multipart/form-data">
                             <input type="file" id="profile-pic-input" name="image" accept="image/*" />
                             <button type="submit">Upload</button>
-                          </form>
-                          <!-- ............ -->
+                        </form>
                     </div>
                 </div>
             </div>
@@ -133,7 +138,6 @@
                               <% } else { %>
                                 <p class="text-xs text-gray-500">No default address set.</p>
                               <% } %>
-                              
                         </div>
                     </div>
                 </div>
@@ -162,8 +166,8 @@
     </main>
 </div>
 
- <!-- Edit Profile Modal -->
-<div id="editProfileModal" class="fixed inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center hidden">
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="fixed inset-0 bg-gray-300 bg-opacity-50 flex items-center justify-center hidden z-50">
     <div class="bg-gray-900 text-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative animate-fadeIn">
         <!-- Close Button -->
         <button id="btn-close" class="absolute top-3 right-3 text-gray-400 hover:text-white">
@@ -174,67 +178,75 @@
         <h2 class="text-2xl font-semibold flex items-center mb-6">
             <i class="fa-solid fa-pen-to-square"></i> Edit Profile
         </h2>
-         <form action="/edit-profile" method="post">
-        <!-- Full Name -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300">Full Name</label>
-            <div class="relative">
-                <i class="fa-solid fa-user  absolute left-3 top-3"></i>
-                <input required type="text" id="fullName" name="full_name" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.full_name %>">
+        <form action="/edit-profile" method="post">
+            <!-- Full Name -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300">Full Name</label>
+                <div class="relative">
+                    <i class="fa-solid fa-user absolute left-3 top-3"></i>
+                    <input required type="text" id="fullName" name="full_name" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.full_name %>">
+                </div>
             </div>
-        </div>
 
-        <!-- Email -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300">Email</label>
-            <div class="relative">
-                <i class="fa-solid fa-envelope absolute left-3 top-3"></i>
-                <input required type="email" id="email" name="email" class= "w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.email %>">
+            <!-- Email -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300">Email</label>
+                <div class="relative">
+                    <i class="fa-solid fa-envelope absolute left-3 top-3"></i>
+                    <input required type="email" id="email" name="email" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.email %>">
+                </div>
             </div>
-        </div>
 
-        <!-- Mobile -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300">Mobile</label>
-            <div class="relative">
-                <i class="fa-solid fa-phone absolute left-3 top-3"></i>
-                <input required name="phone" type="text" id="mobile" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.phone %>">
+            <!-- Mobile -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300">Mobile</label>
+                <div class="relative">
+                    <i class="fa-solid fa-phone absolute left-3 top-3"></i>
+                    <input required name="phone" type="text" id="mobile" class="w-full border border-gray-600 rounded-lg bg-gray-800 text-white p-2 pl-10" value="<%= user.phone %>">
+                </div>
             </div>
-        </div>
 
-        <!-- Address -->
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-300">Address</label>
-            <input type="hidden" id="allAddresses" value='<%- JSON.stringify(addresses) %>'>
-            <div class="flex items-center gap-2">
-              <div class="relative pl-10 border border-gray-600 rounded-lg p-2 flex-1 bg-gray-800 text-gray-300 flex items-center">
-                <i class="fa-solid fa-location-dot absolute left-3 top-3"></i>
-                <span id="addressSpan">
-                  <%= addresses && addresses.length ? addresses[0].name : "No Address set" %>
-                </span>
-                <input type="hidden" name="addressId" id="addressId" value=''>
-              </div>
-          
-              <% if (addresses && addresses.length) { %>
-                <select id="addressSelect" class="border border-gray-600 rounded-lg bg-gray-800 text-white p-2">
-                  <% addresses.forEach((address, index) => { %>
-                    <option value="<%= index %>"><%= address.name %></option>
-                  <% }) %>
-                </select>
-              <% } else { %>
-                <a href="/profile/address"><span class="text-sm text-gray-400 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2">Add new+</span></a>
-              <% } %>
-          
+            <!-- Address -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300">Address</label>
+                <input type="hidden" id="allAddresses" value='<%- JSON.stringify(addresses) %>'>
+                <div class="flex items-center gap-2">
+                    <div class="relative pl-10 border border-gray-600 rounded-lg p-2 flex-1 bg-gray-800 text-gray-300 flex items-center">
+                        <i class="fa-solid fa-location-dot absolute left-3 top-3"></i>
+                        <span id="addressSpan">
+                            <%= addresses && addresses.length ? addresses[0].name : "No Address set" %>
+                        </span>
+                        <input type="hidden" name="addressId" id="addressId" value=''>
+                    </div>
+                    <% if (addresses && addresses.length) { %>
+                        <select id="addressSelect" class="border border-gray-600 rounded-lg bg-gray-800 text-white p-2">
+                            <% addresses.forEach((address, index) => { %>
+                                <option value="<%= index %>"><%= address.name %></option>
+                            <% }) %>
+                        </select>
+                    <% } else { %>
+                        <a href="/profile/address"><span class="text-sm text-gray-400 bg-gray-800 border border-gray-600 rounded-lg px-3 py-2">Add new+</span></a>
+                    <% } %>
+                </div>
             </div>
-          </div>
-          
-       
 
-        <!-- Buttons -->
-        <div class="flex justify-end mt-6">
-            <button id="cancel-btn" type="button" class="px-4 py-2 border border-cyan-100 text-white rounded-lg mr-2 hover:bg-gray-600 transition">Cancel</button>
-            <button id="save-btn" class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-0 transition">Save</button>
-        </div>
+            <!-- Buttons -->
+            <div class="flex justify-end mt-6">
+                <button id="cancel-btn" type="button" class="px-4 py-2 border border-cyan-100 text-white rounded-lg mr-2 hover:bg-gray-600 transition">Cancel</button>
+                <button id="save-btn" class="px-4 py-2 bg-white text-black rounded-lg hover:bg-gray-0 transition">Save</button>
+            </div>
         </form>
     </div>
 </div>
+
+<!-- JavaScript for Hamburger Menu -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const hamburgerButton = document.getElementById('hamburgerButton');
+        if (hamburgerButton) {
+            hamburgerButton.addEventListener('click', () => {
+                window.toggleSidebar();
+            });
+        }
+    });
+</script>

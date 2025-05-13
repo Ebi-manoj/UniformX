@@ -7,8 +7,8 @@
   <div class="container mx-auto flex items-center justify-between">
     <!-- Logo -->
     <a href="/">
-      <div class="flex items-center">
-        <img class="w-28 h-auto max-w-xs" src="/images/logo.png" alt="Logo" />
+      <div class="flex items-center mr-4 md:mr-0">
+        <img class="w-24 md:w-28 h-auto max-w-xs" src="/images/logo.png" alt="Logo" />
       </div>
     </a>
 
@@ -66,14 +66,14 @@
           type="text"
           placeholder="Search products"
           value="<%= searchQuery %>"
-          class="pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 w-full md:w-64"
+          class="pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 w-28 md:w-64 text-ellipsis"
         />
         <button id="clearButton" class="absolute right-2 top-2 text-gray-500 hidden">
           ✖
         </button>
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 text-gray-400 absolute left-3 top-2.5"
+          class="h-5 w-4 md:w-5 text-gray-400 absolute left-3 top-2.5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
