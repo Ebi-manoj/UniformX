@@ -347,9 +347,8 @@ export const downloadInvoice = asyncHandler(async (req, res) => {
   } catch (err) {
     console.error('Error generating invoice:', err);
     if (!res.headersSent) {
-      return res
-        .status(500)
-        .json({ success: false, message: 'Failed to generate invoice' });
+      req.flash('error', 'Failed to generate invoice');
+      return res.redirect('/orders');
     }
   }
 });
