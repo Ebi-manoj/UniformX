@@ -48,7 +48,7 @@ This is my first fully functional **eCommerce web application** built using **No
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/ecommerce-app.git
+git clone https://github.com/Ebi-manoj/ecommerce-app.git
 cd ecommerce-app
 
 ```
